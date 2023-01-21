@@ -1,0 +1,53 @@
+/** ========================== FE ================================= */
+export type Tenant = {
+  id: string;
+  logo: string | null;
+  tenantId: string;
+  name: string;
+  subdomain: string | null;
+  description: string | null;
+  createdAt: string | Date;
+};
+
+export type GetTenantListData = {
+  items: Tenant[];
+  totalItems: number;
+  itemPerPage: number;
+};
+
+export type GetTenantListParams = {
+  page?: number;
+  limit?: number;
+  tenantId?: string;
+  name?: string;
+};
+
+/** ========================== BE ================================= */
+
+// Tenants
+export type GetTenantListServiceParams = {
+  page: number;
+  limit: number;
+  name: string;
+  tenantId: string | undefined;
+};
+
+export type GetTenantListServiceProps = {
+  params: GetTenantListServiceParams;
+};
+
+export type CreateTenantServiceProps = {
+  name: string;
+  tenantId: string;
+  description: string;
+  logo: string;
+  subdomain: string;
+};
+
+export type UpdateTenantInfoByIdServiceProps = {
+  name?: string;
+  tenantId?: string;
+  description?: string;
+  logo?: string;
+  subdomain?: string;
+};
