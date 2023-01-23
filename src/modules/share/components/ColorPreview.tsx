@@ -4,7 +4,7 @@ import { Box, BoxProps, Typography } from '@mui/material';
 
 // ----------------------------------------------------------------------
 
-const RootStyle = styled(Box)(({ theme }) => ({
+const RootStyle = styled(Box)(() => ({
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'flex-end',

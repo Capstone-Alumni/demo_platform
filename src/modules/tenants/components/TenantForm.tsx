@@ -18,6 +18,8 @@ import useYupValidateionResolver from 'src/modules/share/utils/useYupValidationR
 import { Tenant } from '../types';
 
 export type TenantFormValues = {
+  email: string;
+  password: string;
   tenantId: string;
   name: string;
   subdomain: string;
@@ -27,6 +29,8 @@ export type TenantFormValues = {
 const MAINAPP_DOMAIN = '.vercel.app';
 
 const validationSchema = yup.object({
+  email: yup.string().required(),
+  password: yup.string().required(),
   tenantId: yup.string().required(),
   name: yup.string().required(),
   subdomain: yup.string().required(),
@@ -40,7 +44,7 @@ const TenantForm = ({
 }: {
   initialData?: Tenant;
   onClose?: () => void;
-  onSubmit: (values: TenantFormValues) => void;
+  onSubmit: (values: TenantFormValues) => Promise<void>;
 }) => {
   const theme = useTheme();
   const [submitting, setSubmitting] = useState(false);
@@ -84,6 +88,20 @@ const TenantForm = ({
           {initialData ? 'Edit tenant information' : 'Add new tenant'}
         </Typography>
       </Box>
+
+      <Controller
+        control={control}
+        name="email"
+        render={({ field }) => <TextField fullWidth label="email" {...field} />}
+      />
+
+      <Controller
+        control={control}
+        name="password"
+        render={({ field }) => (
+          <TextField fullWidth label="password" {...field} />
+        )}
+      />
 
       <Controller
         control={control}

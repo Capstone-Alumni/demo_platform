@@ -3,17 +3,17 @@ import { PrismaClient } from '@prisma/client';
 
 const globalForPrisma = global as unknown as {
   prisma: PrismaClient;
-  mainappPrisma: PrismaClient;
+  mainAppPrisma: PrismaClient;
 };
 
 export const prisma =
   globalForPrisma.prisma ||
   new PrismaClient({
-    log: ['query'],
+    log: ['query', 'error'],
   });
 
-export const mainappPrisma =
-  globalForPrisma.mainappPrisma ||
+export const mainAppPrisma =
+  globalForPrisma.mainAppPrisma ||
   new PrismaClient({
     datasources: {
       db: {
@@ -24,5 +24,5 @@ export const mainappPrisma =
 
 if (process.env.NODE_ENV !== 'production') {
   globalForPrisma.prisma = prisma;
-  globalForPrisma.mainappPrisma = mainappPrisma;
+  globalForPrisma.mainAppPrisma = mainAppPrisma;
 }

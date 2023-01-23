@@ -1,3 +1,4 @@
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const prettierConfig = require('./.prettierrc.js');
 
 module.exports = {
@@ -24,6 +25,11 @@ module.exports = {
     sourceType: 'module',
   },
   plugins: ['react'],
+  ignorePatterns: [
+    'src/modules/share/components/@material-extend/*',
+    'src/modules/share/components/animate/*',
+    'src/lib/mui/*',
+  ],
   rules: {
     // Possible errors
     'no-console': 'warn',

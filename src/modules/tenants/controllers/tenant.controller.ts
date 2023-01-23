@@ -8,27 +8,20 @@ export default class TenantController {
     req: NextApiRequest,
     res: NextApiResponse<ApiSuccessResponse | ApiErrorResponse>,
   ) => {
-    try {
-      const { page, limit, tenantId, name } = req.query;
-      const tenantListData = await TenantService.getList({
-        params: {
-          page: page ? parseInt(page as string, 10) : 1,
-          limit: limit ? parseInt(limit as string, 10) : 20,
-          tenantId: tenantId ? (tenantId as string) : '',
-          name: name ? (name as string) : '',
-        },
-      });
+    const { page, limit, tenantId, name } = req.query;
+    const tenantListData = await TenantService.getList({
+      params: {
+        page: page ? parseInt(page as string, 10) : 1,
+        limit: limit ? parseInt(limit as string, 10) : 20,
+        tenantId: tenantId ? (tenantId as string) : '',
+        name: name ? (name as string) : '',
+      },
+    });
 
-      return res.status(200).json({
-        status: true,
-        data: tenantListData,
-      });
-    } catch (error: any) {
-      return res.status(500).json({
-        status: false,
-        message: error as string,
-      });
-    }
+    return res.status(200).json({
+      status: true,
+      data: tenantListData,
+    });
   };
 
   static create = async (
@@ -43,7 +36,7 @@ export default class TenantController {
         status: true,
         data: newTenant,
       });
-    } catch (error: any) {
+    } catch (error) {
       if (error.message?.includes('existed')) {
         if (error.message?.includes('tenantId')) {
           return res.status(400).json({
@@ -67,10 +60,7 @@ export default class TenantController {
         });
       }
 
-      return res.status(500).json({
-        status: false,
-        message: error as string,
-      });
+      throw error;
     }
   };
 
@@ -78,61 +68,39 @@ export default class TenantController {
     req: NextApiRequest,
     res: NextApiResponse<ApiSuccessResponse | ApiErrorResponse>,
   ) => {
-    try {
-      const { id } = req.query;
-      const tenant = await TenantService.getById(id as string);
+    const { id } = req.query;
+    const tenant = await TenantService.getById(id as string);
 
-      return res.status(200).json({
-        status: true,
-        data: tenant,
-      });
-    } catch (error: any) {
-      return res.status(500).json({
-        status: false,
-        message: error as string,
-      });
-    }
+    return res.status(200).json({
+      status: true,
+      data: tenant,
+    });
   };
 
   static getBySubdomain = async (
     req: NextApiRequest,
     res: NextApiResponse<ApiSuccessResponse | ApiErrorResponse>,
   ) => {
-    try {
-      const { subdomain } = req.query;
-      console.log('get subdomain', subdomain);
-      const tenant = await TenantService.getBySubdomain(subdomain as string);
+    const { subdomain } = req.query;
+    const tenant = await TenantService.getBySubdomain(subdomain as string);
 
-      return res.status(200).json({
-        status: true,
-        data: tenant,
-      });
-    } catch (error: any) {
-      return res.status(500).json({
-        status: false,
-        message: error as string,
-      });
-    }
+    return res.status(200).json({
+      status: true,
+      data: tenant,
+    });
   };
 
   static updateInfoById = async (
     req: NextApiRequest,
     res: NextApiResponse<ApiSuccessResponse | ApiErrorResponse>,
   ) => {
-    try {
-      const { id } = req.query;
-      const Tenant = await TenantService.updateInfoById(id as string, req.body);
+    const { id } = req.query;
+    const Tenant = await TenantService.updateInfoById(id as string, req.body);
 
-      return res.status(200).json({
-        status: true,
-        data: Tenant,
-      });
-    } catch (error: any) {
-      return res.status(500).json({
-        status: false,
-        message: error as string,
-      });
-    }
+    return res.status(200).json({
+      status: true,
+      data: Tenant,
+    });
   };
 
   static deleteById = async (
@@ -147,7 +115,7 @@ export default class TenantController {
         status: true,
         data: tenant,
       });
-    } catch (error: any) {
+    } catch (error) {
       if (error.message?.includes('existed')) {
         return res.status(403).json({
           status: false,
@@ -155,10 +123,7 @@ export default class TenantController {
         });
       }
 
-      return res.status(500).json({
-        status: false,
-        message: error as string,
-      });
+      throw error;
     }
   };
 }

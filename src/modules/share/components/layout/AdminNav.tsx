@@ -10,6 +10,7 @@ import {
   Typography,
   useTheme,
 } from '@mui/material';
+import { User } from 'next-auth';
 import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
 
@@ -128,7 +129,7 @@ const StyledAccountWrapper = styled(Box)(({ theme }) => ({
 }));
 
 const generateNavItems = (
-  role: 'ALUMNI' | 'CLASS_MOD' | 'GRADE_MOD' | 'SCHOOL_ADMIN',
+  role?: 'ALUMNI' | 'CLASS_MOD' | 'GRADE_MOD' | 'SCHOOL_ADMIN' | string,
 ) => {
   switch (role) {
     case 'ALUMNI':
@@ -145,10 +146,12 @@ const generateNavItems = (
         GRADE_NAV_ITEM,
         USER_NAV_ITEM,
       ];
+    default:
+      return [];
   }
 };
 
-const AdminNav = ({ user }: { user?: any }) => {
+const AdminNav = ({ user }: { user?: User }) => {
   const theme = useTheme();
   const pathname = usePathname();
   const router = useRouter();
@@ -172,7 +175,7 @@ const AdminNav = ({ user }: { user?: any }) => {
           </StyledHeader>
 
           <StyledNav>
-            {generateNavItems(user.accessLevel).map(item => {
+            {generateNavItems(user?.accessLevel).map(item => {
               const isActive = item.link && pathname?.startsWith(item.link);
               return (
                 <StyledNavItem
@@ -215,10 +218,10 @@ const AdminNav = ({ user }: { user?: any }) => {
           </StyledNav>
 
           <StyledAccountWrapper>
-            <Avatar src={user.image} />
+            <Avatar src={user?.image || ''} />
             <Box>
-              <Typography variant="body2">{user.name}</Typography>
-              <Typography variant="caption">{user.email}</Typography>
+              <Typography variant="body2">{user?.name}</Typography>
+              <Typography variant="caption">{user?.email}</Typography>
             </Box>
 
             <IconButton

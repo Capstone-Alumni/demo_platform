@@ -1,8 +1,6 @@
-import { Theme } from '@mui/material';
-
 // ----------------------------------------------------------------------
 
-export default function Badge(theme: Theme) {
+export default function Badge() {
   return {
     MuiBadge: {
       styleOverrides: {

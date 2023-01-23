@@ -1,5 +1,6 @@
-import { mainappPrisma, prisma } from '@lib/prisma/prisma';
-import { createSubdomain, deleteSubdomain } from '@share/utils/subDomainAPI';
+import { mainAppPrisma, prisma } from '@lib/prisma/prisma';
+import { createSubdomain, deleteSubdomain } from '@share/utils/subdomainAPI';
+import { hashSync } from 'bcrypt';
 
 import {
   CreateTenantServiceProps,
@@ -41,6 +42,17 @@ export default class TenantService {
   };
 
   static create = async (values: CreateTenantServiceProps) => {
+    /** pre-check */
+    const user = await prisma.user.findUnique({
+      where: {
+        email: values.email,
+      },
+    });
+
+    if (user) {
+      throw new Error('existed user');
+    }
+
     const existingTenantId = await prisma.tenant.findUnique({
       where: {
         tenantId: values.tenantId,
@@ -61,6 +73,7 @@ export default class TenantService {
       throw new Error('existed subdomain');
     }
 
+    /** Create subdomain */
     const response = await fetch(
       `https://api.vercel.com/v8/projects/${process.env.PROJECT_ID_VERCEL}/domains?teamId=${process.env.TEAM_ID_VERCEL}`,
       {
@@ -85,11 +98,35 @@ export default class TenantService {
       throw new Error('existed subdomain');
     }
 
+    /** Create database  */
+    const encryptedPassword = hashSync(values.password, 10);
+
     const newTenant = await prisma.tenant.create({
-      data: values,
+      data: {
+        name: values.name,
+        tenantId: values.tenantId,
+        description: values.description,
+        logo: values.logo,
+        subdomain: values.subdomain,
+        members: {
+          create: [
+            {
+              user: {
+                create: {
+                  email: values.email,
+                  password: encryptedPassword,
+                  accessLevel: 'SCHOOL_ADMIN',
+                  accessStatus: 'APPROVED',
+                },
+              },
+            },
+          ],
+        },
+      },
     });
 
-    await mainappPrisma.$executeRaw`
+    /** Create schema in mainApp */
+    await mainAppPrisma.$executeRaw`
       SELECT clone_schema('public', ${values.tenantId});
     `;
 
@@ -97,13 +134,13 @@ export default class TenantService {
   };
 
   static getById = async (id: string) => {
-    const Tenant = await prisma.tenant.findUnique({
+    const tenant = await prisma.tenant.findUnique({
       where: {
         id: id,
       },
     });
 
-    return Tenant;
+    return tenant;
   };
 
   static getBySubdomain = async (subdomain: string) => {

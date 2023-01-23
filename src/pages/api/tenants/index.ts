@@ -1,17 +1,15 @@
-import { NextApiResponse } from 'next';
-import { NextApiRequest } from 'next';
+import nc from 'next-connect';
+
+import onErrorAPIHandler from '@share/utils/onErrorAPIHandler';
+import onNoMatchAPIHandler from '@share/utils/onNoMatchAPIHandler';
+
 import TenantController from 'src/modules/tenants/controllers/tenant.controller';
 
-export default function handler(req: NextApiRequest, res: NextApiResponse) {
-  const { method } = req;
+const handler = nc({
+  onError: onErrorAPIHandler,
+  onNoMatch: onNoMatchAPIHandler,
+})
+  .get(TenantController.getList)
+  .post(TenantController.create);
 
-  switch (method) {
-    case 'GET':
-      return TenantController.getList(req, res);
-    case 'POST':
-      return TenantController.create(req, res);
-    default:
-      res.setHeader('Allow', ['GET', 'POST']);
-      res.status(405).end(`Method ${method} Not Allowed`);
-  }
-}
+export default handler;

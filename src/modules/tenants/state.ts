@@ -2,7 +2,7 @@ import { atom } from 'recoil';
 import { GetTenantListParams } from './types';
 
 export const getTenantListParamsAtom = atom<GetTenantListParams>({
-  key: 'getGradeListParams',
+  key: 'getTenantListParams',
   default: {
     page: 1,
     limit: 10,

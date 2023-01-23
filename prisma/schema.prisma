@@ -7,18 +7,72 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+  url      = env("CORE_DATABASE_URL")
 }
 
 model Tenant {
   id            String  @id @default(cuid())
   tenantId        String  @unique
   name          String
-  description   String? @db.Text
-  logo          String?
   subdomain     String? @unique
-  customDomain  String? @unique
-  createdAt     DateTime     @default(now())
-  updatedAt     DateTime     @updatedAt
+  customDomain  String? @unique @map("custom_domain")
+  logo          String?
+  description   String? @db.Text
+
+  members Member[]
+
   archived Boolean @default(false)
+  createdAt     DateTime     @default(now()) @map("created_at")
+  updatedAt     DateTime     @default(now()) @updatedAt @map("updated_at")
+
+  @@map("tenants")
+}
+model User {
+  id            String       @id @default(cuid())
+  email         String      @unique
+  password      String
+
+  members Member[]
+  
+  accessStatus  AccessStatus @default(PENDING) @map("access_status")
+  accessLevel   AccessLevel  @default(ALUMNI) @map("access_level")
+  accessMode    AccessMode   @default(FULL_ACCESS) @map("access_mode")
+  
+  archived      Boolean      @default(false)
+  createdAt     DateTime     @default(now()) @map("created_at")
+  updatedAt     DateTime     @default(now()) @updatedAt @map("updated_at")
+
+  @@map("users")
+}
+
+model Member {
+  id            String  @id @default(cuid())
+  tenantId        String   @map("tenant_id")
+  userId String @map("user_id")
+
+  tenant Tenant @relation(fields: [tenantId], references: [id])
+  user User @relation(fields: [userId], references: [id])
+
+  archived Boolean @default(false)
+  createdAt     DateTime     @default(now()) @map("created_at")
+  updatedAt     DateTime     @default(now()) @updatedAt @map("updated_at")
+
+  @@map("members")
+}
+
+enum AccessLevel {
+  SCHOOL_ADMIN
+  ALUMNI
+  CLASS_MOD
+  GRADE_MOD
+}
+
+enum AccessStatus {
+  PENDING
+  APPROVED
+}
+
+enum AccessMode {
+  FULL_ACCESS
+  READ_ONLY
 }

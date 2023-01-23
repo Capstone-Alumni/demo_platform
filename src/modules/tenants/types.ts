@@ -37,6 +37,8 @@ export type GetTenantListServiceProps = {
 };
 
 export type CreateTenantServiceProps = {
+  email: string;
+  password: string;
   name: string;
   tenantId: string;
   description: string;

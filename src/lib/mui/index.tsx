@@ -4,9 +4,10 @@ import {
   createTheme,
   CssBaseline,
   StyledEngineProvider,
-  ThemeOptions,
+  // ThemeOptions,
   ThemeProvider,
 } from '@mui/material';
+import type { ThemeOptions } from '@mui/material';
 // hooks
 // import useSettings from '../hooks/useSettings';
 //
@@ -27,10 +28,10 @@ type ThemeConfigProps = {
 export default function ThemeConfig({ children }: ThemeConfigProps) {
   // const { themeMode, themeDirection } = useSettings();
   const themeMode = 'light';
-  const themeDirection = 'ltf';
+  const themeDirection = undefined;
   const isLight = themeMode === 'light';
 
-  const themeOptions: any = useMemo(
+  const themeOptions: ThemeOptions = useMemo(
     () => ({
       palette: isLight
         ? { ...palette.light, mode: 'light' }
