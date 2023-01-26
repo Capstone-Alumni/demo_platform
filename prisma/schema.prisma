@@ -18,6 +18,7 @@ model Tenant {
   customDomain  String? @unique @map("custom_domain")
   logo          String?
   description   String? @db.Text
+  activated Boolean @default(false)
 
   members Member[]
 
@@ -27,10 +28,13 @@ model Tenant {
 
   @@map("tenants")
 }
+
 model User {
   id            String       @id @default(cuid())
   email         String      @unique
   password      String
+
+  isTenantAdmin Boolean @default(false) @map("is_tenant_admin")
 
   members Member[]
   

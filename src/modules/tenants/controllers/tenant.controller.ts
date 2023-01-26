@@ -126,4 +126,28 @@ export default class TenantController {
       throw error;
     }
   };
+
+  static registerTenant = async (
+    req: NextApiRequest,
+    res: NextApiResponse<ApiSuccessResponse | ApiErrorResponse>,
+  ) => {
+    try {
+      const values = req.body;
+      const newTenant = await TenantService.registerTenant(values);
+
+      return res.status(201).json({
+        status: true,
+        data: newTenant,
+      });
+    } catch (error) {
+      if (error.message?.includes('existed')) {
+        return res.status(400).json({
+          status: false,
+          message: 'you already has a school',
+        });
+      }
+
+      throw error;
+    }
+  };
 }

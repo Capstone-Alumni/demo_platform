@@ -53,3 +53,9 @@ export type UpdateTenantInfoByIdServiceProps = {
   logo?: string;
   subdomain?: string;
 };
+
+export type RegisterTenantServiceProps = {
+  email: string;
+  password: string;
+  name: string;
+};

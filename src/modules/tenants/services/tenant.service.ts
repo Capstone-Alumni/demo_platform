@@ -1,10 +1,12 @@
 import { mainAppPrisma, prisma } from '@lib/prisma/prisma';
+import { genTenantId } from '@share/utils/genTenantId';
 import { createSubdomain, deleteSubdomain } from '@share/utils/subdomainAPI';
 import { hashSync } from 'bcrypt';
 
 import {
   CreateTenantServiceProps,
   GetTenantListServiceProps,
+  RegisterTenantServiceProps,
   UpdateTenantInfoByIdServiceProps,
 } from '../types';
 
@@ -142,6 +144,8 @@ export default class TenantService {
       },
     });
 
+    console.log(tenant);
+
     return tenant;
   };
 
@@ -223,5 +227,50 @@ export default class TenantService {
     });
 
     return deletedTenant;
+  };
+
+  static registerTenant = async (values: RegisterTenantServiceProps) => {
+    /** pre-check */
+    const user = await prisma.user.findUnique({
+      where: {
+        email: values.email,
+      },
+    });
+
+    if (user) {
+      throw new Error('existed');
+    }
+
+    /** Gen data */
+    const tenantId = genTenantId(values.name);
+    const subdomain = tenantId;
+
+    /** Create database  */
+    const encryptedPassword = hashSync(values.password, 10);
+
+    const newTenant = await prisma.tenant.create({
+      data: {
+        name: values.name,
+        tenantId: tenantId,
+        subdomain: subdomain,
+        activated: false,
+        members: {
+          create: [
+            {
+              accessLevel: 'SCHOOL_ADMIN',
+              accessStatus: 'APPROVED',
+              user: {
+                create: {
+                  email: values.email,
+                  password: encryptedPassword,
+                },
+              },
+            },
+          ],
+        },
+      },
+    });
+
+    return newTenant;
   };
 }
