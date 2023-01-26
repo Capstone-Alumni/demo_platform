@@ -56,4 +56,42 @@ export default class SessionService {
 
     throw new Error('sign-in failed');
   };
+
+  static internalLogin = async ({
+    email,
+    password: passwordInputted,
+  }: SignInRequestBody) => {
+    const user = await prisma.user.findUnique({
+      where: { email: email },
+      include: {
+        members: {
+          select: {
+            accessLevel: true,
+          },
+        },
+      },
+    });
+
+    if (!user) {
+      throw new Error('sign-in failed');
+    }
+
+    const tenant = user.members?.[0];
+
+    if (!user.isTenantAdmin && tenant?.accessLevel !== 'SCHOOL_ADMIN') {
+      throw new Error('denied');
+    }
+
+    const { password } = user;
+
+    if (password && compareSync(passwordInputted, password)) {
+      return {
+        id: user.id,
+        email: user.email,
+        isTenantAdmin: user.isTenantAdmin,
+      };
+    }
+
+    throw new Error('sign-in failed');
+  };
 }

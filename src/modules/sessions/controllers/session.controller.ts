@@ -30,4 +30,32 @@ export default class SessionController {
       throw error;
     }
   };
+
+  static internalLogin = async (
+    req: NextApiRequest,
+    res: NextApiResponse<ApiSuccessResponse | ApiErrorResponse>,
+  ) => {
+    try {
+      const user = await SessionService.internalLogin(req.body);
+      return res.status(200).json({
+        status: true,
+        data: user,
+      });
+    } catch (error) {
+      if (error.message === 'sign-in failed') {
+        return res.status(400).json({
+          status: false,
+          message: 'Wrong username or password',
+        });
+      }
+
+      if (error.message === 'denied') {
+        return res.status(403).json({
+          status: false,
+          message: 'You are not allowed to access this page',
+        });
+      }
+      throw error;
+    }
+  };
 }

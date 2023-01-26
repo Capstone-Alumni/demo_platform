@@ -13,24 +13,22 @@ import {
   requiredPasswordValidator,
 } from '@share/utils/validators';
 
-export type RegisterTenantFormValues = {
+export type LoginFormValues = {
   email: string;
   password: string;
-  name: string;
 };
 
 const validationSchema = yup.object({
   email: requiredEmailValidator,
   password: requiredPasswordValidator,
-  name: yup.string().required(),
 });
 
-const RegisterTenantForm = ({
+const LoginForm = ({
   onClose,
   onSubmit,
 }: {
   onClose?: () => void;
-  onSubmit: (values: RegisterTenantFormValues) => Promise<void>;
+  onSubmit: (values: LoginFormValues) => Promise<void>;
 }) => {
   const theme = useTheme();
   const [submitting, setSubmitting] = useState(false);
@@ -41,12 +39,11 @@ const RegisterTenantForm = ({
     defaultValues: {
       email: '',
       password: '',
-      name: '',
     },
     resolver,
   });
 
-  const onSubmitHandler = async (values: RegisterTenantFormValues) => {
+  const onSubmitHandler = async (values: LoginFormValues) => {
     setSubmitting(true);
     await onSubmit(values);
     setSubmitting(false);
@@ -68,7 +65,7 @@ const RegisterTenantForm = ({
     >
       <Box sx={{ width: '100%' }}>
         <Typography variant="body1" fontWeight="bold">
-          Tài khoản của bạn
+          Đăng nhập
         </Typography>
       </Box>
 
@@ -101,26 +98,6 @@ const RegisterTenantForm = ({
         )}
       />
 
-      <Box sx={{ width: '100%' }}>
-        <Typography variant="body1" fontWeight="bold">
-          Thông tin trường
-        </Typography>
-      </Box>
-
-      <Controller
-        control={control}
-        name="name"
-        render={({ field, fieldState: { error } }) => (
-          <TextField
-            fullWidth
-            label="Name"
-            {...field}
-            error={Boolean(error?.message)}
-            helperText={error?.message}
-          />
-        )}
-      />
-
       <Box
         sx={{
           display: 'flex',
@@ -138,11 +115,11 @@ const RegisterTenantForm = ({
           disabled={submitting}
           onClick={handleSubmit(onSubmitHandler)}
         >
-          Đăng ký
+          Đăng nhập
         </Button>
       </Box>
     </Box>
   );
 };
 
-export default RegisterTenantForm;
+export default LoginForm;

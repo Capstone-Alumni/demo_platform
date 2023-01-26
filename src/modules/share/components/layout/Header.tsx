@@ -55,7 +55,7 @@ const Header = () => {
                 <Button variant="outlined">Đăng ký</Button>
               </Link>
               <Link
-                href="/sign_in"
+                href="/login"
                 style={{ textDecoration: 'none', textUnderlineOffset: 0 }}
               >
                 <Button variant="contained">Đăng nhập</Button>

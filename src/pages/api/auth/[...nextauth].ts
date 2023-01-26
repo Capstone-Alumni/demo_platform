@@ -9,17 +9,17 @@ export const nextAuthOptions = {
       name: 'credentials',
       type: 'credentials',
       credentials: {
-        usernameOrEmail: { type: 'text' },
+        email: { type: 'text' },
         password: { type: 'password' },
       },
       async authorize(credentials) {
         const payload = {
-          usernameOrEmail: credentials?.usernameOrEmail,
+          email: credentials?.email,
           password: credentials?.password,
         };
         try {
           const response = await fetch(
-            `${process.env.NEXTAUTH_URL}/api/signIn`,
+            `${process.env.NEXTAUTH_URL}/api/internal_login`,
             {
               method: 'POST',
               body: JSON.stringify(payload),
@@ -54,14 +54,15 @@ export const nextAuthOptions = {
   callbacks: {
     jwt({ token, user }) {
       if (user) {
-        token.user = user;
-        token.currentTenant = user.members?.[0]?.tenant || null;
+        token.user = {
+          ...token.user,
+          ...user,
+        };
       }
       return token;
     },
     session({ session, token }) {
       session.user = token.user;
-      session.currentTenant = token.currentTenant;
 
       return session;
     },
