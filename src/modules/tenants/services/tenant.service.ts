@@ -33,6 +33,21 @@ export default class TenantService {
         orderBy: {
           createdAt: 'desc',
         },
+        include: {
+          members: {
+            where: {
+              accessLevel: 'SCHOOL_ADMIN',
+            },
+            include: {
+              user: {
+                select: {
+                  id: true,
+                  email: true,
+                },
+              },
+            },
+          },
+        },
       }),
     ]);
 
@@ -217,14 +232,22 @@ export default class TenantService {
 
     await response.json();
 
-    const deletedTenant = await prisma.tenant.update({
-      where: {
-        id: id,
-      },
-      data: {
-        archived: true,
-      },
-    });
+    const [deletedTenant] = await prisma.$transaction([
+      prisma.tenant.update({
+        where: {
+          id: id,
+        },
+        data: {
+          subdomain: null,
+          archived: true,
+        },
+      }),
+      prisma.member.deleteMany({
+        where: {
+          tenantId: id,
+        },
+      }),
+    ]);
 
     return deletedTenant;
   };
@@ -243,7 +266,6 @@ export default class TenantService {
 
     /** Gen data */
     const tenantId = genTenantId(values.name);
-    const subdomain = tenantId;
 
     /** Create database  */
     const encryptedPassword = hashSync(values.password, 10);
@@ -252,7 +274,6 @@ export default class TenantService {
       data: {
         name: values.name,
         tenantId: tenantId,
-        subdomain: subdomain,
         activated: false,
         members: {
           create: [
@@ -268,6 +289,103 @@ export default class TenantService {
             },
           ],
         },
+      },
+    });
+
+    return newTenant;
+  };
+
+  static activateById = async (id: string) => {
+    const tenant = await prisma.tenant.findUnique({
+      where: { id: id },
+    });
+
+    if (!tenant) {
+      throw new Error('tenant is non-existed');
+    }
+
+    const domain = `${tenant.tenantId}${process.env.MAINAPP_DOMAIN}`;
+    /** Create subdomain */
+    if (process.env.GEN_DOMAIN) {
+      const response = await fetch(
+        `https://api.vercel.com/v8/projects/${process.env.PROJECT_ID_VERCEL}/domains?teamId=${process.env.TEAM_ID_VERCEL}`,
+        {
+          body: `{\n  "name": "${domain}"\n}`,
+          headers: {
+            Authorization: `Bearer ${process.env.AUTH_BEARER_TOKEN}`,
+            'Content-Type': 'application/json',
+          },
+          method: 'POST',
+        },
+      );
+
+      const data = await response.json();
+
+      // Domain is already owned by another team but you can request delegation to access it
+      if (data.error?.code === 'forbidden') {
+        throw new Error('forbidden');
+      }
+
+      // Domain is already being used by a different project
+      if (data.error?.code === 'domain_taken') {
+        throw new Error('existed subdomain');
+      }
+    }
+
+    /** Create schema in mainApp */
+    await mainAppPrisma.$executeRaw`
+      SELECT clone_schema('public', ${tenant.tenantId});
+    `;
+
+    const newTenant = await prisma.tenant.update({
+      where: {
+        id: id,
+      },
+      data: {
+        subdomain: tenant.tenantId,
+        activated: true,
+      },
+    });
+
+    return newTenant;
+  };
+
+  static deactivateById = async (id: string) => {
+    const tenant = await prisma.tenant.findUnique({
+      where: { id: id },
+    });
+
+    if (!tenant) {
+      throw new Error('tenant is non-existed');
+    }
+
+    const domain = `${tenant.subdomain}${process.env.MAINAPP_DOMAIN}`;
+
+    if (process.env.GEN_DOMAIN) {
+      const response = await fetch(
+        `https://api.vercel.com/v8/projects/${process.env.PROJECT_ID_VERCEL}/domains/${domain}?teamId=${process.env.TEAM_ID_VERCEL}`,
+        {
+          headers: {
+            Authorization: `Bearer ${process.env.AUTH_BEARER_TOKEN}`,
+          },
+          method: 'DELETE',
+        },
+      );
+
+      await response.json();
+    }
+
+    /** Create schema in mainApp */
+    const query = `DROP SCHEMA IF EXISTS ${tenant.tenantId} CASCADE;`;
+    await mainAppPrisma.$executeRawUnsafe(query);
+
+    const newTenant = await prisma.tenant.update({
+      where: {
+        id: id,
+      },
+      data: {
+        subdomain: null,
+        activated: false,
       },
     });
 

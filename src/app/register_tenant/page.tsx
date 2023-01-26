@@ -1,3 +1,4 @@
+import Body from '@share/components/layout/Body';
 import { unstable_getServerSession } from 'next-auth';
 import { redirect } from 'next/navigation';
 import RegisterTenantPage from 'src/modules/sessions/components/RegisterTenantPage';
@@ -9,7 +10,11 @@ const Page = async () => {
     redirect('/');
   }
 
-  return <RegisterTenantPage />;
+  return (
+    <Body>
+      <RegisterTenantPage />
+    </Body>
+  );
 };
 
 export default Page;

@@ -20,6 +20,7 @@ export const mainAppPrisma =
         url: process.env.MAINAPP_DATABASE_URL,
       },
     },
+    log: ['query', 'error'],
   });
 
 if (process.env.NODE_ENV !== 'production') {

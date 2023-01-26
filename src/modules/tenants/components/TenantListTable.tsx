@@ -12,11 +12,15 @@ import DataTablePagination from '@share/components/DataTablePagination';
 const AdminTenantListTable = ({
   data,
   onDelete,
+  onActivate,
+  onDeactivate,
   page,
   onChangePage,
 }: {
   data: GetTenantListData;
   onDelete: (id: string) => void;
+  onActivate: (id: string) => void;
+  onDeactivate: (id: string) => void;
   page: number;
   onChangePage: (nextPage: number) => void;
 }) => {
@@ -26,13 +30,12 @@ const AdminTenantListTable = ({
         <Table aria-label="Tenant table">
           <TableHead>
             <TableRow>
-              <TableCell align="left">Logo</TableCell>
-              <TableCell align="left">Tenant Id</TableCell>
-              <TableCell align="left">Name</TableCell>
+              <TableCell align="left">Id khách hàng</TableCell>
+              <TableCell align="left">Tên</TableCell>
               <TableCell align="left">Subdomain</TableCell>
-              <TableCell align="left">Created At</TableCell>
-              <TableCell sx={{ maxWidth: '3rem' }} />
-              <TableCell sx={{ maxWidth: '3rem' }} />
+              <TableCell align="left">Người quản lý</TableCell>
+              <TableCell align="center">Trạng thái</TableCell>
+              <TableCell />
             </TableRow>
           </TableHead>
           <TableBody>
@@ -41,6 +44,8 @@ const AdminTenantListTable = ({
                 key={row.tenantId}
                 data={row}
                 onDelete={onDelete}
+                onActivate={onActivate}
+                onDeactivate={onDeactivate}
               />
             ))}
           </TableBody>

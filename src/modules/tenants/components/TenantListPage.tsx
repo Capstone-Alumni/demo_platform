@@ -13,6 +13,8 @@ import { getTenantListParamsAtom } from '../state';
 
 import TenantListTable from './TenantListTable';
 import Link from 'next/link';
+import useActivateTenantById from '../hooks/useActivateTenant';
+import useDeactivateTenantById from '../hooks/useDeactivateTenant';
 
 const TenantListPage = () => {
   const theme = useTheme();
@@ -20,6 +22,9 @@ const TenantListPage = () => {
   const [params, setParams] = useRecoilState(getTenantListParamsAtom);
 
   const { deleteTenantById } = useDeleteTenantById();
+  const { activateTenantById } = useActivateTenantById();
+  const { deactivateTenantById } = useDeactivateTenantById();
+
   const {
     reload,
     data: tenantListData,
@@ -28,6 +33,16 @@ const TenantListPage = () => {
 
   const onDelete = async (id: string) => {
     await deleteTenantById({ id });
+    reload();
+  };
+
+  const onActivate = async (id: string) => {
+    await activateTenantById({ id });
+    reload();
+  };
+
+  const onDeactivate = async (id: string) => {
+    await deactivateTenantById({ id });
     reload();
   };
 
@@ -50,13 +65,13 @@ const TenantListPage = () => {
           alignItems: 'center',
         }}
       >
-        <Typography variant="h3">Tenants</Typography>
+        <Typography variant="h3">Khách hàng</Typography>
 
-        <Link href="/tenants/create">
+        {/* <Link href="/tenants/create">
           <Button variant="contained" startIcon={<AddIcon />}>
             Add tenant
           </Button>
-        </Link>
+        </Link> */}
       </Box>
 
       <Box
@@ -70,6 +85,8 @@ const TenantListPage = () => {
           <TenantListTable
             data={tenantListData?.data}
             onDelete={onDelete}
+            onActivate={onActivate}
+            onDeactivate={onDeactivate}
             page={params.page || 1}
             onChangePage={nextPage => {
               setParams(prevParams => ({ ...prevParams, page: nextPage }));

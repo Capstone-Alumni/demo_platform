@@ -7,6 +7,13 @@ export type Tenant = {
   subdomain: string | null;
   description: string | null;
   createdAt: string | Date;
+  activated: boolean;
+  members: Array<{
+    user: {
+      id: string;
+      email: string;
+    };
+  }>;
 };
 
 export type GetTenantListData = {

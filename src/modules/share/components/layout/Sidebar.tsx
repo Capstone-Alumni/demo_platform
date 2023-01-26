@@ -8,6 +8,7 @@ import {
   ListItemText,
   styled,
   Typography,
+  useTheme,
 } from '@mui/material';
 import Groups2Icon from '@mui/icons-material/Groups2';
 import Link from 'next/link';
@@ -15,6 +16,7 @@ import { usePathname } from 'next/navigation';
 
 const SidebarWrapper = styled('div')(({ theme }) => ({
   height: '100vh',
+  minWidth: theme.spacing(28),
   paddingTop: theme.spacing(8),
   overflow: 'hidden auto',
   '&::-webkit-overflow-scrolling': 'touch',
@@ -35,11 +37,12 @@ const SidebarWrapper = styled('div')(({ theme }) => ({
 }));
 
 const Sidebar = () => {
+  const theme = useTheme();
   const pathname = usePathname();
 
   const items = [
     {
-      link: 'register_tenant',
+      link: '/dashboard/tenants',
       icon: <Groups2Icon />,
       text: 'Khách hàng',
     },
@@ -50,8 +53,11 @@ const Sidebar = () => {
       <List>
         {items.map(item => (
           <ListItem key={item.link}>
-            <Link href={item.link}>
-              <ListItemButton selected={pathname?.startsWith(item.link)}>
+            <Link href={item.link} style={{ width: '100%' }}>
+              <ListItemButton
+                selected={pathname?.startsWith(item.link)}
+                sx={{ borderRadius: theme.shape.borderRadiusSm }}
+              >
                 <ListItemIcon>{item.icon}</ListItemIcon>
                 <ListItemText>
                   <Typography variant="button">{item.text}</Typography>

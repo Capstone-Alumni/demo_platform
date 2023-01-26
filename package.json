@@ -69,6 +69,7 @@
     "swagger-ui-react": "4.15.5",
     "swr": "2.0.0",
     "ts-node": "10.9.1",
+    "tss-react": "4.5.2",
     "uniqid": "5.4.0",
     "use-count-up": "3.0.1",
     "yup": "0.32.11"
