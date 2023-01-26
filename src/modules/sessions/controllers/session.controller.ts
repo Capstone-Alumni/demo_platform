@@ -20,6 +20,13 @@ export default class SessionController {
           message: 'Wrong username or password',
         });
       }
+
+      if (error.message === 'wrong subdomain') {
+        return res.status(403).json({
+          status: false,
+          message: 'You are not allowed to access this page',
+        });
+      }
       throw error;
     }
   };

@@ -74,28 +74,30 @@ export default class TenantService {
     }
 
     /** Create subdomain */
-    const response = await fetch(
-      `https://api.vercel.com/v8/projects/${process.env.PROJECT_ID_VERCEL}/domains?teamId=${process.env.TEAM_ID_VERCEL}`,
-      {
-        body: `{\n  "name": "${values.subdomain}${process.env.MAINAPP_DOMAIN}"\n}`,
-        headers: {
-          Authorization: `Bearer ${process.env.AUTH_BEARER_TOKEN}`,
-          'Content-Type': 'application/json',
+    if (process.env.GEN_DOMAIN) {
+      const response = await fetch(
+        `https://api.vercel.com/v8/projects/${process.env.PROJECT_ID_VERCEL}/domains?teamId=${process.env.TEAM_ID_VERCEL}`,
+        {
+          body: `{\n  "name": "${values.subdomain}${process.env.MAINAPP_DOMAIN}"\n}`,
+          headers: {
+            Authorization: `Bearer ${process.env.AUTH_BEARER_TOKEN}`,
+            'Content-Type': 'application/json',
+          },
+          method: 'POST',
         },
-        method: 'POST',
-      },
-    );
+      );
 
-    const data = await response.json();
+      const data = await response.json();
 
-    // Domain is already owned by another team but you can request delegation to access it
-    if (data.error?.code === 'forbidden') {
-      throw new Error('forbidden');
-    }
+      // Domain is already owned by another team but you can request delegation to access it
+      if (data.error?.code === 'forbidden') {
+        throw new Error('forbidden');
+      }
 
-    // Domain is already being used by a different project
-    if (data.error?.code === 'domain_taken') {
-      throw new Error('existed subdomain');
+      // Domain is already being used by a different project
+      if (data.error?.code === 'domain_taken') {
+        throw new Error('existed subdomain');
+      }
     }
 
     /** Create database  */
@@ -111,12 +113,12 @@ export default class TenantService {
         members: {
           create: [
             {
+              accessLevel: 'SCHOOL_ADMIN',
+              accessStatus: 'APPROVED',
               user: {
                 create: {
                   email: values.email,
                   password: encryptedPassword,
-                  accessLevel: 'SCHOOL_ADMIN',
-                  accessStatus: 'APPROVED',
                 },
               },
             },

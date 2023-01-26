@@ -34,10 +34,6 @@ model User {
 
   members Member[]
   
-  accessStatus  AccessStatus @default(PENDING) @map("access_status")
-  accessLevel   AccessLevel  @default(ALUMNI) @map("access_level")
-  accessMode    AccessMode   @default(FULL_ACCESS) @map("access_mode")
-  
   archived      Boolean      @default(false)
   createdAt     DateTime     @default(now()) @map("created_at")
   updatedAt     DateTime     @default(now()) @updatedAt @map("updated_at")
@@ -49,6 +45,10 @@ model Member {
   id            String  @id @default(cuid())
   tenantId        String   @map("tenant_id")
   userId String @map("user_id")
+
+  accessStatus  AccessStatus @default(PENDING) @map("access_status")
+  accessLevel   AccessLevel  @default(ALUMNI) @map("access_level")
+  accessMode    AccessMode   @default(FULL_ACCESS) @map("access_mode")
 
   tenant Tenant @relation(fields: [tenantId], references: [id])
   user User @relation(fields: [userId], references: [id])
