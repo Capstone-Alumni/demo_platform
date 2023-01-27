@@ -29,10 +29,10 @@ export const nextAuthOptions = {
             data: payload,
           });
 
-          if (!response.status) {
+          if (!response.data.status) {
             return null;
           }
-          return response.data;
+          return response.data.data;
         } catch (err) {
           return null;
         }
