@@ -32,6 +32,7 @@ export const nextAuthOptions = {
           console.log(response);
 
           if (!response.status) {
+            throw new Error(response);
             return null;
           }
           return response.data;
