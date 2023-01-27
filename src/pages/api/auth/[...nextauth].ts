@@ -29,6 +29,8 @@ export const nextAuthOptions = {
             },
           ).then(res => res.json());
 
+          console.log(res);
+
           if (!response.status) {
             return null;
           }
