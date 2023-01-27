@@ -7,12 +7,12 @@ const useLogin = () => {
   const router = useRouter();
 
   const login = (values: LoginFormValues) => {
+    console.log('login hook', values);
     signIn('credentials', {
       email: values?.email,
       password: values?.password,
       redirect: false,
     }).then(res => {
-      console.log(res);
       if (res?.error) {
         toast.error('Đăng nhap thất bại');
       } else {

@@ -36,6 +36,7 @@ export default class SessionController {
     res: NextApiResponse<ApiSuccessResponse | ApiErrorResponse>,
   ) => {
     try {
+      console.log('internal login controller', req.body);
       const user = await SessionService.internalLogin(req.body);
       return res.status(200).json({
         status: true,

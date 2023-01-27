@@ -18,6 +18,7 @@ export const nextAuthOptions = {
           password: credentials?.password,
         };
         try {
+          console.log('nextauth', credentials);
           const response = await fetch(
             `${process.env.NEXTAUTH_URL}/api/internal_login`,
             {
