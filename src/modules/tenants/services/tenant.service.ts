@@ -314,6 +314,7 @@ export default class TenantService {
 
     const domain = `${tenant.tenantId}${process.env.MAINAPP_DOMAIN}`;
     /** Create subdomain */
+    console.log(process.env);
     if (process.env.GEN_DOMAIN) {
       const response = await fetch(
         `https://api.vercel.com/v8/projects/${process.env.PROJECT_ID_VERCEL}/domains?teamId=${process.env.TEAM_ID_VERCEL}`,

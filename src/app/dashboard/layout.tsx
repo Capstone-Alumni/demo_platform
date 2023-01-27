@@ -10,8 +10,6 @@ export default async function Layout({
 }) {
   const session = await unstable_getServerSession(nextAuthOptions);
 
-  console.log('dashboard layout', session);
-
   if (!session) {
     redirect('/');
   }

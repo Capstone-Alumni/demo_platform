@@ -9,8 +9,6 @@ export default async function Layout({
 }) {
   const session = await unstable_getServerSession(nextAuthOptions);
 
-  console.log('layout tenantss', session);
-
   if (!session || !session.user.isTenantAdmin) {
     redirect('/');
   }
