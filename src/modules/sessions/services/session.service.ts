@@ -61,6 +61,8 @@ export default class SessionService {
     email,
     password: passwordInputted,
   }: SignInRequestBody) => {
+    console.log(email);
+    console.log(passwordInputted);
     const user = await prisma.user.findUnique({
       where: { email: email },
       include: {
@@ -80,6 +82,7 @@ export default class SessionService {
         },
       },
     });
+    console.log(user);
 
     if (!user) {
       throw new Error('sign-in failed');
