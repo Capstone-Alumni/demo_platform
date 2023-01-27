@@ -19,7 +19,6 @@ export const nextAuthOptions = {
           password: credentials?.password,
         };
         try {
-          console.log('nextauth', credentials);
           const response = await axios({
             method: 'POST',
             url: `${process.env.NEXTAUTH_URL}/api/internal_login`,
@@ -29,16 +28,6 @@ export const nextAuthOptions = {
             },
             data: payload,
           });
-          //   `${process.env.NEXTAUTH_URL}/api/internal_login`,
-          //   {
-          //     method: 'POST',
-          //     body: JSON.stringify(payload),
-          //     headers: {
-          //       'Content-Type': 'application/json',
-          //     },
-          //   },
-          // ).then(res => res.json());
-          console.log('after auth [next auth]', response);
 
           if (!response.status) {
             return null;

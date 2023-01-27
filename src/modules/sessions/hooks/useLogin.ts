@@ -7,7 +7,6 @@ const useLogin = () => {
   const router = useRouter();
 
   const login = (values: LoginFormValues) => {
-    console.log('login hook', values);
     signIn('credentials', {
       email: values?.email,
       password: values?.password,
