@@ -329,7 +329,7 @@ export default class TenantService {
       //   },
       // );
 
-      const { data } = await axios({
+      const response = await axios({
         method: 'POST',
         url: `https://api.vercel.com/v8/projects/${process.env.PROJECT_ID_VERCEL}/domains?teamId=${process.env.TEAM_ID_VERCEL}`,
         data: {
@@ -340,6 +340,9 @@ export default class TenantService {
           'Content-Type': 'application/json',
         },
       });
+
+      console.log(response);
+      const { data } = response;
 
       // const data = await response.json();
 
