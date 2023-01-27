@@ -96,7 +96,7 @@ export default class SessionService {
         id: user.id,
         email: user.email,
         isTenantAdmin: user.isTenantAdmin,
-        tenant: user.members[0].tenant,
+        tenant: user.members?.[0]?.tenant,
       };
     }
 

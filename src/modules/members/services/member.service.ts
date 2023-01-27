@@ -16,8 +16,6 @@ const isTenantExisted = async (id: string) => {
     where: { id: id },
   });
 
-  console.log(tenant);
-
   if (!tenant) {
     throw new Error('tenant not exist');
   }
