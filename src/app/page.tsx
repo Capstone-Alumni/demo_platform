@@ -9,11 +9,11 @@ export default async function Page({
 }: {
   children: React.ReactNode;
 }) {
-  const session = await unstable_getServerSession(nextAuthOptions);
+  // const session = await unstable_getServerSession(nextAuthOptions);
 
-  if (session) {
-    redirect('/dashboard/tenants');
-  }
+  // if (session) {
+  //   redirect('/dashboard/tenants');
+  // }
 
   return (
     <Body>

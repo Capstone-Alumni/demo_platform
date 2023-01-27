@@ -5,8 +5,7 @@ import { useRouter } from 'next/navigation';
 
 import useUpdateTenantById from '../hooks/useUpdateTenantById';
 import { Tenant } from '../types';
-
-import TenantForm, { TenantFormValues } from './TenantForm';
+import EditTenantForm, { EditTenantFormValues } from './EditTenantForm';
 
 const EditTenantPage = ({ initialData }: { initialData: Tenant }) => {
   const theme = useTheme();
@@ -14,7 +13,7 @@ const EditTenantPage = ({ initialData }: { initialData: Tenant }) => {
 
   const { updateTenantById } = useUpdateTenantById();
 
-  const onUpdate = async (values: TenantFormValues) => {
+  const onUpdate = async (values: EditTenantFormValues) => {
     await updateTenantById({ id: initialData.id, ...values });
   };
 
@@ -37,14 +36,14 @@ const EditTenantPage = ({ initialData }: { initialData: Tenant }) => {
         }}
       >
         <Typography variant="h3" sx={{ flex: 1 }}>
-          Tenants
+          {initialData.name}
         </Typography>
       </Box>
 
-      <TenantForm
+      <EditTenantForm
         initialData={initialData}
         onSubmit={onUpdate}
-        onClose={() => router.push('/tenants')}
+        onClose={() => router.push('/dashboard/tenants')}
       />
     </Box>
   );

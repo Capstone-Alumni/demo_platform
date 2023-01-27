@@ -1,4 +1,5 @@
 import { prisma } from '@lib/prisma/prisma';
+import { redirect } from 'next/navigation';
 import EditTenantPage from 'src/modules/tenants/components/EditTenantPage';
 
 export default async function Page({ params }: { params: { id: string } }) {
@@ -8,9 +9,27 @@ export default async function Page({ params }: { params: { id: string } }) {
       where: {
         id: id,
       },
+      include: {
+        members: {
+          where: {
+            accessLevel: 'SCHOOL_ADMIN',
+          },
+          include: {
+            user: {
+              select: {
+                id: true,
+                email: true,
+              },
+            },
+          },
+        },
+      },
     });
     if (!data || data.archived) {
       throw new Error('cannot fetch tenant data');
+    }
+    if (!data.activated) {
+      throw new Error('tenant is not activated');
     }
 
     return (
@@ -23,10 +42,13 @@ export default async function Page({ params }: { params: { id: string } }) {
           description: data.description,
           logo: data.logo,
           createdAt: data.createdAt.toString(),
+          activated: data.activated,
+          members: data.members,
+          theme: data.theme,
         }}
       />
     );
   } catch {
-    return null;
+    return redirect('404_error');
   }
 }

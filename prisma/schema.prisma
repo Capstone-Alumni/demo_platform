@@ -19,6 +19,7 @@ model Tenant {
   logo          String?
   description   String? @db.Text
   activated Boolean @default(false)
+  theme String? @default("purple")
 
   members Member[]
 

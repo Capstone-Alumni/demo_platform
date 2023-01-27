@@ -94,13 +94,33 @@ export default class TenantController {
     req: NextApiRequest,
     res: NextApiResponse<ApiSuccessResponse | ApiErrorResponse>,
   ) => {
-    const { id } = req.query;
-    const Tenant = await TenantService.updateInfoById(id as string, req.body);
+    try {
+      const { id } = req.query;
+      const Tenant = await TenantService.updateInfoById(id as string, req.body);
 
-    return res.status(200).json({
-      status: true,
-      data: Tenant,
-    });
+      return res.status(200).json({
+        status: true,
+        data: Tenant,
+      });
+    } catch (error) {
+      if (error.message?.includes('existed')) {
+        if (error.message?.includes('subdomain')) {
+          return res.status(400).json({
+            status: false,
+            message: 'subdomain is existed',
+          });
+        }
+      }
+
+      if (error.message?.includes('forbidden')) {
+        return res.status(403).json({
+          status: false,
+          message: 'subdomain is taken',
+        });
+      }
+
+      throw error;
+    }
   };
 
   static deleteById = async (

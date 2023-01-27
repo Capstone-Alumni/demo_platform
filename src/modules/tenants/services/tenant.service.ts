@@ -193,17 +193,25 @@ export default class TenantService {
         throw new Error('subdomain existed');
       }
 
-      if (tenant.subdomain) {
-        await deleteSubdomain(tenant.subdomain);
+      if (process.env.GEN_DOMAIN) {
+        if (tenant.subdomain) {
+          await deleteSubdomain(tenant.subdomain);
+        }
+        await createSubdomain(data.subdomain);
       }
-      await createSubdomain(data.subdomain);
     }
 
     const newTenant = await prisma.tenant.update({
       where: {
         id: id,
       },
-      data: data,
+      data: {
+        subdomain: data.subdomain,
+        name: data.name,
+        description: data.description,
+        logo: data.logo,
+        theme: data.theme,
+      },
     });
 
     return newTenant;

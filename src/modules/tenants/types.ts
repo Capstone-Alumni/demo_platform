@@ -14,6 +14,7 @@ export type Tenant = {
       email: string;
     };
   }>;
+  theme?: string;
 };
 
 export type GetTenantListData = {
@@ -59,6 +60,7 @@ export type UpdateTenantInfoByIdServiceProps = {
   description?: string;
   logo?: string;
   subdomain?: string;
+  theme?: string;
 };
 
 export type RegisterTenantServiceProps = {

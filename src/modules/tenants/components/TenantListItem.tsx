@@ -16,6 +16,7 @@ import React, { useState } from 'react';
 import { Tenant } from '../types';
 import { ListItemText } from '@mui/material';
 import { useRouter } from 'next/navigation';
+import { noop } from 'lodash/fp';
 
 const ActionButton = ({
   actions,
@@ -122,7 +123,9 @@ const AdminTenantListItem = ({
                 id: 'edit',
                 icon: <BorderColorIcon />,
                 text: 'Chỉnh sửa',
-                onClick: () => router.push(`/dashboard/tenants/${data.id}`),
+                onClick: data.activated
+                  ? () => router.push(`/dashboard/tenants/${data.id}`)
+                  : noop,
               },
               data.activated
                 ? {
