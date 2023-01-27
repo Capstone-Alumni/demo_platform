@@ -329,7 +329,7 @@ export default class TenantService {
       //   },
       // );
 
-      const { data: response } = await axios({
+      const { data } = await axios({
         method: 'POST',
         url: `https://api.vercel.com/v8/projects/${process.env.PROJECT_ID_VERCEL}/domains?teamId=${process.env.TEAM_ID_VERCEL}`,
         data: {
@@ -341,7 +341,7 @@ export default class TenantService {
         },
       });
 
-      const data = await response.json();
+      // const data = await response.json();
 
       // Domain is already owned by another team but you can request delegation to access it
       if (data.error?.code === 'forbidden') {
