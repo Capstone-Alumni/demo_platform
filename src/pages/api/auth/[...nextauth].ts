@@ -22,7 +22,7 @@ export const nextAuthOptions = {
           console.log('nextauth', credentials);
           const response = await axios({
             method: 'POST',
-            url: '/api/internal_login',
+            url: `${process.env.NEXTAUTH_URL}/api/internal_login`,
             headers: {
               accept: 'application/json',
               'Content-Type': 'application/json',
