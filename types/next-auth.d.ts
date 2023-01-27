@@ -28,10 +28,13 @@ declare module 'next-auth' {
 
   interface User extends NextUser {
     email: string;
-    accessLevel?: string;
-    accessStatus?: string;
-    accessMode?: string;
+    isTenantAdmin: boolean;
     members: Array<Member>;
+    tenant: {
+      id: string;
+      tenantId: string;
+      subdomain: string;
+    };
   }
 }
 

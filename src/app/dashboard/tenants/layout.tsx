@@ -1,4 +1,3 @@
-import BodyWithSidebar from '@share/components/layout/BodyWidthSidebar';
 import { unstable_getServerSession } from 'next-auth';
 import { nextAuthOptions } from 'src/pages/api/auth/[...nextauth]';
 import { redirect } from 'next/navigation';
@@ -10,8 +9,9 @@ export default async function Layout({
 }) {
   const session = await unstable_getServerSession(nextAuthOptions);
 
-  if (!session) {
+  if (!session || !session.user.isTenantAdmin) {
     redirect('/');
   }
-  return <BodyWithSidebar>{children}</BodyWithSidebar>;
+
+  return <>{children}</>;
 }

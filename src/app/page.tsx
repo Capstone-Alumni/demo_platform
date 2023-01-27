@@ -1,20 +1,7 @@
 import Body from '@share/components/layout/Body';
 import Link from 'next/link';
-import { unstable_getServerSession } from 'next-auth';
-import { nextAuthOptions } from 'src/pages/api/auth/[...nextauth]';
-import { redirect } from 'next/navigation';
 
-export default async function Page({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
-  // const session = await unstable_getServerSession(nextAuthOptions);
-
-  // if (session) {
-  //   redirect('/dashboard/tenants');
-  // }
-
+export default async function Page() {
   return (
     <Body>
       <p>Landing page of platform</p>

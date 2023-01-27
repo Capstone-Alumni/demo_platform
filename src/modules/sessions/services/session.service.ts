@@ -65,8 +65,17 @@ export default class SessionService {
       where: { email: email },
       include: {
         members: {
-          select: {
-            accessLevel: true,
+          where: {
+            accessLevel: 'SCHOOL_ADMIN',
+          },
+          include: {
+            tenant: {
+              select: {
+                id: true,
+                tenantId: true,
+                subdomain: true,
+              },
+            },
           },
         },
       },
@@ -76,9 +85,7 @@ export default class SessionService {
       throw new Error('sign-in failed');
     }
 
-    const tenant = user.members?.[0];
-
-    if (!user.isTenantAdmin && tenant?.accessLevel !== 'SCHOOL_ADMIN') {
+    if (!user.isTenantAdmin && user?.members.length !== 1) {
       throw new Error('denied');
     }
 
@@ -89,6 +96,7 @@ export default class SessionService {
         id: user.id,
         email: user.email,
         isTenantAdmin: user.isTenantAdmin,
+        tenant: user.members[0].tenant,
       };
     }
 

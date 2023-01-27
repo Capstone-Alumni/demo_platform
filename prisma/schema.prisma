@@ -55,6 +55,8 @@ model Member {
   accessLevel   AccessLevel  @default(ALUMNI) @map("access_level")
   accessMode    AccessMode   @default(FULL_ACCESS) @map("access_mode")
 
+  isOwner Boolean @map("is_owner") @default(false)
+
   tenant Tenant @relation(fields: [tenantId], references: [id])
   user User @relation(fields: [userId], references: [id])
 

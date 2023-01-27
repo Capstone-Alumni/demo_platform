@@ -46,6 +46,16 @@ const Sidebar = () => {
       icon: <Groups2Icon />,
       text: 'Khách hàng',
     },
+    {
+      link: '/dashboard/your_school',
+      icon: <Groups2Icon />,
+      text: 'Truong cua ban',
+    },
+    {
+      link: '/dashboard/your_members',
+      icon: <Groups2Icon />,
+      text: 'Thanh vien',
+    },
   ];
 
   return (
