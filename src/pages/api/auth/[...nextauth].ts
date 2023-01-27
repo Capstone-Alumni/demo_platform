@@ -1,6 +1,7 @@
 import NextAuth from 'next-auth/next';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import { AuthOptions } from 'next-auth';
+import axios from 'axios';
 
 export const nextAuthOptions = {
   providers: [
@@ -19,16 +20,25 @@ export const nextAuthOptions = {
         };
         try {
           console.log('nextauth', credentials);
-          const response = await fetch(
-            `${process.env.NEXTAUTH_URL}/api/internal_login`,
-            {
-              method: 'POST',
-              body: JSON.stringify(payload),
-              headers: {
-                'Content-Type': 'application/json',
-              },
+          const response = await axios({
+            method: 'POST',
+            url: '/api/internal_login',
+            headers: {
+              accept: 'application/json',
+              'Content-Type': 'application/json',
             },
-          ).then(res => res.json());
+            data: payload,
+          });
+          //   `${process.env.NEXTAUTH_URL}/api/internal_login`,
+          //   {
+          //     method: 'POST',
+          //     body: JSON.stringify(payload),
+          //     headers: {
+          //       'Content-Type': 'application/json',
+          //     },
+          //   },
+          // ).then(res => res.json());
+          console.log('after auth [next auth]', response);
 
           if (!response.status) {
             return null;
