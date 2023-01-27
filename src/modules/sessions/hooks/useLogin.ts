@@ -12,8 +12,9 @@ const useLogin = () => {
       password: values?.password,
       redirect: false,
     }).then(res => {
+      console.log(res);
       if (res?.error) {
-        toast.error('Đăng ký thất bại');
+        toast.error('Đăng nhap thất bại');
       } else {
         router.replace('/');
       }
