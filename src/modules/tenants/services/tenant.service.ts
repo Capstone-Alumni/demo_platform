@@ -1,6 +1,7 @@
 import { mainAppPrisma, prisma } from '@lib/prisma/prisma';
 import { genTenantId } from '@share/utils/genTenantId';
 import { createSubdomain, deleteSubdomain } from '@share/utils/subdomainAPI';
+import axios from 'axios';
 import { hashSync } from 'bcrypt';
 
 import {
@@ -316,17 +317,29 @@ export default class TenantService {
     /** Create subdomain */
     console.log(process.env);
     if (process.env.GEN_DOMAIN) {
-      const response = await fetch(
-        `https://api.vercel.com/v8/projects/${process.env.PROJECT_ID_VERCEL}/domains?teamId=${process.env.TEAM_ID_VERCEL}`,
-        {
-          body: `{\n  "name": "${domain}"\n}`,
-          headers: {
-            Authorization: `Bearer ${process.env.AUTH_BEARER_TOKEN}`,
-            'Content-Type': 'application/json',
-          },
-          method: 'POST',
+      // await fetch(
+      //   `https://api.vercel.com/v8/projects/${process.env.PROJECT_ID_VERCEL}/domains?teamId=${process.env.TEAM_ID_VERCEL}`,
+      //   {
+      //     body: `{\n  "name": "${domain}"\n}`,
+      //     headers: {
+      //       Authorization: `Bearer ${process.env.AUTH_BEARER_TOKEN}`,
+      //       'Content-Type': 'application/json',
+      //     },
+      //     method: 'POST',
+      //   },
+      // );
+
+      const { data: response } = await axios({
+        method: 'POST',
+        url: `https://api.vercel.com/v8/projects/${process.env.PROJECT_ID_VERCEL}/domains?teamId=${process.env.TEAM_ID_VERCEL}`,
+        data: {
+          name: domain,
         },
-      );
+        headers: {
+          Authorization: `Bearer ${process.env.AUTH_BEARER_TOKEN}`,
+          'Content-Type': 'application/json',
+        },
+      });
 
       const data = await response.json();
 
