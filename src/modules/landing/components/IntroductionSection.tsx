@@ -3,6 +3,7 @@
 import { Container, useTheme } from '@mui/material';
 import { Box, Button, Typography } from '@mui/material';
 import Image from 'next/image';
+import Link from 'next/link';
 
 const IntroductionSection = () => {
   const theme = useTheme();
@@ -11,7 +12,6 @@ const IntroductionSection = () => {
     <Box
       sx={{
         paddingX: theme.spacing(2),
-        // backgroundColor: 'yellow',
         backgroundImage: 'url("/landing-page-intro-background.png")',
         backgroundPosition: 'center',
         backgroundSize: 'cover',
@@ -47,7 +47,7 @@ const IntroductionSection = () => {
               src="/connect-alumni.jpg"
             />
             <Typography variant="h2" color="primary">
-              Alumni Connection Platform
+              Alumni Connector Platform
             </Typography>
           </Box>
 
@@ -63,9 +63,14 @@ const IntroductionSection = () => {
           </Typography>
 
           <Box>
-            <Button variant="contained" size="large">
-              Gia nhập ngay
-            </Button>
+            <Link
+              href="/register_tenant"
+              style={{ textDecoration: 'none', textUnderlineOffset: 0 }}
+            >
+              <Button variant="contained" size="large">
+                Gia nhập ngay
+              </Button>
+            </Link>
           </Box>
         </Box>
       </Container>
