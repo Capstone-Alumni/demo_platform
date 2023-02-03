@@ -1,9 +1,15 @@
 'use client';
 
-import { Container, useTheme } from '@mui/material';
+import { BoxProps, Container, useTheme } from '@mui/material';
 import React from 'react';
 
-const Body = ({ children }: { children: React.ReactNode }) => {
+const Body = ({
+  children,
+  sx,
+}: {
+  children: React.ReactNode;
+  sx: BoxProps;
+}) => {
   const theme = useTheme();
 
   return (
@@ -14,6 +20,7 @@ const Body = ({ children }: { children: React.ReactNode }) => {
         paddingLeft: theme.spacing(2),
         paddingRight: theme.spacing(2),
         paddingBottom: theme.spacing(4),
+        ...sx,
       }}
     >
       {children}

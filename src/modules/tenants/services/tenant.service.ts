@@ -316,18 +316,6 @@ export default class TenantService {
     const domain = `${subdomain}${process.env.MAINAPP_DOMAIN}`;
     /** Create subdomain */
     if (process.env.GEN_DOMAIN) {
-      // await fetch(
-      //   `https://api.vercel.com/v8/projects/${process.env.PROJECT_ID_VERCEL}/domains?teamId=${process.env.TEAM_ID_VERCEL}`,
-      //   {
-      //     body: `{\n  "name": "${domain}"\n}`,
-      //     headers: {
-      //       Authorization: `Bearer ${process.env.AUTH_BEARER_TOKEN}`,
-      //       'Content-Type': 'application/json',
-      //     },
-      //     method: 'POST',
-      //   },
-      // );
-
       const payload = {
         name: domain,
       };

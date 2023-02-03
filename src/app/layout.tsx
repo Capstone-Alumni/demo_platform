@@ -1,5 +1,5 @@
 import Header from '@share/components/layout/Header';
-import CSRProvider from './CSRProider';
+import CSRProvider from '../modules/share/components/CSRProider';
 
 export default async function RootLayout({
   children,
