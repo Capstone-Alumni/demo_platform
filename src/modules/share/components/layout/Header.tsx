@@ -63,12 +63,31 @@ const Header = () => {
               </Typography>
 
               {user ? (
-                <>
+                <Box
+                  sx={{
+                    display: 'flex',
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    gap: theme.spacing(2),
+                  }}
+                >
                   <Typography>{user?.email}</Typography>
-                  <Button color="inherit" onClick={() => signOut()}>
-                    Sign Out
+                  <Link
+                    href="/dashboard/tenants"
+                    style={{ textDecoration: 'none', textUnderlineOffset: 0 }}
+                  >
+                    <Button color="warning" variant="outlined">
+                      Bảng điều khiển
+                    </Button>
+                  </Link>
+                  <Button
+                    color="error"
+                    variant="outlined"
+                    onClick={() => signOut()}
+                  >
+                    Đăng xuất
                   </Button>
-                </>
+                </Box>
               ) : (
                 <Box
                   sx={{
