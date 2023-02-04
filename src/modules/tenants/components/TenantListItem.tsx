@@ -12,11 +12,13 @@ import BorderColorIcon from '@mui/icons-material/BorderColor';
 import ConfirmDeleteModal from '@share/components/ConfirmDeleteModal';
 import LightbulbIcon from '@mui/icons-material/Lightbulb';
 import DeleteIcon from '@mui/icons-material/Delete';
+import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import React, { useState } from 'react';
 import { Tenant } from '../types';
 import { ListItemText } from '@mui/material';
 import { useRouter } from 'next/navigation';
 import { noop } from 'lodash/fp';
+import getTenantHost from '../utils/getTenantHost';
 
 const ActionButton = ({
   actions,
@@ -115,6 +117,17 @@ const AdminTenantListItem = ({
               </Button>
             )}
           </Typography>
+        </TableCell>
+        <TableCell align="center">
+          {data.subdomain && data.activated ? (
+            <a
+              href={getTenantHost(data.subdomain)}
+              target="_blank"
+              rel="noreferrer"
+            >
+              <OpenInNewIcon />
+            </a>
+          ) : null}
         </TableCell>
         <TableCell align="center">
           <ActionButton

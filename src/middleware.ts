@@ -29,7 +29,7 @@ export default withAuth(
         if (user.isTenantAdmin) {
           url.pathname = '/dashboard/tenants';
         } else {
-          url.pathname = '/dashboard/school';
+          url.pathname = '/';
         }
       }
 

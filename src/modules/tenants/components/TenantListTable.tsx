@@ -30,12 +30,13 @@ const AdminTenantListTable = ({
         <Table aria-label="Tenant table">
           <TableHead>
             <TableRow>
-              <TableCell align="left">Id khách hàng</TableCell>
-              <TableCell align="left">Tên</TableCell>
+              <TableCell align="left">Id</TableCell>
+              <TableCell align="left">Tên trường</TableCell>
               <TableCell align="left">Subdomain</TableCell>
               <TableCell align="left">Người quản lý</TableCell>
               <TableCell align="center">Trạng thái</TableCell>
-              <TableCell />
+              <TableCell align="center">Truy cập</TableCell>
+              <TableCell align="center">Thao tác</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -51,7 +52,7 @@ const AdminTenantListTable = ({
           </TableBody>
 
           <DataTablePagination
-            colSpan={6}
+            colSpan={7}
             currentPage={page}
             totalPage={Math.ceil(data.totalItems / data.itemPerPage)}
             onChangePage={onChangePage}

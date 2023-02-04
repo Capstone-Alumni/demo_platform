@@ -57,7 +57,7 @@ const schoolAdminItems = [
   {
     link: '/dashboard/members',
     icon: <RememberMeIcon />,
-    text: 'Danh sách học sinh',
+    text: 'Danh sách thành viên',
   },
 ];
 

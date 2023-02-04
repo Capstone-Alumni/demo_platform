@@ -2,7 +2,7 @@
 
 import { Box, Container, useTheme } from '@mui/material';
 import React from 'react';
-import Sidebar from './Sidebar';
+// import Sidebar from './Sidebar';
 
 const BodyWithSidebar = ({ children }: { children: React.ReactNode }) => {
   const theme = useTheme();
@@ -15,7 +15,7 @@ const BodyWithSidebar = ({ children }: { children: React.ReactNode }) => {
         flexDirection: 'row',
       }}
     >
-      <Sidebar />
+      {/* <Sidebar /> */}
       <Container
         sx={{
           paddingTop: theme.spacing(4),
