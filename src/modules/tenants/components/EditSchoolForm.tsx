@@ -20,7 +20,7 @@ import useYupValidateionResolver from 'src/modules/share/utils/useYupValidationR
 import { Tenant } from '../types';
 import UploadAvatar from '@share/components/upload/UploadAvatar';
 
-export type EditTenantFormValues = {
+export type EditSChoolFormValues = {
   email: string;
   tenantId: string;
   subdomain: string;
@@ -33,8 +33,6 @@ export type EditTenantFormValues = {
 const MAINAPP_DOMAIN = '.vercel.app';
 
 const validationSchema = yup.object({
-  email: yup.string().required(),
-  tenantId: yup.string().required(),
   subdomain: yup.string().required(),
   logo: yup.string(),
   name: yup.string().required(),
@@ -42,28 +40,20 @@ const validationSchema = yup.object({
   description: yup.string(),
 });
 
-const EditTenantForm = ({
+const EditSChoolForm = ({
   initialData,
-  onClose,
   onSubmit,
 }: {
   initialData: Tenant;
-  onClose?: () => void;
-  onSubmit: (values: EditTenantFormValues) => Promise<void>;
+  onSubmit: (values: EditSChoolFormValues) => Promise<void>;
 }) => {
   const theme = useTheme();
   const [submitting, setSubmitting] = useState(false);
 
   const resolver = useYupValidateionResolver(validationSchema);
 
-  const {
-    control,
-    handleSubmit,
-    formState: { errors },
-  } = useForm({
+  const { control, handleSubmit } = useForm({
     defaultValues: {
-      email: initialData.members[0].user.email,
-      tenantId: initialData.tenantId ?? '',
       subdomain: initialData?.subdomain ?? '',
       logo: initialData?.logo ?? '',
       name: initialData?.name ?? '',
@@ -73,7 +63,7 @@ const EditTenantForm = ({
     resolver,
   });
 
-  const onSubmitHandler = async (values: EditTenantFormValues) => {
+  const onSubmitHandler = async (values: EditSChoolFormValues) => {
     setSubmitting(true);
     await onSubmit(values);
     setSubmitting(false);
@@ -93,22 +83,6 @@ const EditTenantForm = ({
         borderRadius: `${theme.shape.borderRadius}px`,
       }}
     >
-      <Box sx={{ width: '100%' }}>
-        <Typography variant="h6">Người quản lý</Typography>
-      </Box>
-
-      <Controller
-        control={control}
-        name="email"
-        render={({ field }) => (
-          <TextField fullWidth label="email" disabled {...field} />
-        )}
-      />
-
-      <Box sx={{ width: '100%' }}>
-        <Typography variant="h6">Thông tin trường</Typography>
-      </Box>
-
       <Box
         sx={{
           width: '100%',
@@ -132,14 +106,6 @@ const EditTenantForm = ({
           )}
         />
       </Box>
-
-      <Controller
-        control={control}
-        name="tenantId"
-        render={({ field }) => (
-          <TextField fullWidth label="Tenant Id" disabled {...field} />
-        )}
-      />
 
       <Box
         sx={{
@@ -216,11 +182,6 @@ const EditTenantForm = ({
           gap: theme.spacing(2),
         }}
       >
-        {onClose ? (
-          <Button variant="outlined" disabled={submitting} onClick={onClose}>
-            Huỷ
-          </Button>
-        ) : null}
         <Button
           variant="contained"
           disabled={submitting}
@@ -233,4 +194,4 @@ const EditTenantForm = ({
   );
 };
 
-export default EditTenantForm;
+export default EditSChoolForm;

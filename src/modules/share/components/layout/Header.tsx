@@ -43,7 +43,7 @@ const Header = () => {
   const theme = useTheme();
   const { data: session } = useSession();
   const { user } = session || { user: undefined };
-  console.log(user);
+
   return (
     <Box sx={{ flexGrow: 1 }}>
       <ElevationScroll>

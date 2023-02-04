@@ -38,7 +38,7 @@ const useUpdateTenantById = () => {
       },
       onSuccess: () => {
         toast.success('Cập nhập thành công');
-        router.push('/dashboard/tenants');
+        // router.push('/dashboard/tenants');
       },
     },
   );

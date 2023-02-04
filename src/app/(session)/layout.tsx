@@ -1,3 +1,5 @@
+import Body from '@share/components/layout/Body';
+import Footer from '@share/components/layout/Footer';
 import Header from '@share/components/layout/Header';
 
 export default async function RootLayout({
@@ -8,7 +10,8 @@ export default async function RootLayout({
   return (
     <>
       <Header />
-      {children}
+      <Body sx={{ paddingY: 0 }}>{children}</Body>
+      <Footer />
     </>
   );
 }

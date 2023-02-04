@@ -12,6 +12,7 @@ import {
   requiredEmailValidator,
   requiredPasswordValidator,
 } from '@share/utils/validators';
+import Logo from '@share/components/Logo';
 
 export type LoginFormValues = {
   email: string;
@@ -24,10 +25,8 @@ const validationSchema = yup.object({
 });
 
 const LoginForm = ({
-  onClose,
   onSubmit,
 }: {
-  onClose?: () => void;
   onSubmit: (values: LoginFormValues) => Promise<void>;
 }) => {
   const theme = useTheme();
@@ -63,8 +62,17 @@ const LoginForm = ({
         borderRadius: `${theme.shape.borderRadius}px`,
       }}
     >
-      <Box sx={{ width: '100%' }}>
-        <Typography variant="body1" fontWeight="bold">
+      <Box
+        sx={{
+          width: '100%',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          marginBottom: theme.spacing(1),
+        }}
+      >
+        <Logo height={80} width={80} />
+        <Typography variant="h6" fontWeight="bold">
           Đăng nhập
         </Typography>
       </Box>
@@ -98,26 +106,14 @@ const LoginForm = ({
         )}
       />
 
-      <Box
-        sx={{
-          display: 'flex',
-          flexDirection: 'row',
-          gap: theme.spacing(2),
-        }}
+      <Button
+        fullWidth
+        variant="contained"
+        disabled={submitting}
+        onClick={handleSubmit(onSubmitHandler)}
       >
-        {onClose ? (
-          <Button variant="outlined" disabled={submitting} onClick={onClose}>
-            Huỷ
-          </Button>
-        ) : null}
-        <Button
-          variant="contained"
-          disabled={submitting}
-          onClick={handleSubmit(onSubmitHandler)}
-        >
-          Đăng nhập
-        </Button>
-      </Box>
+        Đăng nhập
+      </Button>
     </Box>
   );
 };

@@ -24,7 +24,7 @@ const useRegisterTenant = () => {
       },
       onSuccess: () => {
         toast.success('Đăng ký thành công');
-        router.replace('/');
+        router.push('/login');
       },
     },
   );

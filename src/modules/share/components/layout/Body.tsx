@@ -15,6 +15,7 @@ const Body = ({
   return (
     <Container
       sx={{
+        minHeight: '100vh',
         height: '100%',
         paddingTop: theme.spacing(10),
         paddingLeft: theme.spacing(2),

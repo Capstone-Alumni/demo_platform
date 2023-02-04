@@ -4,10 +4,19 @@ import Image from 'next/image';
 
 // ----------------------------------------------------------------------
 
-export default function Logo({ sx }: BoxProps) {
+export default function Logo({
+  sx,
+  height,
+  width,
+}: BoxProps & { height?: number; width?: number }) {
   return (
     <Box sx={sx}>
-      <Image height={40} width={40} alt="platform-logo" src="/logo.png" />
+      <Image
+        height={height || 40}
+        width={width || 40}
+        alt="platform-logo"
+        src="/logo.png"
+      />
     </Box>
     // <Box sx={{ width: 40, height: 40, ...sx }}>
     //   <svg

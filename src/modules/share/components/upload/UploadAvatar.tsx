@@ -114,8 +114,6 @@ export default function UploadAvatar({
     </Paper>
   );
 
-  console.log(file);
-
   return (
     <>
       <RootStyle sx={sx}>

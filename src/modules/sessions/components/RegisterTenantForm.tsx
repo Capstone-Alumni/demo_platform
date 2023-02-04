@@ -12,6 +12,7 @@ import {
   requiredEmailValidator,
   requiredPasswordValidator,
 } from '@share/utils/validators';
+import Logo from '@share/components/Logo';
 
 export type RegisterTenantFormValues = {
   email: string;
@@ -26,10 +27,8 @@ const validationSchema = yup.object({
 });
 
 const RegisterTenantForm = ({
-  onClose,
   onSubmit,
 }: {
-  onClose?: () => void;
   onSubmit: (values: RegisterTenantFormValues) => Promise<void>;
 }) => {
   const theme = useTheme();
@@ -66,9 +65,24 @@ const RegisterTenantForm = ({
         borderRadius: `${theme.shape.borderRadius}px`,
       }}
     >
+      <Box
+        sx={{
+          width: '100%',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          marginBottom: theme.spacing(1),
+        }}
+      >
+        <Logo height={80} width={80} />
+        <Typography variant="h6" fontWeight="bold">
+          Đăng ký trường
+        </Typography>
+      </Box>
+
       <Box sx={{ width: '100%' }}>
         <Typography variant="body1" fontWeight="bold">
-          Tài khoản của bạn
+          Tài khoản quản lý
         </Typography>
       </Box>
 
@@ -113,7 +127,7 @@ const RegisterTenantForm = ({
         render={({ field, fieldState: { error } }) => (
           <TextField
             fullWidth
-            label="Name"
+            label="Tên trường"
             {...field}
             error={Boolean(error?.message)}
             helperText={error?.message}
@@ -121,26 +135,13 @@ const RegisterTenantForm = ({
         )}
       />
 
-      <Box
-        sx={{
-          display: 'flex',
-          flexDirection: 'row',
-          gap: theme.spacing(2),
-        }}
+      <Button
+        variant="contained"
+        disabled={submitting}
+        onClick={handleSubmit(onSubmitHandler)}
       >
-        {onClose ? (
-          <Button variant="outlined" disabled={submitting} onClick={onClose}>
-            Huỷ
-          </Button>
-        ) : null}
-        <Button
-          variant="contained"
-          disabled={submitting}
-          onClick={handleSubmit(onSubmitHandler)}
-        >
-          Đăng ký
-        </Button>
-      </Box>
+        Đăng ký
+      </Button>
     </Box>
   );
 };

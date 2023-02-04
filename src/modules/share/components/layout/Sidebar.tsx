@@ -11,13 +11,17 @@ import {
   useTheme,
 } from '@mui/material';
 import Groups2Icon from '@mui/icons-material/Groups2';
+import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
+import RememberMeIcon from '@mui/icons-material/RememberMe';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useSession } from 'next-auth/react';
+import { useMemo } from 'react';
 
 const SidebarWrapper = styled('div')(({ theme }) => ({
   height: '100vh',
-  minWidth: theme.spacing(28),
-  paddingTop: theme.spacing(8),
+  minWidth: theme.spacing(32),
+  paddingTop: theme.spacing(2),
   overflow: 'hidden auto',
   '&::-webkit-overflow-scrolling': 'touch',
   '&::-webkit-scrollbar': {
@@ -36,27 +40,37 @@ const SidebarWrapper = styled('div')(({ theme }) => ({
   },
 }));
 
+const tenantAdminItems = [
+  {
+    link: '/dashboard/tenants',
+    icon: <Groups2Icon />,
+    text: 'Khách hàng',
+  },
+];
+
+const schoolAdminItems = [
+  {
+    link: '/dashboard/school',
+    icon: <AccountBalanceIcon />,
+    text: 'Thiết lập trường',
+  },
+  {
+    link: '/dashboard/members',
+    icon: <RememberMeIcon />,
+    text: 'Danh sách học sinh',
+  },
+];
+
 const Sidebar = () => {
   const theme = useTheme();
   const pathname = usePathname();
+  const { data: session } = useSession();
+  const { user } = session || { user: undefined };
 
-  const items = [
-    {
-      link: '/dashboard/tenants',
-      icon: <Groups2Icon />,
-      text: 'Khách hàng',
-    },
-    {
-      link: '/dashboard/your_school',
-      icon: <Groups2Icon />,
-      text: 'Truong cua ban',
-    },
-    {
-      link: '/dashboard/your_members',
-      icon: <Groups2Icon />,
-      text: 'Thanh vien',
-    },
-  ];
+  const items = useMemo(
+    () => (user?.isTenantAdmin ? tenantAdminItems : schoolAdminItems),
+    [user?.isTenantAdmin],
+  );
 
   return (
     <SidebarWrapper>

@@ -18,7 +18,7 @@ const BodyWithSidebar = ({ children }: { children: React.ReactNode }) => {
       <Sidebar />
       <Container
         sx={{
-          paddingTop: theme.spacing(10),
+          paddingTop: theme.spacing(4),
           paddingLeft: theme.spacing(2),
           paddingRight: theme.spacing(2),
           paddingBottom: theme.spacing(4),
