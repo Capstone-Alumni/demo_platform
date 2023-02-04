@@ -14,10 +14,7 @@ export default async function RootLayout({
         <link rel="shortcut icon" href="/logo.png" />
       </head>
       <body style={{ margin: 0, minHeight: '100vh' }}>
-        <CSRProvider>
-          <Header />
-          {children}
-        </CSRProvider>
+        <CSRProvider>{children}</CSRProvider>
       </body>
     </html>
   );

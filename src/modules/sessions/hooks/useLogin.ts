@@ -10,12 +10,11 @@ const useLogin = () => {
     signIn('credentials', {
       email: values?.email,
       password: values?.password,
-      redirect: false,
     }).then(res => {
       if (res?.error) {
-        toast.error('Đăng nhap thất bại');
+        toast.error('Đăng nhập thất bại');
       } else {
-        router.replace('/');
+        router.push('/');
       }
     });
   };

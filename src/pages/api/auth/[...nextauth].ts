@@ -52,6 +52,9 @@ export const nextAuthOptions = {
     signIn: 'sign_in',
   },
   callbacks: {
+    redirect({ baseUrl }) {
+      return baseUrl;
+    },
     jwt({ token, user }) {
       if (user) {
         token.user = {

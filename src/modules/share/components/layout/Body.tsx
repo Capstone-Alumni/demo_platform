@@ -8,7 +8,7 @@ const Body = ({
   sx,
 }: {
   children: React.ReactNode;
-  sx: BoxProps;
+  sx?: BoxProps;
 }) => {
   const theme = useTheme();
 
