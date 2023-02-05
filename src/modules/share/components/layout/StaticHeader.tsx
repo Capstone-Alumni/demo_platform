@@ -44,7 +44,7 @@ const StaticHeader = () => {
             >
               <Typography>{user?.email}</Typography>
               <Link
-                href="/dashboard/tenants"
+                href="/dashboard"
                 style={{ textDecoration: 'none', textUnderlineOffset: 0 }}
               >
                 <Button color="warning" variant="outlined">

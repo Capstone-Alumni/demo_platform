@@ -25,6 +25,7 @@ export default class MemberService {
   static create = async ({
     email,
     password,
+    accessLevel,
     tenantId,
   }: CreateMemberServiceProps) => {
     await isTenantExisted(tenantId);
@@ -50,6 +51,7 @@ export default class MemberService {
 
     const newMember = await prisma.member.create({
       data: {
+        accessLevel: accessLevel,
         user: {
           connect: {
             email: email,
@@ -62,6 +64,8 @@ export default class MemberService {
         },
       },
     });
+
+    console.log(accessLevel, newMember);
 
     return newMember;
   };
@@ -135,6 +139,17 @@ export default class MemberService {
         },
         data: {
           password: encryptedPassword,
+        },
+      });
+    }
+
+    if (data.accessLevel) {
+      await prisma.member.update({
+        where: {
+          id: id,
+        },
+        data: {
+          accessLevel: data.accessLevel,
         },
       });
     }

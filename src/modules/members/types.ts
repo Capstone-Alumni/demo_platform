@@ -1,3 +1,5 @@
+import { AccessLevel } from '@prisma/client';
+
 /** ========================== FE ================================= */
 export type Member = {
   id: string;
@@ -41,8 +43,10 @@ export type CreateMemberServiceProps = {
   email: string;
   password: string;
   tenantId: string;
+  accessLevel: AccessLevel;
 };
 
 export type UpdateMemberInfoByIdServiceProps = {
   password?: string;
+  accessLevel: AccessLevel;
 };
