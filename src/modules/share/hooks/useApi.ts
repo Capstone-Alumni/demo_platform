@@ -3,6 +3,7 @@ import axios from 'axios';
 import { useEffect } from 'react';
 import formatSearchParams from '../utils/formatParams';
 import { noop } from 'lodash/fp';
+import { getSession } from 'next-auth/react';
 
 export type ApiConfig = {
   method: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
@@ -22,27 +23,6 @@ export type AxiosConfig = {
 export type ApiOptions<Data, Err, Params> = {
   retainOnUnmount?: boolean;
 } & SWRMutationConfiguration<Data, Err, Params, string>;
-
-const transformAxiosConfig = ({
-  method,
-  url,
-  params,
-  data,
-  headers,
-}: ApiConfig): AxiosConfig => {
-  const config: AxiosConfig = {
-    method,
-    url: params ? url + formatSearchParams(params) : url,
-    headers: {
-      accept: 'application/json',
-      'Content-Type': 'application/json',
-      ...headers,
-    },
-    data,
-  };
-
-  return config;
-};
 
 const useApi = <Params, Data, Err>(
   apiName: string, // should be unique accross the provider
@@ -69,9 +49,33 @@ const useApi = <Params, Data, Err>(
     retainOnUnmount,
   } = apiOptions;
 
+  const transformAxiosConfig = async ({
+    method,
+    url,
+    params,
+    data,
+    headers,
+  }: ApiConfig): Promise<AxiosConfig> => {
+    const session = await getSession();
+
+    const config: AxiosConfig = {
+      method,
+      url: params ? url + formatSearchParams(params) : url,
+      headers: {
+        accept: 'application/json',
+        'Content-Type': 'application/json',
+        'tenant-userid': session?.user.id, // enhance here
+        ...headers,
+      },
+      data,
+    };
+
+    return config;
+  };
+
   const fetcher = async (key: string, { arg: params }: { arg: Params }) => {
     const apiConfig = generateDescription(params);
-    const axiosConfig = transformAxiosConfig(apiConfig);
+    const axiosConfig = await transformAxiosConfig(apiConfig);
 
     const response = await axios(axiosConfig);
     const { data } = response;
