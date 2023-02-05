@@ -15,7 +15,9 @@ const EditSchoolPage = () => {
   const { updateTenantById } = useUpdateTenantById();
 
   const onUpdate = async (values: EditSChoolFormValues) => {
-    await updateTenantById({ id: initialData?.id, ...values });
+    if (initialData?.id) {
+      await updateTenantById({ id: initialData.id, ...values });
+    }
   };
 
   return (

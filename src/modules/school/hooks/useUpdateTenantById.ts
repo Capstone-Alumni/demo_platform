@@ -1,20 +1,17 @@
-import { useRouter } from 'next/navigation';
 import { AxiosError } from 'axios';
 import { toast } from 'react-toastify';
 import useApi from 'src/modules/share/hooks/useApi';
-import { EditTenantFormValues } from '../components/EditTenantForm';
+import { EditSChoolFormValues } from '../components/EditSchoolForm';
 
 type UpdateTenantByIdDataParams = {
   id: string;
-} & EditTenantFormValues;
+} & EditSChoolFormValues;
 
 type UpdateTenantByIdDataResponse = unknown;
 
 type UpdateTenantByIdDataError = AxiosError;
 
 const useUpdateTenantById = () => {
-  const router = useRouter();
-
   const { fetchApi, isLoading } = useApi<
     UpdateTenantByIdDataParams,
     UpdateTenantByIdDataResponse,
