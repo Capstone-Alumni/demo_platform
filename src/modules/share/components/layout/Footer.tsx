@@ -40,7 +40,7 @@ const Footer = () => {
           sx={{
             display: 'flex',
             flexDirection: 'row',
-            gap: theme.spacing(2),
+            gap: theme.spacing(4),
           }}
         >
           <Box
