@@ -52,14 +52,15 @@ const IntroductionSection = () => {
           </Box>
 
           <Typography fontSize={22}>
-            Some description long long descriptioncs sc fwefa vf va fewvdsvafd
-            ab csdc ds
+            Nền tảng kết nối cựu học sinh là dịch vụ cung cấp nơi cho nhà trường
+            và các cựu học sinh kết nối lại với nhau.
           </Typography>
 
           <Typography fontSize={18}>
-            Some description long long descriptioncs sc fwefa vf va fewvdsvafd
-            ab csdc ds. Some description long long descriptioncs sc fwefa vf va
-            fewvdsvafd ab csdc ds.
+            Ở đây cựu học sinh có thể tìm lại những người bạn học cũ của mình,
+            nắm được những tin tức của trường, tạo ra các hoạt động liên quan
+            đến cựu học sinh, gây quỹ ủng hộ hay tạo ra các hoạt động định hướng
+            nghề nghiệp cho các học sinh hiện tại.
           </Typography>
 
           <Box>
