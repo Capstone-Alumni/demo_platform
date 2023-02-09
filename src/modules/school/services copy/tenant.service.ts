@@ -147,7 +147,7 @@ export default class TenantService {
 
     /** Create schema in mainApp */
     await mainAppPrisma.$executeRaw`
-      SELECT clone_schema('public', ${values.tenantId});
+      SELECT template.clone_schema('template', ${values.tenantId});
     `;
 
     return newTenant;
@@ -348,7 +348,7 @@ export default class TenantService {
 
     /** Create schema in mainApp */
     await mainAppPrisma.$executeRaw`
-      SELECT clone_schema('public', ${tenant.tenantId});
+      SELECT template.clone_schema('template', ${tenant.tenantId});
     `;
 
     const newTenant = await prisma.tenant.update({

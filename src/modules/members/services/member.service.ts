@@ -144,14 +144,27 @@ export default class MemberService {
     }
 
     if (data.accessLevel) {
-      await prisma.member.update({
-        where: {
-          id: id,
-        },
-        data: {
-          accessLevel: data.accessLevel,
-        },
-      });
+      if (data.accessLevel === 'ALUMNI') {
+        await prisma.member.update({
+          where: {
+            id: id,
+          },
+          data: {
+            accessStatus: 'PENDING',
+            accessLevel: data.accessLevel,
+          },
+        });
+      } else {
+        await prisma.member.update({
+          where: {
+            id: id,
+          },
+          data: {
+            accessStatus: 'APPROVED',
+            accessLevel: data.accessLevel,
+          },
+        });
+      }
     }
 
     return member;
