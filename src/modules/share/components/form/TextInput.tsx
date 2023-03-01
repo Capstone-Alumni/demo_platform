@@ -1,10 +1,10 @@
-import { OutlinedInput, OutlinedInputProps } from '@mui/material';
+import { TextField, TextFieldProps } from '@mui/material';
 import { Control, Controller } from 'react-hook-form';
 
 type TextInputProps = {
   control: Control;
   name: string;
-  inputProps: OutlinedInputProps;
+  inputProps?: TextFieldProps;
 };
 
 const TextInput = ({ control, name, inputProps }: TextInputProps) => {
@@ -12,7 +12,14 @@ const TextInput = ({ control, name, inputProps }: TextInputProps) => {
     <Controller
       control={control}
       name={name}
-      render={({ field }) => <OutlinedInput {...inputProps} {...field} />}
+      render={({ field, fieldState: { error } }) => (
+        <TextField
+          {...inputProps}
+          {...field}
+          error={Boolean(error?.message)}
+          helperText={error?.message}
+        />
+      )}
     />
   );
 };
