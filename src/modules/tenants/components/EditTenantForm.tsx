@@ -18,7 +18,7 @@ import {
 
 import useYupValidateionResolver from 'src/modules/share/utils/useYupValidationResolver';
 import { Tenant } from '../types';
-import UploadAvatar from '@share/components/upload/UploadAvatar';
+import UploadAvatarInput from '@share/components/form/UploadAvatarInput';
 
 export type EditTenantFormValues = {
   email: string;
@@ -56,11 +56,7 @@ const EditTenantForm = ({
 
   const resolver = useYupValidateionResolver(validationSchema);
 
-  const {
-    control,
-    handleSubmit,
-    formState: { errors },
-  } = useForm({
+  const { control, handleSubmit } = useForm({
     defaultValues: {
       email: initialData.members[0].user.email,
       tenantId: initialData.tenantId ?? '',
@@ -117,19 +113,10 @@ const EditTenantForm = ({
           alignItems: 'flex-start',
         }}
       >
-        <Controller
+        <UploadAvatarInput
           control={control}
           name="logo"
-          render={({ field }) => (
-            <UploadAvatar
-              file={field.value}
-              {...field}
-              onDrop={files => {
-                console.log('on drop', files);
-              }}
-              sx={{ margin: 0 }}
-            />
-          )}
+          inputProps={{ label: 'Logo trường', sx: { margin: 0 } }}
         />
       </Box>
 
