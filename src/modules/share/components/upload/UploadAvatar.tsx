@@ -60,7 +60,7 @@ interface CustomFile extends File {
   preview?: string;
 }
 
-interface UploadAvatarProps extends DropzoneOptions {
+export interface UploadAvatarProps extends DropzoneOptions {
   error?: boolean;
   file: CustomFile | string | null;
   caption?: ReactNode;
@@ -82,6 +82,9 @@ export default function UploadAvatar({
     fileRejections,
   } = useDropzone({
     multiple: false,
+    accept: {
+      'image/jpeg': ['.jpeg', '.png'],
+    },
     ...other,
   });
 
@@ -156,7 +159,7 @@ export default function UploadAvatar({
               sx={{ width: 24, height: 24, mb: 1 }}
             />
             <Typography variant="caption">
-              {file ? 'Update photo' : 'Upload photo'}
+              {file ? 'Cập nhập' : 'Tải ảnh lên'}
             </Typography>
           </PlaceholderStyle>
         </DropZoneStyle>
