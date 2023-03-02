@@ -15,6 +15,9 @@ export type Tenant = {
     };
   }>;
   theme?: string;
+  background1: string | null;
+  background2: string | null;
+  background3: string | null;
 };
 
 export type GetTenantListData = {

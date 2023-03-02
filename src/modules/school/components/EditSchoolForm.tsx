@@ -31,6 +31,9 @@ export type EditSChoolFormValues = {
   name: string;
   theme?: string;
   description?: string;
+  background1?: string;
+  background2?: string;
+  background3?: string;
 };
 
 const MAINAPP_DOMAIN = '.vercel.app';
@@ -41,6 +44,9 @@ const validationSchema = yup.object({
   name: yup.string().required(),
   theme: yup.string(),
   description: yup.string(),
+  background1: yup.string(),
+  background2: yup.string(),
+  background3: yup.string(),
 });
 
 const EditSChoolForm = ({
@@ -62,6 +68,9 @@ const EditSChoolForm = ({
       name: initialData?.name ?? '',
       theme: initialData?.theme,
       description: initialData?.description ?? '',
+      background1: initialData?.background1 ?? '',
+      background2: initialData?.background2 ?? '',
+      background3: initialData?.background3 ?? '',
     },
     resolver,
   });
