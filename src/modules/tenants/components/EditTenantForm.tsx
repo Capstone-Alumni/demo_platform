@@ -19,6 +19,7 @@ import {
 import useYupValidateionResolver from 'src/modules/share/utils/useYupValidationResolver';
 import { Tenant } from '../types';
 import UploadAvatarInput from '@share/components/form/UploadAvatarInput';
+import RichTextInput from '@share/components/form/RichTextInput';
 
 export type EditTenantFormValues = {
   email: string;
@@ -194,6 +195,17 @@ const EditTenantForm = ({
         render={({ field }) => (
           <TextField fullWidth label="Mô tả" multiline {...field} />
         )}
+      />
+
+      <RichTextInput
+        control={control}
+        name="description"
+        inputProps={{
+          placeholder: 'Hãy mô tả thêm về trường',
+          containerSx: {
+            width: '100%',
+          },
+        }}
       />
 
       <Box

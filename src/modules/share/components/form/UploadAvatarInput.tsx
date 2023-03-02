@@ -45,7 +45,7 @@ const UploadAvatarInput = ({ control, name, inputProps }: TextInputProps) => {
         name={name}
         render={({ field }) => (
           <UploadAvatar
-            {...field}
+            // {...field}
             {...inputProps}
             file={field.value}
             onDrop={async files => {

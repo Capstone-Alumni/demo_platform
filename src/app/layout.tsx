@@ -1,5 +1,6 @@
-import Header from '@share/components/layout/Header';
 import CSRProvider from '../modules/share/components/CSRProider';
+
+import 'quill/dist/quill.snow.css';
 
 export default async function RootLayout({
   children,
