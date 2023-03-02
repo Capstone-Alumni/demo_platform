@@ -13,10 +13,12 @@ import {
   requiredPasswordValidator,
 } from '@share/utils/validators';
 import Logo from '@share/components/Logo';
+import UploadAvatarInput from '@share/components/form/UploadAvatarInput';
 
 export type RegisterTenantFormValues = {
   email: string;
   password: string;
+  logo: string;
   name: string;
 };
 
@@ -24,6 +26,7 @@ const validationSchema = yup.object({
   email: requiredEmailValidator,
   password: requiredPasswordValidator,
   name: yup.string().required(),
+  logo: yup.string().required(),
 });
 
 const RegisterTenantForm = ({
@@ -41,6 +44,7 @@ const RegisterTenantForm = ({
       email: '',
       password: '',
       name: '',
+      logo: '',
     },
     resolver,
   });
@@ -119,6 +123,21 @@ const RegisterTenantForm = ({
         <Typography variant="body1" fontWeight="bold">
           Thông tin trường
         </Typography>
+      </Box>
+
+      <Box
+        sx={{
+          width: '100%',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'flex-start',
+        }}
+      >
+        <UploadAvatarInput
+          control={control}
+          name="logo"
+          inputProps={{ label: 'Logo trường', sx: { margin: 0 } }}
+        />
       </Box>
 
       <Controller

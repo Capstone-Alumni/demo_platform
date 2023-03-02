@@ -10,7 +10,7 @@ const BodyWithSidebar = ({ children }: { children: React.ReactNode }) => {
   return (
     <Box
       sx={{
-        height: '100vh',
+        minHeight: '100vh',
         display: 'flex',
         flexDirection: 'row',
       }}

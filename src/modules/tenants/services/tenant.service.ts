@@ -283,6 +283,7 @@ export default class TenantService {
     const newTenant = await prisma.tenant.create({
       data: {
         name: values.name,
+        logo: values.logo,
         tenantId: tenantId,
         activated: false,
         members: {

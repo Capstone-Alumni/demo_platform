@@ -19,6 +19,9 @@ import {
 import useYupValidateionResolver from 'src/modules/share/utils/useYupValidationResolver';
 import { Tenant } from '../types';
 import UploadAvatar from '@share/components/upload/UploadAvatar';
+import UploadBackgroundInput from '@share/components/form/UploadBackgroundInput';
+import UploadAvatarInput from '@share/components/form/UploadAvatarInput';
+import RichTextInput from '@share/components/form/RichTextInput';
 
 export type EditSChoolFormValues = {
   email: string;
@@ -91,19 +94,38 @@ const EditSChoolForm = ({
           alignItems: 'flex-start',
         }}
       >
-        <Controller
+        <UploadAvatarInput
           control={control}
           name="logo"
-          render={({ field }) => (
-            <UploadAvatar
-              file={field.value}
-              {...field}
-              onDrop={files => {
-                console.log('on drop', files);
-              }}
-              sx={{ margin: 0 }}
-            />
-          )}
+          inputProps={{ label: 'Logo trường', sx: { margin: 0 } }}
+        />
+      </Box>
+
+      <Box
+        sx={{
+          width: '100%',
+          display: 'flex',
+          flexDirection: 'row',
+          alignItems: 'flex-start',
+          gap: 2,
+        }}
+      >
+        <UploadBackgroundInput
+          control={control}
+          name="background1"
+          inputProps={{ label: 'Hình nền 1', sx: { margin: 0 } }}
+        />
+
+        <UploadBackgroundInput
+          control={control}
+          name="background2"
+          inputProps={{ label: 'Hình nền 2', sx: { margin: 0 } }}
+        />
+
+        <UploadBackgroundInput
+          control={control}
+          name="background3"
+          inputProps={{ label: 'Hình nền 3', sx: { margin: 0 } }}
         />
       </Box>
 
@@ -130,6 +152,7 @@ const EditSChoolForm = ({
             <TextField
               fullWidth
               label="Subdomain"
+              disabled={!initialData.activated}
               {...field}
               InputProps={{
                 endAdornment: (
@@ -167,12 +190,15 @@ const EditSChoolForm = ({
         />
       </Box>
 
-      <Controller
+      <RichTextInput
         control={control}
         name="description"
-        render={({ field }) => (
-          <TextField fullWidth label="Mô tả" multiline {...field} />
-        )}
+        inputProps={{
+          placeholder: 'Hãy mô tả thêm về trường',
+          containerSx: {
+            width: '100%',
+          },
+        }}
       />
 
       <Box

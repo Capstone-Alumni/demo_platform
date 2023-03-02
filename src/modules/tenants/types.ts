@@ -73,4 +73,5 @@ export type RegisterTenantServiceProps = {
   email: string;
   password: string;
   name: string;
+  logo: string;
 };

@@ -1,7 +1,10 @@
 'use client';
 
-import { Box, Typography, useTheme } from '@mui/material';
+import { Button } from '@mui/material';
+import { Box, Link, Typography, useTheme } from '@mui/material';
+import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import LoadingIndicator from '@share/components/LoadingIndicator';
+import getTenantHost from 'src/modules/tenants/utils/getTenantHost';
 import useGetMySchool from '../hooks/useGetMySchool';
 
 import useUpdateTenantById from '../hooks/useUpdateTenantById';
@@ -40,6 +43,18 @@ const EditSchoolPage = () => {
       >
         <Typography variant="h3" sx={{ flex: 1 }}>
           Thông tin của trường
+          <br />
+          {initialData?.subdomain && initialData?.activated ? (
+            <Link
+              href={getTenantHost(initialData.subdomain)}
+              target="_blank"
+              rel="noreferrer"
+            >
+              <Button startIcon={<OpenInNewIcon />}>Mở trang web</Button>
+            </Link>
+          ) : (
+            <Typography>Chưa được kích hoạt</Typography>
+          )}
         </Typography>
       </Box>
 
