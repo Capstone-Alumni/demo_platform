@@ -17,6 +17,9 @@ model Tenant {
   subdomain     String? @unique
   customDomain  String? @unique @map("custom_domain")
   logo          String?
+  background1          String?
+  background2          String?
+  background3          String?
   description   String? @db.Text
   activated Boolean @default(false)
   theme String? @default("purple")

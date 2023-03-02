@@ -20,6 +20,7 @@ import useYupValidateionResolver from 'src/modules/share/utils/useYupValidationR
 import { Tenant } from '../types';
 import UploadAvatarInput from '@share/components/form/UploadAvatarInput';
 import RichTextInput from '@share/components/form/RichTextInput';
+import UploadBackgroundInput from '@share/components/form/UploadBackgroundInput';
 
 export type EditTenantFormValues = {
   email: string;
@@ -29,6 +30,9 @@ export type EditTenantFormValues = {
   name: string;
   theme?: string;
   description?: string;
+  background1?: string;
+  background2?: string;
+  background3?: string;
 };
 
 const MAINAPP_DOMAIN = '.vercel.app';
@@ -38,6 +42,9 @@ const validationSchema = yup.object({
   tenantId: yup.string().required(),
   subdomain: yup.string().required(),
   logo: yup.string(),
+  background1: yup.string(),
+  background2: yup.string(),
+  background3: yup.string(),
   name: yup.string().required(),
   theme: yup.string(),
   description: yup.string(),
@@ -55,6 +62,8 @@ const EditTenantForm = ({
   const theme = useTheme();
   const [submitting, setSubmitting] = useState(false);
 
+  console.log(initialData);
+
   const resolver = useYupValidateionResolver(validationSchema);
 
   const { control, handleSubmit } = useForm({
@@ -63,6 +72,9 @@ const EditTenantForm = ({
       tenantId: initialData.tenantId ?? '',
       subdomain: initialData?.subdomain ?? '',
       logo: initialData?.logo ?? '',
+      background1: initialData?.background1 ?? '',
+      background2: initialData?.background2 ?? '',
+      background3: initialData?.background3 ?? '',
       name: initialData?.name ?? '',
       theme: initialData?.theme,
       description: initialData?.description ?? '',
@@ -118,6 +130,34 @@ const EditTenantForm = ({
           control={control}
           name="logo"
           inputProps={{ label: 'Logo trường', sx: { margin: 0 } }}
+        />
+      </Box>
+
+      <Box
+        sx={{
+          width: '100%',
+          display: 'flex',
+          flexDirection: 'row',
+          alignItems: 'flex-start',
+          gap: 2,
+        }}
+      >
+        <UploadBackgroundInput
+          control={control}
+          name="background1"
+          inputProps={{ label: 'Hình nền 1', sx: { margin: 0 } }}
+        />
+
+        <UploadBackgroundInput
+          control={control}
+          name="background2"
+          inputProps={{ label: 'Hình nền 2', sx: { margin: 0 } }}
+        />
+
+        <UploadBackgroundInput
+          control={control}
+          name="background3"
+          inputProps={{ label: 'Hình nền 3', sx: { margin: 0 } }}
         />
       </Box>
 

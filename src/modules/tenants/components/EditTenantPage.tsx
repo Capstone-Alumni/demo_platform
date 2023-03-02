@@ -1,10 +1,12 @@
 'use client';
 
-import { Box, Typography, useTheme } from '@mui/material';
+import { Box, Button, Link, Typography, useTheme } from '@mui/material';
 import { useRouter } from 'next/navigation';
+import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 
 import useUpdateTenantById from '../hooks/useUpdateTenantById';
 import { Tenant } from '../types';
+import getTenantHost from '../utils/getTenantHost';
 import EditTenantForm, { EditTenantFormValues } from './EditTenantForm';
 
 const EditTenantPage = ({ initialData }: { initialData: Tenant }) => {
@@ -37,6 +39,16 @@ const EditTenantPage = ({ initialData }: { initialData: Tenant }) => {
       >
         <Typography variant="h3" sx={{ flex: 1 }}>
           {initialData.name}
+          <br />
+          {initialData.subdomain && initialData.activated ? (
+            <Link
+              href={getTenantHost(initialData.subdomain)}
+              target="_blank"
+              rel="noreferrer"
+            >
+              <Button startIcon={<OpenInNewIcon />}>Mở trang web</Button>
+            </Link>
+          ) : null}
         </Typography>
       </Box>
 

@@ -1,28 +1,29 @@
 import { setStorage } from '@lib/firebase/methods/setStorage';
 import { Control, Controller } from 'react-hook-form';
 import { toast } from 'react-toastify';
-import UploadAvatar, { UploadAvatarProps } from '../upload/UploadAvatar';
+import UploadBackground, {
+  UploadBackgroundProps,
+} from '../upload/UploadBackground';
 import uniqid from 'uniqid';
-import { Box, FormLabel } from '@mui/material';
-import { SxProps } from '@mui/material';
+import { Box, FormLabel, SxProps } from '@mui/material';
 
 type TextInputProps = {
   control: Control;
   name: string;
-  inputProps?: Omit<UploadAvatarProps, 'file'> & {
+  inputProps?: Omit<UploadBackgroundProps, 'file'> & {
     label?: string;
   };
   containerSx?: SxProps;
 };
 
-const UploadAvatarInput = ({
+const UploadBackgroundInput = ({
   control,
   name,
   inputProps,
   containerSx,
 }: TextInputProps) => {
   const handleDrop = async (acceptedFiles: File[]) => {
-    const { uploadAvatar } = setStorage();
+    const { uploadBackground } = setStorage();
     const file = acceptedFiles[0];
     const toastId = new Date().getMilliseconds();
 
@@ -30,7 +31,7 @@ const UploadAvatarInput = ({
       toast.loading('Đang xử lý ảnh...', {
         toastId,
       });
-      const url = await uploadAvatar(uniqid(), file);
+      const url = await uploadBackground(uniqid(), file);
 
       toast.dismiss(toastId);
       toast.success('Đã xử lý xong');
@@ -51,7 +52,7 @@ const UploadAvatarInput = ({
         control={control}
         name={name}
         render={({ field }) => (
-          <UploadAvatar
+          <UploadBackground
             // {...field}
             {...inputProps}
             file={field.value}
@@ -66,4 +67,4 @@ const UploadAvatarInput = ({
   );
 };
 
-export default UploadAvatarInput;
+export default UploadBackgroundInput;

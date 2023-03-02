@@ -16,6 +16,18 @@ export const setStorage = () => {
     }
   };
 
+  const uploadBackground = async (userID: any, file: any) => {
+    filePath = `users/${userID}/background/${file.name}`;
+    const storageRef = projectStorage.ref(filePath);
+    try {
+      const res = await storageRef.put(file);
+      const url = await res.ref.getDownloadURL();
+      return url;
+    } catch (err) {
+      console.log(err.message);
+    }
+  };
+
   const uploadNewsImg = async (newsId: any, file: any) => {
     filePath = `news/${newsId}/${file.name}`;
     const storageRef = projectStorage.ref(filePath);
@@ -30,6 +42,7 @@ export const setStorage = () => {
 
   return {
     uploadAvatar,
+    uploadBackground,
     uploadNewsImg,
   };
 };

@@ -2,6 +2,9 @@
 export type Tenant = {
   id: string;
   logo: string | null;
+  background1: string | null;
+  background2: string | null;
+  background3: string | null;
   tenantId: string;
   name: string;
   subdomain: string | null;
@@ -59,6 +62,9 @@ export type UpdateTenantInfoByIdServiceProps = {
   tenantId?: string;
   description?: string;
   logo?: string;
+  background1?: string;
+  background2?: string;
+  background3?: string;
   subdomain?: string;
   theme?: string;
 };

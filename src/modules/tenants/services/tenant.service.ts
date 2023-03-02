@@ -209,6 +209,9 @@ export default class TenantService {
         name: data.name,
         description: data.description,
         logo: data.logo,
+        background1: data.background1,
+        background2: data.background2,
+        background3: data.background3,
         theme: data.theme,
       },
     });
