@@ -1,5 +1,5 @@
 import { projectFirestore, timestamp } from '../config';
-import { generateUniqSerial } from 'src/utils';
+import uniqid from 'uniqid';
 
 export const setCollection = () => {
   const addDocWithID = async (
@@ -13,7 +13,7 @@ export const setCollection = () => {
         .collection(collection)
         .doc(userID)
         .collection(subCollection)
-        .doc(generateUniqSerial())
+        .doc(uniqid())
         .set({
           ...doc,
           createdAt: timestamp(),
