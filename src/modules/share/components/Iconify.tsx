@@ -8,6 +8,8 @@ import { Box } from '@mui/material';
 
 Iconify.propTypes = {
   icon: PropTypes.oneOfType([PropTypes.element, PropTypes.string]),
+  width: PropTypes.number,
+  height: PropTypes.number,
   sx: PropTypes.object,
 };
 

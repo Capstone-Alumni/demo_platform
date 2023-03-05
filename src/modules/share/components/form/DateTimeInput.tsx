@@ -17,7 +17,9 @@ const DateTimeInput = ({ control, name, inputProps }: TextInputProps) => {
         <DateTimePicker
           {...field}
           label={inputProps?.label}
-          renderInput={params => <TextField {...params} {...inputProps} />}
+          renderInput={(params: JSX.IntrinsicAttributes & TextFieldProps) => (
+            <TextField {...params} {...inputProps} />
+          )}
         />
       )}
     />

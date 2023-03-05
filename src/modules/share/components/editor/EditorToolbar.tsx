@@ -35,9 +35,13 @@ const HEADINGS = [
 ];
 
 export function undoChange() {
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
   this.quill.history.undo();
 }
 export function redoChange() {
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
   this.quill.history.redo();
 }
 

@@ -119,6 +119,8 @@ export default function Editor({
 
       const quillObj = quillRef.current?.getEditor();
       const range = quillObj?.getSelection();
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
       quillObj?.editor.insertEmbed(range?.index, 'image', url);
     };
   };
