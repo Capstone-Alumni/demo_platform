@@ -63,20 +63,20 @@ export default class SessionService {
   }: SignInRequestBody) => {
     const user = await prisma.user.findUnique({
       where: { email: email },
-      include: {
-        members: {
-          where: {
-            accessLevel: 'SCHOOL_ADMIN',
-          },
-        },
-      },
+      // include: {
+      //   members: {
+      //     where: {
+      //       accessLevel: 'SCHOOL_ADMIN',
+      //     },
+      //   },
+      // },
     });
 
     if (!user) {
       throw new Error('sign-in failed');
     }
 
-    if (!user.isTenantAdmin && user.members.length !== 1) {
+    if (!user.isTenantAdmin) {
       throw new Error('denied');
     }
 
