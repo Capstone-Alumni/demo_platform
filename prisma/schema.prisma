@@ -11,61 +11,64 @@ datasource db {
 }
 
 model Tenant {
-  id            String  @id @default(cuid())
-  tenantId        String  @unique
-  name          String
-  subdomain     String? @unique
-  customDomain  String? @unique @map("custom_domain")
-  logo          String?
-  background1          String?
-  background2          String?
-  background3          String?
-  description   String? @db.Text
-  activated Boolean @default(false)
-  theme String? @default("purple")
+  id           String  @id @default(cuid())
+  tenantId     String  @unique
+  name         String
+  subdomain    String? @unique
+  customDomain String? @unique @map("custom_domain")
+  logo         String?
+  background1  String?
+  background2  String?
+  background3  String?
+  description  String? @db.Text
+  activated    Boolean @default(false)
+  theme        String? @default("purple")
+
+  vnp_tmnCode String? @map("vnp_tmn_code")
+  vnp_hashSecret String? @map("vnp_hash_secret")
 
   members Member[]
 
-  archived Boolean @default(false)
-  createdAt     DateTime     @default(now()) @map("created_at")
-  updatedAt     DateTime     @default(now()) @updatedAt @map("updated_at")
+  archived  Boolean  @default(false)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
 
   @@map("tenants")
 }
 
 model User {
-  id            String       @id @default(cuid())
-  email         String      @unique
-  password      String
+  id       String @id @default(cuid())
+  email    String @unique
+  password String
 
   isTenantAdmin Boolean @default(false) @map("is_tenant_admin")
 
   members Member[]
-  
-  archived      Boolean      @default(false)
-  createdAt     DateTime     @default(now()) @map("created_at")
-  updatedAt     DateTime     @default(now()) @updatedAt @map("updated_at")
+
+  archived  Boolean  @default(false)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
 
   @@map("users")
 }
 
 model Member {
-  id            String  @id @default(cuid())
-  tenantId        String   @map("tenant_id")
-  userId String @map("user_id")
+  id       String @id @default(cuid())
+  tenantId String @map("tenant_id")
+  userId   String @map("user_id")
 
-  accessStatus  AccessStatus @default(PENDING) @map("access_status")
-  accessLevel   AccessLevel  @default(ALUMNI) @map("access_level")
-  accessMode    AccessMode   @default(FULL_ACCESS) @map("access_mode")
+  accessStatus AccessStatus @default(PENDING) @map("access_status")
+  accessLevel  AccessLevel  @default(ALUMNI) @map("access_level")
+  accessMode   AccessMode   @default(FULL_ACCESS) @map("access_mode")
 
-  isOwner Boolean @map("is_owner") @default(false)
+  isOwner Boolean @default(false) @map("is_owner")
 
   tenant Tenant @relation(fields: [tenantId], references: [id])
-  user User @relation(fields: [userId], references: [id])
+  user   User   @relation(fields: [userId], references: [id])
 
-  archived Boolean @default(false)
-  createdAt     DateTime     @default(now()) @map("created_at")
-  updatedAt     DateTime     @default(now()) @updatedAt @map("updated_at")
+  archived  Boolean  @default(false)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
 
   @@map("members")
 }

@@ -241,4 +241,30 @@ export default class TenantController {
       throw error;
     }
   };
+
+  static updateVnpayById = async (
+    req: NextApiRequest,
+    res: NextApiResponse<ApiSuccessResponse | ApiErrorResponse>,
+  ) => {
+    const { id } = req.query;
+    const Tenant = await TenantService.updateVnpayById(id as string, req.body);
+
+    return res.status(200).json({
+      status: true,
+      data: Tenant,
+    });
+  };
+
+  static getVnpayById = async (
+    req: NextApiRequest,
+    res: NextApiResponse<ApiSuccessResponse | ApiErrorResponse>,
+  ) => {
+    const { id } = req.query;
+    const data = await TenantService.getVnpayById(id as string);
+
+    return res.status(200).json({
+      status: true,
+      data,
+    });
+  };
 }

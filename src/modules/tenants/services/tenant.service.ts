@@ -3,6 +3,7 @@ import { genTenantId } from '@share/utils/genTenantId';
 import { createSubdomain, deleteSubdomain } from '@share/utils/subdomainAPI';
 import axios from 'axios';
 import { hashSync } from 'bcrypt';
+import { omit } from 'lodash/fp';
 
 import {
   CreateTenantServiceProps,
@@ -404,5 +405,50 @@ export default class TenantService {
     });
 
     return newTenant;
+  };
+
+  static updateVnpayById = async (
+    id: string,
+    data: { tmnCode: string; hashSecret: string },
+  ) => {
+    const tenant = await prisma.tenant.findUnique({
+      where: { id: id },
+    });
+    if (!tenant) {
+      throw new Error('tenant not existed');
+    }
+
+    const newTenant = await prisma.tenant.update({
+      where: {
+        id: id,
+      },
+      data: {
+        vnp_tmnCode: data.tmnCode,
+        vnp_hashSecret: data.hashSecret,
+      },
+    });
+
+    return newTenant;
+  };
+
+  static getVnpayById = async (id: string) => {
+    const data = await prisma.tenant.findFirst({
+      where: {
+        OR: [
+          {
+            tenantId: id,
+          },
+          {
+            id: id,
+          },
+        ],
+      },
+      select: {
+        vnp_tmnCode: true,
+        vnp_hashSecret: true,
+      },
+    });
+
+    return data;
   };
 }
