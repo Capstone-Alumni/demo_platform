@@ -1,15 +1,14 @@
 import { prisma } from 'src/lib/prisma/prisma';
 import { exclude } from './helpers';
-import { User } from '@prisma/client';
 
 export const getAlums = async () => {
   try {
-    const alumns = await prisma.user.findMany({
+    const alumns = await prisma.account.findMany({
       where: {
         archived: false,
       },
     });
-    const alumsResponse = alumns.map((alum: User) =>
+    const alumsResponse = alumns.map((alum: any) =>
       exclude(alum, ['password']),
     );
     return alumsResponse;
