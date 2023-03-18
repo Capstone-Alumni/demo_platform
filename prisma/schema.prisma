@@ -94,7 +94,7 @@ model Account {
 model Alumni {
   id        String @id @default(cuid())
   tenantId  String @map("tenant_id")
-  accountId String @map("user_id")
+  accountId String @map("account_id")
 
   accessLevel AccessLevel @default(ALUMNI) @map("access_level")
   firstLogin  DateTime?   @map("first_login")
