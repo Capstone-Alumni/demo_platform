@@ -36,6 +36,13 @@ export default class MemberController {
         });
       }
 
+      if (error.message?.includes('member already existed')) {
+        return res.status(400).json({
+          status: false,
+          message: 'Member is already existed',
+        });
+      }
+
       throw error;
     }
   };

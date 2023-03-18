@@ -1,4 +1,4 @@
-import { prisma } from '@lib/prisma/prisma';
+import { mainAppPrisma, prisma } from '@lib/prisma/prisma';
 import { hashSync } from 'bcrypt';
 
 import {
@@ -19,6 +19,8 @@ const isTenantExisted = async (id: string) => {
   if (!tenant) {
     throw new Error('tenant not exist');
   }
+
+  return tenant;
 };
 
 export default class MemberService {
@@ -28,25 +30,38 @@ export default class MemberService {
     accessLevel,
     tenantId,
   }: CreateMemberServiceProps) => {
-    await isTenantExisted(tenantId);
+    const tenant = await isTenantExisted(tenantId);
 
     if (!email || !password) {
       throw new Error('invalid data');
     }
 
-    const user = await prisma.account.findUnique({
+    let user = await prisma.account.findUnique({
       where: { email: email },
     });
 
     const encryptedPassword = hashSync(password, 10);
 
     if (!user) {
-      await prisma.account.create({
+      user = await prisma.account.create({
         data: {
           email: email,
           password: encryptedPassword,
         },
       });
+    }
+
+    const member = await prisma.alumni.findUnique({
+      where: {
+        tenantId_accountId: {
+          tenantId: tenantId,
+          accountId: user.id,
+        },
+      },
+    });
+
+    if (member) {
+      throw new Error('member already existed');
     }
 
     const newMember = await prisma.alumni.create({
@@ -65,7 +80,17 @@ export default class MemberService {
       },
     });
 
-    console.log(accessLevel, newMember);
+    const insertAlumniQuery = `
+      INSERT INTO ${tenant.tenantId}.alumni (id, tenant_id, account_id, account_email, access_level, access_status) values ($1, $2, $3, $4, $5::"template"."AccessLevel", 'APPROVED')
+    `;
+    await mainAppPrisma.$executeRawUnsafe(
+      insertAlumniQuery,
+      newMember.id,
+      tenant.id,
+      user.id,
+      user.email,
+      accessLevel,
+    );
 
     return newMember;
   };
@@ -124,9 +149,12 @@ export default class MemberService {
     id: string,
     data: UpdateMemberInfoByIdServiceProps,
   ) => {
-    const member = await prisma.alumni.findUnique({
+    let member = await prisma.alumni.findUnique({
       where: {
         id: id,
+      },
+      include: {
+        tenant: true,
       },
     });
 
@@ -144,37 +172,57 @@ export default class MemberService {
     }
 
     if (data.accessLevel) {
-      if (data.accessLevel === 'ALUMNI') {
-        await prisma.alumni.update({
-          where: {
-            id: id,
-          },
-          data: {
-            accessLevel: data.accessLevel,
-          },
-        });
-      } else {
-        await prisma.alumni.update({
-          where: {
-            id: id,
-          },
-          data: {
-            accessLevel: data.accessLevel,
-          },
-        });
+      if (
+        member?.accessLevel === 'SCHOOL_ADMIN' ||
+        data.accessLevel === 'SCHOOL_ADMIN'
+      ) {
+        return member;
       }
+
+      member = await prisma.alumni.update({
+        where: {
+          id: id,
+        },
+        data: {
+          accessLevel: data.accessLevel,
+        },
+        include: {
+          tenant: true,
+        },
+      });
+
+      const alumniQuery = `
+        UPDATE ${member?.tenant.tenantId}.alumni SET access_level = $1::"template"."AccessLevel" WHERE id = $2;
+      `;
+      await mainAppPrisma.$executeRawUnsafe(alumniQuery, data.accessLevel, id);
     }
 
     return member;
   };
 
   static deleteById = async (id: string) => {
-    const MemberDeleted = await prisma.alumni.delete({
+    const member = await prisma.alumni.findUnique({
+      where: { id: id },
+      include: {
+        tenant: true,
+      },
+    });
+
+    if (member?.isOwner) {
+      throw new Error('cannot delete');
+    }
+
+    const memberDeleted = await prisma.alumni.delete({
       where: {
         id: id,
       },
     });
 
-    return MemberDeleted;
+    const alumniQuery = `
+      DELETE FROM ${member?.tenant.tenantId}.alumni WHERE id = $1;
+    `;
+    await mainAppPrisma.$executeRawUnsafe(alumniQuery, id);
+
+    return memberDeleted;
   };
 }

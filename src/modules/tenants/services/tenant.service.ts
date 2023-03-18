@@ -321,8 +321,6 @@ export default class TenantService {
       },
     });
 
-    console.log(tenant);
-
     if (!tenant) {
       throw new Error('tenant is non-existed');
     }
@@ -363,6 +361,7 @@ export default class TenantService {
     }
     /** Create schema in mainApp */
     const tenantId = tenant.id;
+    const alumniId = tenant.alumni?.[0].id;
     const accountId = tenant.alumni?.[0].account.id;
     const accountEmail = tenant.alumni?.[0].account.email;
     await mainAppPrisma.$executeRaw`
@@ -373,7 +372,7 @@ export default class TenantService {
     `;
     await mainAppPrisma.$executeRawUnsafe(
       insertAlumniQuery,
-      tenantId,
+      alumniId,
       accountId,
       accountEmail,
     );
