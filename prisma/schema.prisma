@@ -24,7 +24,7 @@ model Tenant {
   activated    Boolean @default(false)
   theme        String? @default("purple")
 
-  vnp_tmnCode String? @map("vnp_tmn_code")
+  vnp_tmnCode    String? @map("vnp_tmn_code")
   vnp_hashSecret String? @map("vnp_hash_secret")
 
   members Member[]
@@ -32,6 +32,7 @@ model Tenant {
   archived  Boolean  @default(false)
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
+  alumni    Alumni[]
 
   @@map("tenants")
 }
@@ -48,6 +49,7 @@ model User {
   archived  Boolean  @default(false)
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
+  Alumni    Alumni[]
 
   @@map("users")
 }
@@ -71,6 +73,43 @@ model Member {
   updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
 
   @@map("members")
+}
+
+model Account {
+  id       String @id @default(cuid())
+  email    String @unique
+  password String
+
+  isTenantAdmin Boolean @default(false) @map("is_tenant_admin")
+
+  archived  Boolean  @default(false)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
+
+  alumni Alumni[]
+
+  @@map("accounts")
+}
+
+model Alumni {
+  id        String @id @default(cuid())
+  tenantId  String @map("tenant_id")
+  accountId String @map("user_id")
+
+  accessLevel AccessLevel @default(ALUMNI) @map("access_level")
+  firstLogin  DateTime?   @map("first_login")
+  isOwner     Boolean     @default(false) @map("is_owner")
+
+  tenant  Tenant  @relation(fields: [tenantId], references: [id])
+  account Account @relation(fields: [accountId], references: [id])
+
+  archived  Boolean  @default(false)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
+  User      User?    @relation(fields: [userId], references: [id])
+  userId    String?
+
+  @@map("alumni")
 }
 
 enum AccessLevel {
