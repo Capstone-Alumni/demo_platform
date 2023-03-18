@@ -27,51 +27,13 @@ model Tenant {
   vnp_tmnCode    String? @map("vnp_tmn_code")
   vnp_hashSecret String? @map("vnp_hash_secret")
 
-  members Member[]
-
   archived  Boolean  @default(false)
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
+
   alumni    Alumni[]
 
   @@map("tenants")
-}
-
-model User {
-  id       String @id @default(cuid())
-  email    String @unique
-  password String
-
-  isTenantAdmin Boolean @default(false) @map("is_tenant_admin")
-
-  members Member[]
-
-  archived  Boolean  @default(false)
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
-
-  @@map("users")
-}
-
-model Member {
-  id       String @id @default(cuid())
-  tenantId String @map("tenant_id")
-  userId   String @map("user_id")
-
-  accessStatus AccessStatus @default(PENDING) @map("access_status")
-  accessLevel  AccessLevel  @default(ALUMNI) @map("access_level")
-  accessMode   AccessMode   @default(FULL_ACCESS) @map("access_mode")
-
-  isOwner Boolean @default(false) @map("is_owner")
-
-  tenant Tenant @relation(fields: [tenantId], references: [id])
-  user   User   @relation(fields: [userId], references: [id])
-
-  archived  Boolean  @default(false)
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
-
-  @@map("members")
 }
 
 model Account {
@@ -114,14 +76,4 @@ enum AccessLevel {
   ALUMNI
   CLASS_MOD
   GRADE_MOD
-}
-
-enum AccessStatus {
-  PENDING
-  APPROVED
-}
-
-enum AccessMode {
-  FULL_ACCESS
-  READ_ONLY
 }
