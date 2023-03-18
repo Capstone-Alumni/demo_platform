@@ -7,15 +7,15 @@ export default class SchoolService {
         subdomain: subdomain,
       },
       include: {
-        members: {
+        alumni: {
           where: {
-            userId: userId,
+            accountId: userId,
           },
         },
       },
     });
 
-    if (school?.members?.length !== 1) {
+    if (school?.alumni?.length !== 1) {
       throw new Error('school not existed');
     }
 

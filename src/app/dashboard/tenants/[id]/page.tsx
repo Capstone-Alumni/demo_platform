@@ -10,12 +10,12 @@ export default async function Page({ params }: { params: { id: string } }) {
         id: id,
       },
       include: {
-        members: {
+        alumni: {
           where: {
             accessLevel: 'SCHOOL_ADMIN',
           },
           include: {
-            user: {
+            account: {
               select: {
                 id: true,
                 email: true,
@@ -46,7 +46,7 @@ export default async function Page({ params }: { params: { id: string } }) {
           background3: data.background3,
           createdAt: data.createdAt.toString(),
           activated: data.activated,
-          members: data.members,
+          alumni: data.alumni,
           theme: data.theme || undefined,
         }}
       />

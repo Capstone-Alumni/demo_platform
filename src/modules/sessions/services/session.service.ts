@@ -12,10 +12,10 @@ export default class SessionService {
       throw new Error('wrong tenant');
     }
 
-    const user = await prisma.user.findUnique({
+    const user = await prisma.account.findUnique({
       where: { email: email },
       include: {
-        members: {
+        alumni: {
           include: {
             tenant: {
               select: {
@@ -32,7 +32,7 @@ export default class SessionService {
       throw new Error('sign-in failed');
     }
 
-    const tenant = user.members.find(m => m.tenant.subdomain === subdomain);
+    const tenant = user.alumni.find(m => m.tenant.subdomain === subdomain);
 
     if (!tenant) {
       throw new Error('wrong subdomain');
@@ -49,8 +49,6 @@ export default class SessionService {
           subdomain: tenant.tenant.subdomain,
         },
         accessLevel: tenant.accessLevel,
-        accessStatus: tenant.accessStatus,
-        accessMode: tenant.accessMode,
       };
     }
 
@@ -61,10 +59,10 @@ export default class SessionService {
     email,
     password: passwordInputted,
   }: SignInRequestBody) => {
-    const user = await prisma.user.findUnique({
+    const user = await prisma.account.findUnique({
       where: { email: email },
       // include: {
-      //   members: {
+      //   alumni: {
       //     where: {
       //       accessLevel: 'SCHOOL_ADMIN',
       //     },

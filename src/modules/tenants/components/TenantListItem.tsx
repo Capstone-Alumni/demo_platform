@@ -103,7 +103,7 @@ const AdminTenantListItem = ({
           <Typography>{data.subdomain}</Typography>
         </TableCell>
         <TableCell align="left">
-          <Typography>{data.members?.[0].user.email}</Typography>
+          <Typography>{data.alumni?.[0].account.email}</Typography>
         </TableCell>
         <TableCell align="center">
           <Typography>

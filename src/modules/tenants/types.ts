@@ -11,8 +11,8 @@ export type Tenant = {
   description: string | null;
   createdAt: string | Date;
   activated: boolean;
-  members: Array<{
-    user: {
+  alumni: Array<{
+    account: {
       id: string;
       email: string;
     };

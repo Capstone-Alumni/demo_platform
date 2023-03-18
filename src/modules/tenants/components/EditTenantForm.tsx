@@ -68,7 +68,7 @@ const EditTenantForm = ({
 
   const { control, handleSubmit } = useForm({
     defaultValues: {
-      email: initialData.members[0].user.email,
+      email: initialData.alumni[0].account.email,
       tenantId: initialData.tenantId ?? '',
       subdomain: initialData?.subdomain ?? '',
       logo: initialData?.logo ?? '',

@@ -2,12 +2,12 @@ import { prisma } from '@lib/prisma/prisma';
 
 export default class SchoolService {
   static getSchool = async (userId: string) => {
-    const user = await prisma.user.findUnique({
+    const user = await prisma.account.findUnique({
       where: {
         id: userId,
       },
       include: {
-        members: {
+        alumni: {
           where: {
             accessLevel: 'SCHOOL_ADMIN',
           },
@@ -18,6 +18,6 @@ export default class SchoolService {
       },
     });
 
-    return user?.members[0].tenant;
+    return user?.alumni[0].tenant;
   };
 }

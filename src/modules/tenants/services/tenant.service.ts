@@ -36,12 +36,12 @@ export default class TenantService {
           createdAt: 'desc',
         },
         include: {
-          members: {
+          alumni: {
             where: {
               accessLevel: 'SCHOOL_ADMIN',
             },
             include: {
-              user: {
+              account: {
                 select: {
                   id: true,
                   email: true,
@@ -62,7 +62,7 @@ export default class TenantService {
 
   static create = async (values: CreateTenantServiceProps) => {
     /** pre-check */
-    const user = await prisma.user.findUnique({
+    const user = await prisma.account.findUnique({
       where: {
         email: values.email,
       },
@@ -129,12 +129,11 @@ export default class TenantService {
         description: values.description,
         logo: values.logo,
         subdomain: values.subdomain,
-        members: {
+        alumni: {
           create: [
             {
               accessLevel: 'SCHOOL_ADMIN',
-              accessStatus: 'APPROVED',
-              user: {
+              account: {
                 create: {
                   email: values.email,
                   password: encryptedPassword,
@@ -253,7 +252,7 @@ export default class TenantService {
           archived: true,
         },
       }),
-      prisma.member.deleteMany({
+      prisma.alumni.deleteMany({
         where: {
           tenantId: id,
         },
@@ -265,7 +264,7 @@ export default class TenantService {
 
   static registerTenant = async (values: RegisterTenantServiceProps) => {
     /** pre-check */
-    const user = await prisma.user.findUnique({
+    const user = await prisma.account.findUnique({
       where: {
         email: values.email,
       },
@@ -287,12 +286,11 @@ export default class TenantService {
         logo: values.logo,
         tenantId: tenantId,
         activated: false,
-        members: {
+        alumni: {
           create: [
             {
               accessLevel: 'SCHOOL_ADMIN',
-              accessStatus: 'APPROVED',
-              user: {
+              account: {
                 create: {
                   email: values.email,
                   password: encryptedPassword,

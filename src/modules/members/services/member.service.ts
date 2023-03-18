@@ -34,14 +34,14 @@ export default class MemberService {
       throw new Error('invalid data');
     }
 
-    const user = await prisma.user.findUnique({
+    const user = await prisma.account.findUnique({
       where: { email: email },
     });
 
     const encryptedPassword = hashSync(password, 10);
 
     if (!user) {
-      await prisma.user.create({
+      await prisma.account.create({
         data: {
           email: email,
           password: encryptedPassword,
@@ -49,10 +49,10 @@ export default class MemberService {
       });
     }
 
-    const newMember = await prisma.member.create({
+    const newMember = await prisma.alumni.create({
       data: {
         accessLevel: accessLevel,
-        user: {
+        account: {
           connect: {
             email: email,
           },
@@ -79,7 +79,7 @@ export default class MemberService {
       AND: [
         { tenantId: tenantId },
         {
-          user: {
+          account: {
             email: {
               contains: email,
             },
@@ -90,15 +90,15 @@ export default class MemberService {
     };
 
     const [totalMemberItem, MemberItems] = await prisma.$transaction([
-      prisma.member.count({
+      prisma.alumni.count({
         where: whereFilter,
       }),
-      prisma.member.findMany({
+      prisma.alumni.findMany({
         skip: (page - 1) * limit,
         take: limit,
         where: whereFilter,
         include: {
-          user: true,
+          account: true,
         },
       }),
     ]);
@@ -124,7 +124,7 @@ export default class MemberService {
     id: string,
     data: UpdateMemberInfoByIdServiceProps,
   ) => {
-    const member = await prisma.member.findUnique({
+    const member = await prisma.alumni.findUnique({
       where: {
         id: id,
       },
@@ -133,9 +133,9 @@ export default class MemberService {
     if (data.password) {
       const encryptedPassword = hashSync(data.password, 10);
 
-      await prisma.user.update({
+      await prisma.account.update({
         where: {
-          id: member?.userId,
+          id: member?.accountId,
         },
         data: {
           password: encryptedPassword,
@@ -145,22 +145,20 @@ export default class MemberService {
 
     if (data.accessLevel) {
       if (data.accessLevel === 'ALUMNI') {
-        await prisma.member.update({
+        await prisma.alumni.update({
           where: {
             id: id,
           },
           data: {
-            accessStatus: 'PENDING',
             accessLevel: data.accessLevel,
           },
         });
       } else {
-        await prisma.member.update({
+        await prisma.alumni.update({
           where: {
             id: id,
           },
           data: {
-            accessStatus: 'APPROVED',
             accessLevel: data.accessLevel,
           },
         });
@@ -171,7 +169,7 @@ export default class MemberService {
   };
 
   static deleteById = async (id: string) => {
-    const MemberDeleted = await prisma.member.delete({
+    const MemberDeleted = await prisma.alumni.delete({
       where: {
         id: id,
       },
