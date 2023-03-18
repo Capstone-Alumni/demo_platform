@@ -229,14 +229,6 @@ const EditTenantForm = ({
         )}
       />
 
-      <Controller
-        control={control}
-        name="description"
-        render={({ field }) => (
-          <TextField fullWidth label="Mô tả" multiline {...field} />
-        )}
-      />
-
       <RichTextInput
         control={control}
         name="description"
