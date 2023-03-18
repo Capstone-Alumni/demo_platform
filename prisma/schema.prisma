@@ -58,7 +58,7 @@ model Alumni {
   accountId String @map("account_id")
 
   accessLevel AccessLevel @default(ALUMNI) @map("access_level")
-  firstLogin  DateTime?   @map("first_login")
+  lastLogin  DateTime?   @map("last_login")
   isOwner     Boolean     @default(false) @map("is_owner")
 
   tenant  Tenant  @relation(fields: [tenantId], references: [id])

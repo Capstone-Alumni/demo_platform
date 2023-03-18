@@ -290,6 +290,7 @@ export default class TenantService {
           create: [
             {
               accessLevel: 'SCHOOL_ADMIN',
+              isOwner: true,
               account: {
                 create: {
                   email: values.email,
@@ -308,7 +309,19 @@ export default class TenantService {
   static activateById = async (id: string) => {
     const tenant = await prisma.tenant.findUnique({
       where: { id: id },
+      include: {
+        alumni: {
+          where: {
+            isOwner: true,
+          },
+          include: {
+            account: true,
+          },
+        },
+      },
     });
+
+    console.log(tenant);
 
     if (!tenant) {
       throw new Error('tenant is non-existed');
@@ -348,11 +361,22 @@ export default class TenantService {
         throw new Error('existed subdomain');
       }
     }
-
     /** Create schema in mainApp */
+    const tenantId = tenant.id;
+    const accountId = tenant.alumni?.[0].account.id;
+    const accountEmail = tenant.alumni?.[0].account.email;
     await mainAppPrisma.$executeRaw`
       SELECT template.clone_schema('template', ${tenant.tenantId});
     `;
+    const insertAlumniQuery = `
+      INSERT INTO ${tenant.tenantId}.alumni (id, tenant_id, account_id, account_email, access_level, access_status) values ($1, $1, $2, $3, 'SCHOOL_ADMIN', 'APPROVED')
+    `;
+    await mainAppPrisma.$executeRawUnsafe(
+      insertAlumniQuery,
+      tenantId,
+      accountId,
+      accountEmail,
+    );
 
     const newTenant = await prisma.tenant.update({
       where: {

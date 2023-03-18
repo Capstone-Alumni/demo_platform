@@ -41,6 +41,15 @@ export default class SessionService {
     const { password } = account;
 
     if (password && compareSync(passwordInputted, password)) {
+      await prisma.alumni.update({
+        where: {
+          id: alumni.id,
+        },
+        data: {
+          lastLogin: new Date(),
+        },
+      });
+
       return {
         id: account.id,
         email: account.email,
