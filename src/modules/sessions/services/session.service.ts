@@ -12,7 +12,7 @@ export default class SessionService {
       throw new Error('wrong tenant');
     }
 
-    const user = await prisma.account.findUnique({
+    const account = await prisma.account.findUnique({
       where: { email: email },
       include: {
         alumni: {
@@ -28,27 +28,27 @@ export default class SessionService {
       },
     });
 
-    if (!user) {
+    if (!account) {
       throw new Error('sign-in failed');
     }
 
-    const tenant = user.alumni.find(m => m.tenant.subdomain === subdomain);
+    const alumni = account.alumni.find(m => m.tenant.subdomain === subdomain);
 
-    if (!tenant) {
+    if (!alumni) {
       throw new Error('wrong subdomain');
     }
 
-    const { password } = user;
+    const { password } = account;
 
     if (password && compareSync(passwordInputted, password)) {
       return {
-        id: user.id,
-        email: user.email,
+        id: account.id,
+        email: account.email,
         tenant: {
-          tenantId: tenant.tenant.tenantId,
-          subdomain: tenant.tenant.subdomain,
+          tenantId: alumni.tenant.tenantId,
+          subdomain: alumni.tenant.subdomain,
         },
-        accessLevel: tenant.accessLevel,
+        accessLevel: alumni.accessLevel,
       };
     }
 
@@ -59,7 +59,7 @@ export default class SessionService {
     email,
     password: passwordInputted,
   }: SignInRequestBody) => {
-    const user = await prisma.account.findUnique({
+    const account = await prisma.account.findUnique({
       where: { email: email },
       // include: {
       //   alumni: {
@@ -70,21 +70,21 @@ export default class SessionService {
       // },
     });
 
-    if (!user) {
+    if (!account) {
       throw new Error('sign-in failed');
     }
 
-    if (!user.isTenantAdmin) {
+    if (!account.isTenantAdmin) {
       throw new Error('denied');
     }
 
-    const { password } = user;
+    const { password } = account;
 
     if (password && compareSync(passwordInputted, password)) {
       return {
-        id: user.id,
-        email: user.email,
-        isTenantAdmin: user.isTenantAdmin,
+        id: account.id,
+        email: account.email,
+        isTenantAdmin: account.isTenantAdmin,
       };
     }
 
