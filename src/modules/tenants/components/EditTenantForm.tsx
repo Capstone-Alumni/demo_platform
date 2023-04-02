@@ -62,8 +62,6 @@ const EditTenantForm = ({
   const theme = useTheme();
   const [submitting, setSubmitting] = useState(false);
 
-  console.log(initialData);
-
   const resolver = useYupValidateionResolver(validationSchema);
 
   const { control, handleSubmit } = useForm({

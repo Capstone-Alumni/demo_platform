@@ -2,6 +2,7 @@ import { mainAppPrisma, prisma } from '@lib/prisma/prisma';
 import { hashSync } from 'bcrypt';
 
 import {
+  CreateManyMemberServiceProps,
   CreateMemberServiceProps,
   GetMemberListServiceProps,
   UpdateMemberInfoByIdServiceProps,
@@ -93,6 +94,144 @@ export default class MemberService {
     );
 
     return newMember;
+  };
+
+  static createMany = async ({
+    memberListData,
+    tenantId,
+  }: CreateManyMemberServiceProps) => {
+    const tenant = await isTenantExisted(tenantId);
+
+    memberListData.forEach(({ email, password }) => {
+      if (!email || !password) {
+        throw new Error('invalid data');
+      }
+    });
+
+    const formattedData = await Promise.all(
+      memberListData.map(async ({ email, password, accessLevel }) => {
+        const encryptedPassword = hashSync(password, 10);
+
+        const user = await prisma.account.findUnique({
+          where: { email: email },
+        });
+
+        return {
+          accountId: user?.id,
+          accessLevel: accessLevel,
+          email: email,
+          password: encryptedPassword,
+        };
+      }),
+    );
+
+    const res = await prisma.$transaction(
+      formattedData.map(({ accountId, email, password, accessLevel }) => {
+        return prisma.alumni.upsert({
+          where: {
+            tenantId_accountId: {
+              tenantId: tenantId,
+              accountId: accountId || '',
+            },
+          },
+          update: {},
+          create: {
+            accessLevel: accessLevel,
+            account: {
+              connectOrCreate: {
+                where: { email: email },
+                create: { email: email, password: password },
+              },
+            },
+            tenant: {
+              connect: {
+                id: tenantId,
+              },
+            },
+          },
+          include: {
+            account: {
+              select: {
+                id: true,
+                email: true,
+              },
+            },
+          },
+        });
+      }),
+    );
+
+    res.forEach(async ({ id, accessLevel, account: user }) => {
+      const insertAlumniQuery = `
+        INSERT INTO ${tenant.tenantId}.alumni (id, tenant_id, account_id, account_email, access_level, access_status) values ($1, $2, $3, $4, $5::"template"."AccessLevel", 'APPROVED')
+      `;
+      await mainAppPrisma.$executeRawUnsafe(
+        insertAlumniQuery,
+        id,
+        tenant.id,
+        user.id,
+        user.email,
+        accessLevel,
+      );
+    });
+
+    return res;
+
+    // let user = await prisma.account.findUnique({
+    //   where: { email: email },
+    // });
+
+    // if (!user) {
+    //   user = await prisma.account.create({
+    //     data: {
+    //       email: email,
+    //       password: encryptedPassword,
+    //     },
+    //   });
+    // }
+
+    // const member = await prisma.alumni.findUnique({
+    //   where: {
+    //     tenantId_accountId: {
+    //       tenantId: tenantId,
+    //       accountId: user.id,
+    //     },
+    //   },
+    // });
+
+    // if (member) {
+    //   throw new Error('member already existed');
+    // }
+
+    // const newMember = await prisma.alumni.create({
+    //   data: {
+    //     accessLevel: accessLevel,
+    //     account: {
+    //       connect: {
+    //         email: email,
+    //       },
+    //     },
+    //     tenant: {
+    //       connect: {
+    //         id: tenantId,
+    //       },
+    //     },
+    //   },
+    // });
+
+    // const insertAlumniQuery = `
+    //   INSERT INTO ${tenant.tenantId}.alumni (id, tenant_id, account_id, account_email, access_level, access_status) values ($1, $2, $3, $4, $5::"template"."AccessLevel", 'APPROVED')
+    // `;
+    // await mainAppPrisma.$executeRawUnsafe(
+    //   insertAlumniQuery,
+    //   newMember.id,
+    //   tenant.id,
+    //   user.id,
+    //   user.email,
+    //   accessLevel,
+    // );
+
+    // return newMember;
   };
 
   static getList = async ({ tenantId, params }: GetMemberListServiceProps) => {
