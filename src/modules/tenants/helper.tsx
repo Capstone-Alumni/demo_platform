@@ -85,8 +85,6 @@ export const getVnpUrl = async ({
     },
   });
 
-  await prisma.$disconnect();
-
   vnp_Params.vnp_ReturnUrl = returnUrl;
   vnp_Params = sortObject(vnp_Params);
 

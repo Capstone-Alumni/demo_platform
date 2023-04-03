@@ -464,14 +464,14 @@ export default class TenantService {
       req.connection.remoteAddress ||
       req.socket.remoteAddress;
 
-    // const vnpUrl = await getVnpUrl({
-    //   ipAddr: ipAddr as string,
-    //   amount: tenant.plan.price,
-    //   orderDescription: 'Thanh toan hoa don the alumni app',
-    //   orderType: 250000,
-    //   tenantId: tenant.id,
-    //   planId: tenant.planId,
-    // });
+    const vnpUrl = await getVnpUrl({
+      ipAddr: ipAddr as string,
+      amount: tenant.plan.price,
+      orderDescription: 'Thanh toan hoa don the alumni app',
+      orderType: 250000,
+      tenantId: tenant.id,
+      planId: tenant.planId,
+    });
 
     // run async
     // axios.post(`${process.env.NEXT_PUBLIC_MAIL_HOST}/mail/send-email`, {
