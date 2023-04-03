@@ -474,16 +474,16 @@ export default class TenantService {
     });
 
     // run async
-    axios.post(`${process.env.NEXT_PUBLIC_MAIL_HOST}/mail/send-email`, {
-      to: tenant.alumni[0].account.email,
-      subject: 'Đăng ký Alumni App',
-      text: `
-        Kính gửi anh/chị,
+    // axios.post(`${process.env.NEXT_PUBLIC_MAIL_HOST}/mail/send-email`, {
+    //   to: tenant.alumni[0].account.email,
+    //   subject: 'Đăng ký Alumni App',
+    //   text: `
+    //     Kính gửi anh/chị,
 
-        Cảm ơn anh/chị đã lựa chọn The Alumn App. Mời anh/chị dùng link dưới đây để thanh toán và hoàn tất quá trình đăng ký.
-        ${vnpUrl}
-      `,
-    });
+    //     Cảm ơn anh/chị đã lựa chọn The Alumn App. Mời anh/chị dùng link dưới đây để thanh toán và hoàn tất quá trình đăng ký.
+    //     ${vnpUrl}
+    //   `,
+    // });
 
     /** Create schema in mainApp */
     const alumniId = tenant.alumni?.[0].id;
