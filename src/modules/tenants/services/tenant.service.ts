@@ -489,7 +489,7 @@ export default class TenantService {
     const alumniId = tenant.alumni?.[0].id;
     const accountId = tenant.alumni?.[0].account.id;
     const accountEmail = tenant.alumni?.[0].account.email;
-    await mainAppPrisma.$executeRaw`
+    mainAppPrisma.$executeRaw`
       SELECT template.clone_schema('template', ${tenant.tenantId});
     `;
     // const insertAlumniQuery = `
