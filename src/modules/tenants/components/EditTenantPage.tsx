@@ -8,6 +8,7 @@ import useUpdateTenantById from '../hooks/useUpdateTenantById';
 import { Tenant } from '../types';
 import getTenantHost from '../utils/getTenantHost';
 import EditTenantForm, { EditTenantFormValues } from './EditTenantForm';
+import SubscriptionForm from './SubscriptionForm';
 
 const EditTenantPage = ({ initialData }: { initialData: Tenant }) => {
   const theme = useTheme();
@@ -40,7 +41,7 @@ const EditTenantPage = ({ initialData }: { initialData: Tenant }) => {
         <Typography variant="h3" sx={{ flex: 1 }}>
           {initialData.name}
           <br />
-          {initialData.subdomain && initialData.activated ? (
+          {initialData.subdomain && initialData.approved ? (
             <Link
               href={getTenantHost(initialData.subdomain)}
               target="_blank"
@@ -51,6 +52,8 @@ const EditTenantPage = ({ initialData }: { initialData: Tenant }) => {
           ) : null}
         </Typography>
       </Box>
+
+      <SubscriptionForm initialData={initialData} />
 
       <EditTenantForm
         initialData={initialData}

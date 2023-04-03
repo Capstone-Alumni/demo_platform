@@ -16,10 +16,11 @@ model Plan {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
 
-  name     String   @unique
-  duration Int      @default(0)
-  price    Int      @default(0)
-  tenants  Tenant[]
+  name        String        @unique
+  duration    Int           @default(0)
+  price       Int           @default(0)
+  tenants     Tenant[]
+  transactions Transaction[]
 
   @@map("plans")
 }
@@ -119,8 +120,10 @@ model Transaction {
   vnp_ResponseCode      String? @map("vnp_response_code")
   vnp_TransactionStatus String? @map("vnp_transaction_status")
 
-  paymentStatus Int    @default(0) @map("payment_status")
-  subcription   String
+  paymentStatus Int @default(0) @map("payment_status")
+
+  planId String
+  plan   Plan   @relation(fields: [planId], references: [id])
 
   tenantId String @map("tenant_id")
   tenant   Tenant @relation(fields: [tenantId], references: [id])

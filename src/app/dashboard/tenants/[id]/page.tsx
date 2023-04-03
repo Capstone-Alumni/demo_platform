@@ -10,6 +10,7 @@ export default async function Page({ params }: { params: { id: string } }) {
         id: id,
       },
       include: {
+        plan: true,
         alumni: {
           where: {
             accessLevel: 'SCHOOL_ADMIN',
@@ -46,9 +47,16 @@ export default async function Page({ params }: { params: { id: string } }) {
           background3: data.background3,
           createdAt: data.createdAt.toString(),
           subcriptionEndTime: data.subcriptionEndTime?.toString(),
-          activated: data.activated,
           alumni: data.alumni,
           theme: data.theme || undefined,
+          provinceCodename: data.provinceCodename || '',
+          provinceName: data.provinceName || '',
+          cityCodename: data.cityCodename || '',
+          cityName: data.cityName || '',
+          plan: data?.plan,
+          planId: data.planId || '',
+          address: data.address || '',
+          approved: data.approved,
         }}
       />
     );

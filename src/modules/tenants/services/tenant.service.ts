@@ -1,9 +1,9 @@
+import { NextApiRequest } from 'next';
 import { mainAppPrisma, prisma } from '@lib/prisma/prisma';
 import { genTenantId } from '@share/utils/genTenantId';
 import { createSubdomain, deleteSubdomain } from '@share/utils/subdomainAPI';
 import axios from 'axios';
 import { hashSync } from 'bcrypt';
-import { omit } from 'lodash/fp';
 
 import {
   CreateTenantServiceProps,
@@ -11,6 +11,7 @@ import {
   RegisterTenantServiceProps,
   UpdateTenantInfoByIdServiceProps,
 } from '../types';
+import { getVnpUrl } from '../helper';
 
 export default class TenantService {
   static getList = async ({ params }: GetTenantListServiceProps) => {
@@ -394,7 +395,64 @@ export default class TenantService {
       },
       data: {
         subdomain: subdomain,
-        activated: true,
+        approved: true,
+      },
+    });
+
+    return newTenant;
+  };
+
+  static approveById = async (id: string, req: NextApiRequest) => {
+    const tenant = await prisma.tenant.findUnique({
+      where: { id: id },
+      include: {
+        alumni: {
+          where: {
+            isOwner: true,
+          },
+          include: {
+            account: true,
+          },
+        },
+        plan: true,
+      },
+    });
+
+    if (!tenant || !tenant?.plan || !tenant?.planId) {
+      throw new Error('tenant is non-existed');
+    }
+
+    const ipAddr =
+      req.headers['x-forwarded-for'] ||
+      req.connection.remoteAddress ||
+      req.socket.remoteAddress;
+
+    const vnpUrl = await getVnpUrl({
+      ipAddr: ipAddr as string,
+      amount: tenant.plan.price,
+      orderDescription: 'Thanh toan hoa don the alumni app',
+      orderType: 250000,
+      tenantId: tenant.id,
+      planId: tenant.planId,
+    });
+
+    await axios.post(`${process.env.NEXT_PUBLIC_MAIL_HOST}/mail/send-email`, {
+      to: tenant.alumni[0].account.email,
+      subject: 'Hoàn tất đăng ký Alumni App',
+      text: `
+        Kính gửi anh/chị,
+
+        Cảm ơn anh/chị đã lựa chọn The Alumn App. Mời anh/chị dùng link dưới đây để thanh toán và hoàn tất quá trình đăng ký.
+        ${vnpUrl}
+      `,
+    });
+
+    const newTenant = await prisma.tenant.update({
+      where: {
+        id: id,
+      },
+      data: {
+        approved: true,
       },
     });
 
@@ -432,7 +490,7 @@ export default class TenantService {
       },
       data: {
         subdomain: null,
-        activated: false,
+        approved: false,
       },
     });
 

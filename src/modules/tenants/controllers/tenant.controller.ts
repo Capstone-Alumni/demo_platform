@@ -1,5 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { ApiErrorResponse, ApiSuccessResponse } from 'src/types';
+import { getVnpUrl } from '../helper';
 
 import TenantService from '../services/tenant.service';
 
@@ -178,6 +179,53 @@ export default class TenantController {
     try {
       const { id } = req.query;
       const newTenant = await TenantService.activateById(id as string);
+
+      return res.status(201).json({
+        status: true,
+        data: newTenant,
+      });
+    } catch (error) {
+      if (error.message?.includes('existed')) {
+        if (error.message?.includes('tenantId')) {
+          return res.status(400).json({
+            status: false,
+            message: 'tenantId is existed',
+          });
+        }
+
+        if (error.message?.includes('subdomain')) {
+          return res.status(400).json({
+            status: false,
+            message: 'subdomain is existed',
+          });
+        }
+      }
+
+      if (error.message?.includes('forbidden')) {
+        return res.status(403).json({
+          status: false,
+          message: 'subdomain is taken',
+        });
+      }
+
+      if (error.message?.includes('non-existed')) {
+        return res.status(400).json({
+          status: false,
+          message: 'Tenant not existed',
+        });
+      }
+
+      throw error;
+    }
+  };
+
+  static approveById = async (
+    req: NextApiRequest,
+    res: NextApiResponse<ApiSuccessResponse | ApiErrorResponse>,
+  ) => {
+    try {
+      const { id } = req.query;
+      const newTenant = await TenantService.approveById(id as string, req);
 
       return res.status(201).json({
         status: true,

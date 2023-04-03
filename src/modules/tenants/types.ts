@@ -1,4 +1,12 @@
 /** ========================== FE ================================= */
+
+export type Plan = {
+  id: string;
+  name: string;
+  duration: string | number;
+  price: string | number;
+};
+
 export type Tenant = {
   id: string;
   logo: string | null;
@@ -11,7 +19,6 @@ export type Tenant = {
   description: string | null;
   createdAt: string | Date;
   subcriptionEndTime?: string | Date;
-  activated: boolean;
   alumni: Array<{
     account: {
       id: string;
@@ -19,6 +26,14 @@ export type Tenant = {
     };
   }>;
   theme?: string;
+  approved: boolean;
+  provinceCodename: string;
+  provinceName: string;
+  cityCodename: string;
+  cityName: string;
+  address: string;
+  planId: string;
+  plan: Plan | null;
 };
 
 export type GetTenantListData = {

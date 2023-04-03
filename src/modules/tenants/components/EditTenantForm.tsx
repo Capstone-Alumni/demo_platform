@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 
 import * as yup from 'yup';
@@ -21,6 +21,8 @@ import { Tenant } from '../types';
 import UploadAvatarInput from '@share/components/form/UploadAvatarInput';
 import RichTextInput from '@share/components/form/RichTextInput';
 import UploadBackgroundInput from '@share/components/form/UploadBackgroundInput';
+import SelectInput from '@share/components/form/SelectInput';
+import { getCityList, getProvinceList } from '@share/utils/getLocaltionList';
 
 export type EditTenantFormValues = {
   email: string;
@@ -33,6 +35,11 @@ export type EditTenantFormValues = {
   background1?: string;
   background2?: string;
   background3?: string;
+  provinceCodename: string;
+  provinceName: string;
+  cityCodename: string;
+  cityName: string;
+  address: string;
 };
 
 const MAINAPP_DOMAIN = '.vercel.app';
@@ -48,6 +55,11 @@ const validationSchema = yup.object({
   name: yup.string().required(),
   theme: yup.string(),
   description: yup.string(),
+  // provinceCodename: yup.string(),
+  provinceName: yup.string(),
+  // cityCodename: yup.string(),
+  cityName: yup.string(),
+  address: yup.string(),
 });
 
 const EditTenantForm = ({
@@ -57,14 +69,14 @@ const EditTenantForm = ({
 }: {
   initialData: Tenant;
   onClose?: () => void;
-  onSubmit: (values: EditTenantFormValues) => Promise<void>;
+  onSubmit?: (values: EditTenantFormValues) => Promise<void>;
 }) => {
   const theme = useTheme();
   const [submitting, setSubmitting] = useState(false);
 
   const resolver = useYupValidateionResolver(validationSchema);
 
-  const { control, handleSubmit } = useForm({
+  const { control, handleSubmit, watch } = useForm({
     defaultValues: {
       email: initialData.alumni[0].account.email,
       tenantId: initialData.tenantId ?? '',
@@ -76,13 +88,33 @@ const EditTenantForm = ({
       name: initialData?.name ?? '',
       theme: initialData?.theme,
       description: initialData?.description ?? '',
+      // provinceCodename: initialData?.provinceCodename ?? '',
+      provinceName: initialData?.provinceName ?? '',
+      // cityCodename: initialData?.cityCodename ?? '',
+      cityName: initialData?.cityName ?? '',
+      address: initialData?.address || '',
     },
     resolver,
   });
 
+  // const provinceCodenameWatcher = watch('provinceCodename');
+
+  // const provinceOptions = getProvinceList().map(p => ({
+  //   name: p.name,
+  //   value: p.codename,
+  // }));
+  // const cityOptions = useMemo(
+  //   () =>
+  //     getCityList(provinceCodenameWatcher)?.map(c => ({
+  //       name: c.name,
+  //       value: c.codename,
+  //     })),
+  //   [provinceCodenameWatcher],
+  // );
+
   const onSubmitHandler = async (values: EditTenantFormValues) => {
     setSubmitting(true);
-    await onSubmit(values);
+    await onSubmit?.(values);
     setSubmitting(false);
   };
 
@@ -159,14 +191,6 @@ const EditTenantForm = ({
         />
       </Box>
 
-      <Controller
-        control={control}
-        name="tenantId"
-        render={({ field }) => (
-          <TextField fullWidth label="Tenant Id" disabled {...field} />
-        )}
-      />
-
       <Box
         sx={{
           width: '100%',
@@ -196,12 +220,66 @@ const EditTenantForm = ({
 
         <Controller
           control={control}
-          name="name"
+          name="tenantId"
           render={({ field }) => (
-            <TextField fullWidth label="Tên trường" {...field} />
+            <TextField fullWidth label="Tenant Id" disabled {...field} />
           )}
         />
       </Box>
+
+      <Controller
+        control={control}
+        name="name"
+        render={({ field }) => (
+          <TextField fullWidth label="Tên trường" {...field} />
+        )}
+      />
+
+      <Controller
+        control={control}
+        name="provinceName"
+        render={({ field }) => <TextField fullWidth label="Tỉnh" {...field} />}
+      />
+
+      <Controller
+        control={control}
+        name="cityName"
+        render={({ field }) => (
+          <TextField fullWidth label="Thành phố" {...field} />
+        )}
+      />
+
+      <Controller
+        control={control}
+        name="address"
+        render={({ field }) => (
+          <TextField fullWidth label="Địa chỉ" {...field} />
+        )}
+      />
+
+      {/* <SelectInput
+        control={control}
+        name="provinceCodename"
+        options={provinceOptions}
+        inputProps={{
+          label: 'Tỉnh',
+          sx: {
+            width: '100%',
+          },
+        }}
+      />
+
+      <SelectInput
+        control={control}
+        name="cityCodename"
+        options={cityOptions}
+        inputProps={{
+          label: 'Thành phố',
+          sx: {
+            width: '100%',
+          },
+        }}
+      /> */}
 
       <Controller
         name="theme"
@@ -250,13 +328,15 @@ const EditTenantForm = ({
             Huỷ
           </Button>
         ) : null}
-        <Button
-          variant="contained"
-          disabled={submitting}
-          onClick={handleSubmit(onSubmitHandler)}
-        >
-          Lưu
-        </Button>
+        {onSubmit ? (
+          <Button
+            variant="contained"
+            disabled={submitting}
+            onClick={handleSubmit(onSubmitHandler)}
+          >
+            Lưu
+          </Button>
+        ) : null}
       </Box>
     </Paper>
   );

@@ -110,26 +110,15 @@ const AdminTenantListItem = ({
         </TableCell>
         <TableCell align="center">
           <Typography>
-            {data.activated ? (
-              <Button variant="outlined" size="small" color="success">
-                Đã kích hoạt
-              </Button>
-            ) : (
-              <Button variant="outlined" size="small" color="warning">
-                Chưa kích hoạt
-              </Button>
-            )}
-          </Typography>
-        </TableCell>
-        <TableCell align="center">
-          <Typography>
-            {formatDate(new Date(data?.subcriptionEndTime || ''))}
+            {data.approved
+              ? formatDate(new Date(data?.subcriptionEndTime || ''))
+              : 'Chưa xác nhận'}
           </Typography>
         </TableCell>
         <TableCell align="center">
           <ActionButton
             actions={[
-              data.activated && data.subdomain
+              data.approved && data.subdomain
                 ? {
                     id: 'view',
                     icon: <OpenInNewIcon />,
@@ -144,16 +133,11 @@ const AdminTenantListItem = ({
               {
                 id: 'edit',
                 icon: <BorderColorIcon />,
-                text: 'Chỉnh sửa',
+                text: 'Chi tiết',
                 onClick: () => router.push(`/dashboard/tenants/${data.id}`),
               },
-              data.activated
-                ? {
-                    id: 'deactivate',
-                    icon: <LightbulbIcon color="warning" />,
-                    text: 'Huỷ kích hoạt',
-                    onClick: () => onDeactivate(data.id),
-                  }
+              data.approved
+                ? null
                 : {
                     id: 'activate',
                     icon: <LightbulbIcon color="primary" />,
