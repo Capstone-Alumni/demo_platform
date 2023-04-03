@@ -473,7 +473,8 @@ export default class TenantService {
       planId: tenant.planId,
     });
 
-    await axios.post(`${process.env.NEXT_PUBLIC_MAIL_HOST}/mail/send-email`, {
+    // run async
+    axios.post(`${process.env.NEXT_PUBLIC_MAIL_HOST}/mail/send-email`, {
       to: tenant.alumni[0].account.email,
       subject: 'Đăng ký Alumni App',
       text: `
