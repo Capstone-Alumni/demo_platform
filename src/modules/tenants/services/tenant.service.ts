@@ -474,24 +474,24 @@ export default class TenantService {
     });
 
     // run async
-    axios.post(`${process.env.NEXT_PUBLIC_MAIL_HOST}/mail/send-email`, {
-      to: tenant.alumni[0].account.email,
-      subject: 'Đăng ký Alumni App',
-      text: `
-        Kính gửi anh/chị,
+    // axios.post(`${process.env.NEXT_PUBLIC_MAIL_HOST}/mail/send-email`, {
+    //   to: tenant.alumni[0].account.email,
+    //   subject: 'Đăng ký Alumni App',
+    //   text: `
+    //     Kính gửi anh/chị,
 
-        Cảm ơn anh/chị đã lựa chọn The Alumn App. Mời anh/chị dùng link dưới đây để thanh toán và hoàn tất quá trình đăng ký.
-        ${vnpUrl}
-      `,
-    });
+    //     Cảm ơn anh/chị đã lựa chọn The Alumn App. Mời anh/chị dùng link dưới đây để thanh toán và hoàn tất quá trình đăng ký.
+    //     ${vnpUrl}
+    //   `,
+    // });
 
     /** Create schema in mainApp */
     const alumniId = tenant.alumni?.[0].id;
     const accountId = tenant.alumni?.[0].account.id;
     const accountEmail = tenant.alumni?.[0].account.email;
-    mainAppPrisma.$executeRaw`
-      SELECT template.clone_schema('template', ${tenant.tenantId});
-    `;
+    // mainAppPrisma.$executeRaw`
+    //   SELECT template.clone_schema('template', ${tenant.tenantId});
+    // `;
     // const insertAlumniQuery = `
     //   INSERT INTO ${tenant.tenantId}.alumni (id, tenant_id, account_id, account_email, access_level, access_status) values ($1, $1, $2, $3, 'SCHOOL_ADMIN', 'APPROVED')
     // `;
