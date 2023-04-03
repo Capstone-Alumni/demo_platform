@@ -136,14 +136,14 @@ const AdminTenantListItem = ({
                 text: 'Chi tiết',
                 onClick: () => router.push(`/dashboard/tenants/${data.id}`),
               },
-              data.approved
-                ? null
-                : {
-                    id: 'activate',
-                    icon: <LightbulbIcon color="primary" />,
-                    text: 'Kích hoạt',
-                    onClick: () => onActivate(data.id),
-                  },
+              // data.approved
+              //   ? null
+              //   : {
+              //       id: 'activate',
+              //       icon: <LightbulbIcon color="primary" />,
+              //       text: 'Kích hoạt',
+              //       onClick: () => onActivate(data.id),
+              //     },
               {
                 id: 'delete',
                 icon: <DeleteIcon color="error" />,
