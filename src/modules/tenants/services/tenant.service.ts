@@ -489,9 +489,9 @@ export default class TenantService {
     const alumniId = tenant.alumni?.[0].id;
     const accountId = tenant.alumni?.[0].account.id;
     const accountEmail = tenant.alumni?.[0].account.email;
-    // await mainAppPrisma.$executeRaw`
-    //   SELECT template.clone_schema('template', ${tenant.tenantId});
-    // `;
+    await mainAppPrisma.$executeRaw`
+      SELECT template.clone_schema('template', ${tenant.tenantId});
+    `;
     // const insertAlumniQuery = `
     //   INSERT INTO ${tenant.tenantId}.alumni (id, tenant_id, account_id, account_email, access_level, access_status) values ($1, $1, $2, $3, 'SCHOOL_ADMIN', 'APPROVED')
     // `;
