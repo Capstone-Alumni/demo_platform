@@ -29,6 +29,7 @@ module.exports = {
     'src/modules/share/components/@material-extend/*',
     'src/modules/share/components/animate/*',
     'src/lib/mui/*',
+    '*.svg',
   ],
   rules: {
     // Possible errors

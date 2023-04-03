@@ -8,6 +8,7 @@ import * as yup from 'yup';
 import {
   Box,
   Button,
+  InputAdornment,
   Stack,
   TextField,
   Typography,
@@ -35,6 +36,7 @@ export type RegisterTenantFormValues = {
   cityName?: string;
   address: string;
   plan: string;
+  subdomain: string;
 };
 
 const validationSchema = yup.object({
@@ -46,7 +48,10 @@ const validationSchema = yup.object({
   cityCodename: yup.string().required('Bắt buộc'),
   address: yup.string().required('Bắt buộc'),
   plan: yup.string().required('Bẳt buộc'),
+  subdomain: yup.string().required('Bẳt buộc'),
 });
+
+const MAINAPP_DOMAIN = '.vercel.app';
 
 const RegisterTenantForm = ({
   onSubmit,
@@ -65,6 +70,7 @@ const RegisterTenantForm = ({
       name: '',
       logo: '',
       address: '',
+      subdomain: '',
     },
     resolver,
   });
@@ -209,6 +215,25 @@ const RegisterTenantForm = ({
               {...field}
               error={Boolean(error?.message)}
               helperText={error?.message}
+            />
+          )}
+        />
+
+        <Controller
+          control={control}
+          name="subdomain"
+          render={({ field }) => (
+            <TextField
+              fullWidth
+              label="Subdomain"
+              {...field}
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    {MAINAPP_DOMAIN}
+                  </InputAdornment>
+                ),
+              }}
             />
           )}
         />

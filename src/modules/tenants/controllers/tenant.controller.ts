@@ -162,9 +162,30 @@ export default class TenantController {
       });
     } catch (error) {
       if (error.message?.includes('existed')) {
+        if (error.message?.includes('subdomain')) {
+          return res.status(400).json({
+            status: false,
+            message: 'subdomain is existed',
+          });
+        }
+
         return res.status(400).json({
           status: false,
           message: 'you already has a school',
+        });
+      }
+
+      if (error.message?.includes('forbidden')) {
+        return res.status(403).json({
+          status: false,
+          message: 'subdomain is taken',
+        });
+      }
+
+      if (error.message?.includes('non-existed')) {
+        return res.status(400).json({
+          status: false,
+          message: 'Tenant not existed',
         });
       }
 

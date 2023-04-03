@@ -1,6 +1,7 @@
 'use client';
 
 import { Box, Stack, Typography, useTheme } from '@mui/material';
+import Image from 'next/image';
 import Done from 'public/thankyou.svg';
 
 const RegisterSuccess = () => {
@@ -16,6 +17,7 @@ const RegisterSuccess = () => {
           tin thanh toán qua email.
         </Typography>
       </Box>
+      <Image src="/done.svg" alt="error" width={500} height={500} />
       {/* <Done style={{ fill: theme.palette.success.main }} /> */}
     </Stack>
   );

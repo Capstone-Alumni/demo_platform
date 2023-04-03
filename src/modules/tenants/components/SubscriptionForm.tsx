@@ -24,6 +24,7 @@ import UploadBackgroundInput from '@share/components/form/UploadBackgroundInput'
 import useActivateTenantById from '../hooks/useActivateTenant';
 import useApproveTenantById from '../hooks/useApproveTenant';
 import { formatDate } from '@share/utils/formatDate';
+import getSubscriptionDisplay from '@share/utils/getSubscriptionDisplay';
 
 export type EditTenantFormValues = {
   email: string;
@@ -63,6 +64,7 @@ const SubscriptionForm = ({ initialData: data }: { initialData: Tenant }) => {
     setSubmitting(true);
     await approveTenantById({ id: data.id });
     setSubmitting(false);
+    window.location.reload();
   };
 
   return (
@@ -80,7 +82,7 @@ const SubscriptionForm = ({ initialData: data }: { initialData: Tenant }) => {
     >
       <Box sx={{ flex: 1 }}>
         <Typography variant="h6">Gói đăng ký</Typography>
-        <Typography>{data.plan?.name}</Typography>
+        <Typography>{getSubscriptionDisplay(data.plan?.name)}</Typography>
       </Box>
 
       {data.approved ? (

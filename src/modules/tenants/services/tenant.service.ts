@@ -165,9 +165,12 @@ export default class TenantService {
   };
 
   static getBySubdomain = async (subdomain: string) => {
-    const Tenant = await prisma.tenant.findUnique({
+    const Tenant = await prisma.tenant.findFirst({
       where: {
         subdomain: subdomain,
+        subcriptionEndTime: {
+          gt: new Date(),
+        },
       },
     });
 
@@ -275,6 +278,39 @@ export default class TenantService {
       throw new Error('existed');
     }
 
+    const domain = `${values.subdomain}${process.env.MAINAPP_DOMAIN}`;
+    /** Create subdomain */
+    if (process.env.GEN_DOMAIN) {
+      const payload = {
+        name: domain,
+      };
+
+      const response = await axios({
+        method: 'POST',
+        url: `https://api.vercel.com/v8/projects/${process.env.PROJECT_ID_VERCEL}/domains?teamId=${process.env.TEAM_ID_VERCEL}`,
+        data: payload,
+        headers: {
+          Authorization: `Bearer ${process.env.AUTH_BEARER_TOKEN}`,
+          'Content-Type': 'application/json',
+          accept: 'application/json',
+        },
+      });
+
+      const { data } = response;
+
+      // const data = await response.json();
+
+      // Domain is already owned by another team but you can request delegation to access it
+      if (data.error?.code === 'forbidden') {
+        throw new Error('forbidden');
+      }
+
+      // Domain is already being used by a different project
+      if (data.error?.code === 'domain_taken') {
+        throw new Error('existed subdomain');
+      }
+    }
+
     /** Gen data */
     const tenantId = genTenantId(values.name);
 
@@ -293,6 +329,7 @@ export default class TenantService {
         cityCodename: values.cityCodename,
         cityName: values.cityName,
         address: values.address,
+        subdomain: values.subdomain,
         plan: {
           connect: {
             name: values.plan,
@@ -438,7 +475,7 @@ export default class TenantService {
 
     await axios.post(`${process.env.NEXT_PUBLIC_MAIL_HOST}/mail/send-email`, {
       to: tenant.alumni[0].account.email,
-      subject: 'Hoàn tất đăng ký Alumni App',
+      subject: 'Đăng ký Alumni App',
       text: `
         Kính gửi anh/chị,
 
@@ -446,6 +483,23 @@ export default class TenantService {
         ${vnpUrl}
       `,
     });
+
+    /** Create schema in mainApp */
+    const alumniId = tenant.alumni?.[0].id;
+    const accountId = tenant.alumni?.[0].account.id;
+    const accountEmail = tenant.alumni?.[0].account.email;
+    await mainAppPrisma.$executeRaw`
+      SELECT template.clone_schema('template', ${tenant.tenantId});
+    `;
+    const insertAlumniQuery = `
+      INSERT INTO ${tenant.tenantId}.alumni (id, tenant_id, account_id, account_email, access_level, access_status) values ($1, $1, $2, $3, 'SCHOOL_ADMIN', 'APPROVED')
+    `;
+    await mainAppPrisma.$executeRawUnsafe(
+      insertAlumniQuery,
+      alumniId,
+      accountId,
+      accountEmail,
+    );
 
     const newTenant = await prisma.tenant.update({
       where: {

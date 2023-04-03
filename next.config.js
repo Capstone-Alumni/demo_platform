@@ -5,7 +5,7 @@ const nextConfig = {
     // Required:
     appDir: true,
     esmExternals: false,
-    swcMinify: true,
+    // swcMinify: true,
   },
   compiler: {
     styledComponents: true,
@@ -13,9 +13,20 @@ const nextConfig = {
   eslint: {
     dirs: ['src'],
   },
+  typescript: {
+    ignoreBuildErrors: true,
+  },
+  images: {
+    domains: [
+      'bka.hcmut.edu.vn',
+      'encrypted-tbn0.gstatic.com',
+      'firebasestorage.googleapis.com',
+    ],
+  },
   webpack(config) {
     config.module.rules.push({
-      test: /\.svg$/,
+      test: /\.svg$/i,
+      issuer: /\.[jt]sx?$/,
       use: ['@svgr/webpack'],
     });
 

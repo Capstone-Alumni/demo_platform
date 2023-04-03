@@ -96,4 +96,5 @@ export type RegisterTenantServiceProps = {
   cityName: string;
   address: string;
   plan: string;
+  subdomain: string;
 };
