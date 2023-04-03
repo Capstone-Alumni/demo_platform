@@ -6,10 +6,12 @@ import { Controller, useForm } from 'react-hook-form';
 import * as yup from 'yup';
 
 import {
+  alpha,
   Box,
   Button,
   InputAdornment,
   Stack,
+  styled,
   TextField,
   Typography,
   useTheme,
@@ -24,6 +26,25 @@ import Logo from '@share/components/Logo';
 import UploadAvatarInput from '@share/components/form/UploadAvatarInput';
 import { getCityList, getProvinceList } from '@share/utils/getLocaltionList';
 import SelectInput from '@share/components/form/SelectInput';
+import Image from 'next/image';
+
+const StyledPlanBox = styled('div')(({ theme }) => ({
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  gap: theme.spacing(1),
+  flex: 1,
+  padding: theme.spacing(2),
+  borderRadius: theme.shape.borderRadius,
+  borderWidth: '1px',
+  borderColor: theme.palette.divider,
+  borderStyle: 'solid',
+  '&:hover': {
+    borderWidth: '2px',
+    borderColor: theme.palette.primary.light,
+    background: alpha(theme.palette.primary.lighter, 0.15),
+  },
+}));
 
 export type RegisterTenantFormValues = {
   email: string;
@@ -286,21 +307,47 @@ const RegisterTenantForm = ({
       </Box>
     </Stack>
   ) : (
-    <Box>
-      <Typography>Chọn gói</Typography>
-      <Stack direction={{ md: 'row', sm: 'column' }}>
-        <Box>
-          Gói 3 tháng:{' '}
-          <Button onClick={() => setValue('plan', '3-month')}>Select</Button>
-        </Box>
-        <Box>
-          Gói 6 tháng:{' '}
-          <Button onClick={() => setValue('plan', '6-month')}>Select</Button>
-        </Box>
-        <Box>
-          Gói 1 năm:{' '}
-          <Button onClick={() => setValue('plan', '1-year')}>Select</Button>
-        </Box>
+    <Box sx={{ width: '100%' }}>
+      <Typography variant="h5" sx={{ mb: 2 }}>
+        Chọn gói
+      </Typography>
+      <Stack direction={{ md: 'row', sm: 'column' }} gap={2}>
+        <StyledPlanBox>
+          <Typography variant="h6">Gói 3 tháng</Typography>
+          <Typography mb={2}>3,000,000 VNĐ</Typography>
+          <Image src="/basic-plan.svg" alt="basic" width={262} height={250} />
+          <Button
+            fullWidth
+            variant="contained"
+            onClick={() => setValue('plan', '3-month')}
+          >
+            Chọn
+          </Button>
+        </StyledPlanBox>
+        <StyledPlanBox>
+          <Typography variant="h6">Gói 6 tháng</Typography>
+          <Typography mb={2}>5,000,000 VNĐ</Typography>
+          <Image src="/advance-plan.svg" alt="basic" width={250} height={250} />
+          <Button
+            fullWidth
+            variant="contained"
+            onClick={() => setValue('plan', '6-month')}
+          >
+            Chọn
+          </Button>
+        </StyledPlanBox>
+        <StyledPlanBox>
+          <Typography variant="h6">Gói 1 năm</Typography>
+          <Typography mb={2}>8,000,000 VNĐ</Typography>
+          <Image src="/pro-plan.svg" alt="basic" width={250} height={250} />
+          <Button
+            fullWidth
+            variant="contained"
+            onClick={() => setValue('plan', '1-year')}
+          >
+            Chọn
+          </Button>
+        </StyledPlanBox>
       </Stack>
     </Box>
   );
