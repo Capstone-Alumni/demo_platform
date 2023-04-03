@@ -64,7 +64,7 @@ const SubscriptionForm = ({ initialData: data }: { initialData: Tenant }) => {
     setSubmitting(true);
     await approveTenantById({ id: data.id });
     setSubmitting(false);
-    window.location.reload();
+    // window.location.reload();
   };
 
   return (
