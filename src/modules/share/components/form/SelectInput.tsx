@@ -21,8 +21,15 @@ const SelectInput = ({
     <Controller
       name={name}
       control={control}
-      render={({ field }) => (
-        <TextField {...inputProps} {...field} select type="select">
+      render={({ field, fieldState: { error } }) => (
+        <TextField
+          {...inputProps}
+          {...field}
+          select
+          type="select"
+          error={Boolean(error?.message)}
+          helperText={error?.message}
+        >
           {options?.map(op => (
             <MenuItem key={op.value} value={op.value}>
               {op.name}

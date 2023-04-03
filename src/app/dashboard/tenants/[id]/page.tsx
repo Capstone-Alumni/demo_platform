@@ -28,9 +28,9 @@ export default async function Page({ params }: { params: { id: string } }) {
     if (!data || data.archived) {
       throw new Error('cannot fetch tenant data');
     }
-    if (!data.activated) {
-      throw new Error('tenant is not activated');
-    }
+    // if (!data.activated) {
+    //   throw new Error('tenant is not activated');
+    // }
 
     return (
       <EditTenantPage
@@ -45,6 +45,7 @@ export default async function Page({ params }: { params: { id: string } }) {
           background2: data.background2,
           background3: data.background3,
           createdAt: data.createdAt.toString(),
+          subcriptionEndTime: data.subcriptionEndTime?.toString(),
           activated: data.activated,
           alumni: data.alumni,
           theme: data.theme || undefined,

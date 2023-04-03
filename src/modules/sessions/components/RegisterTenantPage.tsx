@@ -16,11 +16,13 @@ const RegisterTenantPage = () => {
   return (
     <Box
       sx={{
-        height: '100vh',
+        // height: '100vh',
         display: 'flex',
         flexDirection: 'row',
         justifyContent: 'center',
         alignItems: 'center',
+        mt: 10,
+        mb: 4,
       }}
     >
       <RegisterTenantForm onSubmit={onAddTenant} />

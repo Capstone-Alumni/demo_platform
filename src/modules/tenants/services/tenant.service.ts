@@ -285,7 +285,18 @@ export default class TenantService {
         name: values.name,
         logo: values.logo,
         tenantId: tenantId,
-        activated: false,
+        approved: false,
+        subcriptionEndTime: new Date(),
+        provinceCodename: values.provinceCodename,
+        provinceName: values.provinceName,
+        cityCodename: values.cityCodename,
+        cityName: values.cityName,
+        address: values.address,
+        plan: {
+          connect: {
+            name: values.plan,
+          },
+        },
         alumni: {
           create: [
             {

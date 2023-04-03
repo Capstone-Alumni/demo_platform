@@ -10,6 +10,7 @@ export type Tenant = {
   subdomain: string | null;
   description: string | null;
   createdAt: string | Date;
+  subcriptionEndTime?: string | Date;
   activated: boolean;
   alumni: Array<{
     account: {
@@ -74,4 +75,10 @@ export type RegisterTenantServiceProps = {
   password: string;
   name: string;
   logo: string;
+  provinceCodename: string;
+  provinceName: string;
+  cityCodename: string;
+  cityName: string;
+  address: string;
+  plan: string;
 };

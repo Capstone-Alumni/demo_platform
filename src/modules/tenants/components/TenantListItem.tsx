@@ -19,6 +19,7 @@ import { ListItemText } from '@mui/material';
 import { useRouter } from 'next/navigation';
 import { noop } from 'lodash/fp';
 import getTenantHost from '../utils/getTenantHost';
+import { formatDate } from '@share/utils/formatDate';
 
 const ActionButton = ({
   actions,
@@ -28,7 +29,7 @@ const ActionButton = ({
     icon: React.ReactNode;
     text: string;
     onClick: () => void;
-  }>;
+  } | null>;
 }) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
@@ -59,18 +60,20 @@ const ActionButton = ({
           'aria-labelledby': 'basic-button',
         }}
       >
-        {actions.map(action => (
-          <MenuItem
-            key={action.id}
-            onClick={async () => {
-              await action.onClick();
-              handleClose();
-            }}
-          >
-            <ListItemIcon>{action.icon}</ListItemIcon>
-            <ListItemText>{action.text}</ListItemText>
-          </MenuItem>
-        ))}
+        {actions.map(action =>
+          action === null ? undefined : (
+            <MenuItem
+              key={action.id}
+              onClick={async () => {
+                await action.onClick();
+                handleClose();
+              }}
+            >
+              <ListItemIcon>{action.icon}</ListItemIcon>
+              <ListItemText>{action.text}</ListItemText>
+            </MenuItem>
+          ),
+        )}
       </Menu>
     </div>
   );
@@ -103,7 +106,7 @@ const AdminTenantListItem = ({
           <Typography>{data.subdomain}</Typography>
         </TableCell>
         <TableCell align="left">
-          <Typography>{data.alumni?.[0].account.email}</Typography>
+          <Typography>{data.alumni?.[0]?.account.email}</Typography>
         </TableCell>
         <TableCell align="center">
           <Typography>
@@ -119,26 +122,30 @@ const AdminTenantListItem = ({
           </Typography>
         </TableCell>
         <TableCell align="center">
-          {data.subdomain && data.activated ? (
-            <a
-              href={getTenantHost(data.subdomain)}
-              target="_blank"
-              rel="noreferrer"
-            >
-              <OpenInNewIcon />
-            </a>
-          ) : null}
+          <Typography>
+            {formatDate(new Date(data?.subcriptionEndTime || ''))}
+          </Typography>
         </TableCell>
         <TableCell align="center">
           <ActionButton
             actions={[
+              data.activated && data.subdomain
+                ? {
+                    id: 'view',
+                    icon: <OpenInNewIcon />,
+                    text: 'Truy cập',
+                    onClick: () =>
+                      window.open(
+                        getTenantHost(data.subdomain || ''),
+                        '_blank',
+                      ),
+                  }
+                : null,
               {
                 id: 'edit',
                 icon: <BorderColorIcon />,
                 text: 'Chỉnh sửa',
-                onClick: data.activated
-                  ? () => router.push(`/dashboard/tenants/${data.id}`)
-                  : noop,
+                onClick: () => router.push(`/dashboard/tenants/${data.id}`),
               },
               data.activated
                 ? {

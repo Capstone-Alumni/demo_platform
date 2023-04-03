@@ -10,28 +10,53 @@ datasource db {
   url      = env("CORE_DATABASE_URL")
 }
 
+model Plan {
+  id        String   @id @default(cuid())
+  archived  Boolean  @default(false)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
+
+  name     String   @unique
+  duration Int      @default(0)
+  price    Int      @default(0)
+  tenants  Tenant[]
+
+  @@map("plans")
+}
+
 model Tenant {
-  id           String  @id @default(cuid())
-  tenantId     String  @unique
-  name         String
-  subdomain    String? @unique
-  customDomain String? @unique @map("custom_domain")
-  logo         String?
-  background1  String?
-  background2  String?
-  background3  String?
-  description  String? @db.Text
-  activated    Boolean @default(false)
-  theme        String? @default("purple")
+  id               String  @id @default(cuid())
+  tenantId         String  @unique
+  name             String
+  subdomain        String? @unique
+  customDomain     String? @unique @map("custom_domain")
+  logo             String?
+  background1      String?
+  background2      String?
+  background3      String?
+  description      String? @db.Text
+  provinceCodename String?
+  provinceName     String?
+  cityCodename     String?
+  cityName         String?
+  address          String?
+  approved         Boolean @default(false)
+  theme            String? @default("purple")
 
   vnp_tmnCode    String? @map("vnp_tmn_code")
   vnp_hashSecret String? @map("vnp_hash_secret")
+
+  subcriptionEndTime DateTime? @default(now()) @map("subscription_end")
 
   archived  Boolean  @default(false)
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
 
-  alumni    Alumni[]
+  planId String? @map("plan_id")
+  plan   Plan?   @relation(fields: [planId], references: [id])
+
+  alumni       Alumni[]
+  transactions Transaction[]
 
   @@map("tenants")
 }
@@ -58,7 +83,7 @@ model Alumni {
   accountId String @map("account_id")
 
   accessLevel AccessLevel @default(ALUMNI) @map("access_level")
-  lastLogin  DateTime?   @map("last_login")
+  lastLogin   DateTime?   @map("last_login")
   isOwner     Boolean     @default(false) @map("is_owner")
 
   tenant  Tenant  @relation(fields: [tenantId], references: [id])
@@ -69,8 +94,38 @@ model Alumni {
   updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
 
   @@unique([tenantId, accountId])
-
   @@map("alumni")
+}
+
+model Transaction {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
+
+  vnp_Version    String  @map("vpn_version")
+  vnp_Command    String  @map("vnp_commnad")
+  vnp_TmnCode    String  @map("vnp_tmn_code")
+  vnp_Amount     Int     @map("vnp_amount")
+  vnp_BankCode   String? @map("vnp_bank_code")
+  vnp_CreateDate String  @map("vnp_create_date")
+  vnp_CurrCode   String  @map("vnp_CurrCode")
+  vnp_IpAddr     String  @map("vnp_ip_addr")
+  vnp_Locale     String  @map("vnp_locale")
+  vnp_OrderInfo  String  @map("vnp_order_info")
+  vnp_OrderType  String  @map("vpn_order_type")
+  vnp_TxnRef     String  @unique @map("vnp_txn_ref")
+
+  vnp_TransactionNo     String? @map("vnp_transaction_no")
+  vnp_ResponseCode      String? @map("vnp_response_code")
+  vnp_TransactionStatus String? @map("vnp_transaction_status")
+
+  paymentStatus Int    @default(0) @map("payment_status")
+  subcription   String
+
+  tenantId String @map("tenant_id")
+  tenant   Tenant @relation(fields: [tenantId], references: [id])
+
+  @@map("transactions")
 }
 
 enum AccessLevel {
