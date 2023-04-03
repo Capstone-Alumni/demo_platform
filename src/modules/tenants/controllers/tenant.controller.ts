@@ -253,6 +253,7 @@ export default class TenantController {
         data: newTenant,
       });
     } catch (error) {
+      console.log(error);
       if (error.message?.includes('existed')) {
         if (error.message?.includes('tenantId')) {
           return res.status(400).json({
