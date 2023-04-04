@@ -485,7 +485,7 @@ export default class TenantService {
     const vnpUrl = await getVnpUrl({
       ipAddr: ipAddr as string,
       amount: tenant.plan.price,
-      orderDescription: 'Thanh toan hoa don the alumni app',
+      orderDescription: 'thanh_toan_hoa_don_the_alumni_app',
       orderType: 250000,
       tenantId: tenant.id,
       planId: tenant.planId,

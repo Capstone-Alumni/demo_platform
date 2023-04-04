@@ -26,7 +26,7 @@ const Page = async ({ searchParams }: any) => {
   const hmac = crypto.createHmac('sha512', secretKey || '');
   const signed = hmac.update(new Buffer(signData, 'utf-8')).digest('hex');
 
-  if (secretKey === 'DNWFIGEYSLJYSCXSZESSBYOTTMTICHZO') {
+  if (secureHash === signed) {
     //Kiem tra xem du lieu trong db co hop le hay khong va thong bao ket qua
     if (vnp_Params.vnp_ResponseCode === '24') {
       return redirect('/');
