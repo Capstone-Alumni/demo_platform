@@ -20,13 +20,11 @@ const Page = async ({ searchParams }: any) => {
 
   // const tmnCode = process.env.VNPAY_TMNCODE;
   // const secretKey = process.env.VNPAY_HASHSECRET as string;
-  const secretKey = process.env.VNP_HASHSECRET as string;
+  const secretKey = process.env.NEXT_PUBLIC_VNP_HASHSECRET as string;
 
   const signData = querystring.stringify(vnp_Params, { encode: false });
   const hmac = crypto.createHmac('sha512', secretKey);
   const signed = hmac.update(new Buffer(signData, 'utf-8')).digest('hex');
-
-  console.log(secureHash, signed);
 
   if (secureHash === signed) {
     //Kiem tra xem du lieu trong db co hop le hay khong va thong bao ket qua
