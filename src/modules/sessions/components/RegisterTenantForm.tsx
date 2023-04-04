@@ -137,7 +137,7 @@ const RegisterTenantForm = ({
           fontWeight="bold"
         >
           {planWatcher === '3-month' ? '3 tháng' : null}
-          {planWatcher === '6-month' ? '3 tháng' : null}
+          {planWatcher === '6-month' ? '6 tháng' : null}
           {planWatcher === '1-year' ? '1 năm' : null}
         </Typography>
       </Typography>
