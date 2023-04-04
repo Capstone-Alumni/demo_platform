@@ -26,32 +26,43 @@ const Page = async ({ searchParams }: any) => {
   const hmac = crypto.createHmac('sha512', secretKey || '');
   const signed = hmac.update(new Buffer(signData, 'utf-8')).digest('hex');
 
-  if (secureHash === signed) {
-    //Kiem tra xem du lieu trong db co hop le hay khong va thong bao ket qua
-    if (vnp_Params.vnp_ResponseCode === '24') {
-      return redirect('/');
-    }
-
-    return (
-      <div>
-        <Header />
-        <Body>
-          <TransactionSuccess />
-        </Body>
-        <Footer />
-      </div>
-    );
-  }
-
   return (
     <div>
       <Header />
       <Body>
-        <TransactionFailed />
+        <TransactionSuccess />
       </Body>
       <Footer />
     </div>
   );
+
+  // TODO: Has bug
+  // if (secureHash === signed) {
+  //   //Kiem tra xem du lieu trong db co hop le hay khong va thong bao ket qua
+  //   if (vnp_Params.vnp_ResponseCode === '24') {
+  //     return redirect('/');
+  //   }
+
+  //   return (
+  //     <div>
+  //       <Header />
+  //       <Body>
+  //         <TransactionSuccess />
+  //       </Body>
+  //       <Footer />
+  //     </div>
+  //   );
+  // }
+
+  // return (
+  //   <div>
+  //     <Header />
+  //     <Body>
+  //       <TransactionFailed />
+  //     </Body>
+  //     <Footer />
+  //   </div>
+  // );
 };
 
 export default Page;

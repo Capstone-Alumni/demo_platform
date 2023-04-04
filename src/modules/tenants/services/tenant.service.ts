@@ -511,7 +511,7 @@ export default class TenantService {
         id: id,
       },
       data: {
-        approved: false,
+        approved: true,
       },
     });
 
