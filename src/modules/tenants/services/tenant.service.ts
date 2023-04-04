@@ -13,6 +13,24 @@ import {
 } from '../types';
 import { getVnpUrl } from '../helper';
 
+const cloneSchema = async (tenant: any) => {
+  const alumniId = tenant.alumni?.[0].id;
+  const accountId = tenant.alumni?.[0].account.id;
+  const accountEmail = tenant.alumni?.[0].account.email;
+  await mainAppPrisma.$executeRaw`
+    SELECT template.clone_schema('template', ${tenant.tenantId});
+  `;
+  const insertAlumniQuery = `
+    INSERT INTO ${tenant.tenantId}.alumni (id, tenant_id, account_id, account_email, access_level, access_status) values ($1, $1, $2, $3, 'SCHOOL_ADMIN', 'APPROVED')
+  `;
+  await mainAppPrisma.$executeRawUnsafe(
+    insertAlumniQuery,
+    alumniId,
+    accountId,
+    accountEmail,
+  );
+};
+
 export default class TenantService {
   static getList = async ({ params }: GetTenantListServiceProps) => {
     const { name, tenantId, page, limit } = params;
@@ -486,21 +504,7 @@ export default class TenantService {
     // });
 
     /** Create schema in mainApp */
-    const alumniId = tenant.alumni?.[0].id;
-    const accountId = tenant.alumni?.[0].account.id;
-    const accountEmail = tenant.alumni?.[0].account.email;
-    await mainAppPrisma.$executeRaw`
-      SELECT template.clone_schema('template', ${tenant.tenantId});
-    `;
-    // const insertAlumniQuery = `
-    //   INSERT INTO ${tenant.tenantId}.alumni (id, tenant_id, account_id, account_email, access_level, access_status) values ($1, $1, $2, $3, 'SCHOOL_ADMIN', 'APPROVED')
-    // `;
-    // await mainAppPrisma.$executeRawUnsafe(
-    //   insertAlumniQuery,
-    //   alumniId,
-    //   accountId,
-    //   accountEmail,
-    // );
+    cloneSchema(tenant);
 
     const newTenant = await prisma.tenant.update({
       where: {
