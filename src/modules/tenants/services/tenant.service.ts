@@ -477,31 +477,31 @@ export default class TenantService {
       throw new Error('tenant is non-existed');
     }
 
-    // const ipAddr =
-    //   req.headers['x-forwarded-for'] ||
-    //   req.connection.remoteAddress ||
-    //   req.socket.remoteAddress;
+    const ipAddr =
+      req.headers['x-forwarded-for'] ||
+      req.connection.remoteAddress ||
+      req.socket.remoteAddress;
 
-    // const vnpUrl = await getVnpUrl({
-    //   ipAddr: ipAddr as string,
-    //   amount: tenant.plan.price,
-    //   orderDescription: 'Thanh toan hoa don the alumni app',
-    //   orderType: 250000,
-    //   tenantId: tenant.id,
-    //   planId: tenant.planId,
-    // });
+    const vnpUrl = await getVnpUrl({
+      ipAddr: ipAddr as string,
+      amount: tenant.plan.price,
+      orderDescription: 'Thanh toan hoa don the alumni app',
+      orderType: 250000,
+      tenantId: tenant.id,
+      planId: tenant.planId,
+    });
 
     // // run async
-    // axios.post(`${process.env.NEXT_PUBLIC_MAIL_HOST}/mail/send-email`, {
-    //   to: tenant.alumni[0].account.email,
-    //   subject: 'Đăng ký Alumni App',
-    //   text: `
-    //     Kính gửi anh/chị,
+    axios.post(`${process.env.NEXT_PUBLIC_MAIL_HOST}/mail/send-email`, {
+      to: tenant.alumni[0].account.email,
+      subject: 'Đăng ký Alumni App',
+      text: `
+        Kính gửi anh/chị,
 
-    //     Cảm ơn anh/chị đã lựa chọn The Alumn App. Mời anh/chị dùng link dưới đây để thanh toán và hoàn tất quá trình đăng ký.
-    //     ${vnpUrl}
-    //   `,
-    // });
+        Cảm ơn anh/chị đã lựa chọn The Alumn App. Mời anh/chị dùng link dưới đây để thanh toán và hoàn tất quá trình đăng ký.
+        ${vnpUrl}
+      `,
+    });
 
     /** Create schema in mainApp */
     cloneSchema(tenant);
