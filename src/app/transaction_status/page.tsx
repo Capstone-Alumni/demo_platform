@@ -20,7 +20,7 @@ const Page = async ({ searchParams }: any) => {
 
   // const tmnCode = process.env.VNPAY_TMNCODE;
   // const secretKey = process.env.VNPAY_HASHSECRET as string;
-  const secretKey = process.env.NEXT_PUBLIC_VNP_HASHSECRET;
+  const secretKey = 'DNWFIGEYSLJYSCXSZESSBYOTTMTICHZO'; // process.env.NEXT_PUBLIC_VNP_HASHSECRET;
 
   const signData = querystring.stringify(vnp_Params, { encode: false });
   const hmac = crypto.createHmac('sha512', secretKey || '');
