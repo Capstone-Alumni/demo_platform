@@ -88,7 +88,7 @@ export default class MemberService {
     await mainAppPrisma.$executeRawUnsafe(
       insertAlumniQuery,
       newMember.id,
-      tenant.id,
+      tenant.tenantId,
       user.id,
       user.email,
       accessLevel,
