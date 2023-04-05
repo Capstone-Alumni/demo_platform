@@ -110,7 +110,7 @@ export default class SessionService {
       throw new Error('wrong tenant');
     }
 
-    const user = await prisma.user.findUnique({
+    const account = await prisma.account.findUnique({
       where: { id: userId },
       include: {
         members: {
@@ -126,17 +126,17 @@ export default class SessionService {
       },
     });
 
-    if (!user) {
+    if (!account) {
       throw new Error('update-password failed');
     }
 
-    const tenant = user.members.find(m => m.tenant.subdomain === subdomain);
+    const alumni = account.alumni.find(m => m.tenant.subdomain === subdomain);
 
-    if (!tenant) {
+    if (!alumni) {
       throw new Error('wrong subdomain');
     }
 
-    const { password } = user;
+    const { password } = account;
 
     if (password && compareSync(currentPassword, password)) {
       if (currentPassword === newPassword) {
@@ -145,7 +145,7 @@ export default class SessionService {
       const hashedPassword = hashSync(newPassword, 10);
       await prisma.user.update({
         where: {
-          id: user.id,
+          id: account.id,
         },
         data: {
           password: hashedPassword,
@@ -153,15 +153,15 @@ export default class SessionService {
       });
 
       return {
-        id: user.id,
-        email: user.email,
+        id: account.id,
+        email: account.email,
         tenant: {
-          tenantId: tenant.tenant.tenantId,
-          subdomain: tenant.tenant.subdomain,
+          tenantId: alumni.tenant.tenantId,
+          subdomain: alumni.tenant.subdomain,
         },
-        accessLevel: tenant.accessLevel,
-        accessStatus: tenant.accessStatus,
-        accessMode: tenant.accessMode,
+        accessLevel: alumni.accessLevel,
+        accessStatus: alumni.accessStatus,
+        accessMode: alumni.accessMode,
       };
     }
 
