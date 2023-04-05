@@ -21,11 +21,12 @@ const cloneSchema = async (tenant: any) => {
     SELECT template.clone_schema('template', ${tenant.tenantId});
   `;
   const insertAlumniQuery = `
-    INSERT INTO ${tenant.tenantId}.alumni (id, tenant_id, account_id, account_email, access_level, access_status) values ($1, $1, $2, $3, 'SCHOOL_ADMIN', 'APPROVED')
+    INSERT INTO ${tenant.tenantId}.alumni (id, tenant_id, account_id, account_email, access_level, access_status) values ($1, $2, $3, $4, 'SCHOOL_ADMIN', 'APPROVED')
   `;
   await mainAppPrisma.$executeRawUnsafe(
     insertAlumniQuery,
     alumniId,
+    tenant.tenantId,
     accountId,
     accountEmail,
   );

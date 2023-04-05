@@ -85,7 +85,7 @@ export default class MemberService {
     const insertAlumniQuery = `
       INSERT INTO ${tenant.tenantId}.alumni (id, tenant_id, account_id, account_email, access_level, access_status) values ($1, $2, $3, $4, $5::"template"."AccessLevel", 'APPROVED')
     `;
-    await mainAppPrisma.$executeRawUnsafe(
+    mainAppPrisma.$executeRawUnsafe(
       insertAlumniQuery,
       newMember.id,
       tenant.id,
