@@ -46,6 +46,12 @@ export type CreateMemberServiceProps = {
   accessLevel: AccessLevel;
 };
 
+export type ExternalCreateMemberServiceProps = {
+  email: string;
+  password: string;
+  tenantId: string;
+};
+
 export type CreateManyMemberServiceProps = {
   memberListData: Array<{
     email: string;

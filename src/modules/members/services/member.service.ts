@@ -4,6 +4,7 @@ import { hashSync } from 'bcrypt';
 import {
   CreateManyMemberServiceProps,
   CreateMemberServiceProps,
+  ExternalCreateMemberServiceProps,
   GetMemberListServiceProps,
   UpdateMemberInfoByIdServiceProps,
 } from '../types';
@@ -232,6 +233,75 @@ export default class MemberService {
     // );
 
     // return newMember;
+  };
+
+  static externalCreate = async ({
+    email,
+    password,
+    tenantId,
+  }: ExternalCreateMemberServiceProps) => {
+    const tenant = await isTenantExisted(tenantId);
+
+    if (!email || !password) {
+      throw new Error('invalid data');
+    }
+
+    let user = await prisma.account.findUnique({
+      where: { email: email },
+    });
+
+    const encryptedPassword = hashSync(password, 10);
+
+    if (!user) {
+      user = await prisma.account.create({
+        data: {
+          email: email,
+          password: encryptedPassword,
+        },
+      });
+    }
+
+    const member = await prisma.alumni.findUnique({
+      where: {
+        tenantId_accountId: {
+          tenantId: tenantId,
+          accountId: user.id,
+        },
+      },
+    });
+
+    if (member) {
+      throw new Error('member already existed');
+    }
+
+    const newMember = await prisma.alumni.create({
+      data: {
+        accessLevel: 'ALUMNI',
+        account: {
+          connect: {
+            email: email,
+          },
+        },
+        tenant: {
+          connect: {
+            id: tenantId,
+          },
+        },
+      },
+    });
+
+    const insertAlumniQuery = `
+      INSERT INTO ${tenant.tenantId}.alumni (id, tenant_id, account_id, account_email, access_level, access_status) values ($1, $2, $3, $4, 'ALUMNI', 'PENDING')
+    `;
+    await mainAppPrisma.$executeRawUnsafe(
+      insertAlumniQuery,
+      newMember.id,
+      tenant.id,
+      user.id,
+      user.email,
+    );
+
+    return newMember;
   };
 
   static getList = async ({ tenantId, params }: GetMemberListServiceProps) => {

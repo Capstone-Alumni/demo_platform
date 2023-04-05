@@ -88,6 +88,48 @@ export default class MemberController {
     }
   };
 
+  static externalCreate = async (
+    req: NextApiRequest,
+    res: NextApiResponse<ApiSuccessResponse | ApiErrorResponse>,
+  ) => {
+    try {
+      const { email, password, tenantId } = req.body;
+      const newClass = await MemberService.externalCreate({
+        tenantId: tenantId as string,
+        email,
+        password,
+      });
+
+      return res.status(201).json({
+        status: true,
+        data: newClass,
+      });
+    } catch (error) {
+      if (error.message?.includes('invalid')) {
+        return res.status(400).json({
+          status: false,
+          message: 'Invalid email/password',
+        });
+      }
+
+      if (error.message?.includes('tenant')) {
+        return res.status(400).json({
+          status: false,
+          message: 'Tenant is not exist',
+        });
+      }
+
+      if (error.message?.includes('member already existed')) {
+        return res.status(400).json({
+          status: false,
+          message: 'Member is already existed',
+        });
+      }
+
+      throw error;
+    }
+  };
+
   static getList = async (
     req: NextApiRequest,
     res: NextApiResponse<ApiSuccessResponse | ApiErrorResponse>,
