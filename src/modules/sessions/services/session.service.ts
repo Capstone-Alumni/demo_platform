@@ -32,7 +32,7 @@ export default class SessionService {
       throw new Error('sign-in failed');
     }
 
-    const alumni = account.alumni.find((m) => m.tenant.subdomain === subdomain);
+    const alumni = account.alumni.find(m => m.tenant.subdomain === subdomain);
 
     if (!alumni) {
       throw new Error('wrong subdomain');
