@@ -113,7 +113,7 @@ export default class SessionService {
     const account = await prisma.account.findUnique({
       where: { id: userId },
       include: {
-        members: {
+        alumni: {
           include: {
             tenant: {
               select: {
@@ -143,7 +143,7 @@ export default class SessionService {
         throw new Error('same-password');
       }
       const hashedPassword = hashSync(newPassword, 10);
-      await prisma.user.update({
+      await prisma.account.update({
         where: {
           id: account.id,
         },
@@ -159,9 +159,7 @@ export default class SessionService {
           tenantId: alumni.tenant.tenantId,
           subdomain: alumni.tenant.subdomain,
         },
-        accessLevel: alumni.accessLevel,
-        accessStatus: alumni.accessStatus,
-        accessMode: alumni.accessMode,
+        accessLevel: alumni.accessLevel
       };
     }
 
