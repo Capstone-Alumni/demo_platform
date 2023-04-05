@@ -64,6 +64,7 @@ export default class SessionController {
     res: NextApiResponse<ApiSuccessResponse | ApiErrorResponse>,
   ) => {
     try {
+      // update
       const user = await SessionService.updatePassword({
         ...req.body,
       });
