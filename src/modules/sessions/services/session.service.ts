@@ -1,6 +1,6 @@
-import { compareSync } from 'bcrypt';
+import { compareSync, hashSync } from 'bcrypt';
 import { prisma } from '@lib/prisma/prisma';
-import { SignInRequestBody } from '../types';
+import { SignInRequestBody, UpdatePasswordRequestBody } from '../types';
 
 export default class SessionService {
   static signIn = async ({
@@ -98,5 +98,73 @@ export default class SessionService {
     }
 
     throw new Error('sign-in failed');
+  };
+
+  static updatePassword = async ({
+    userId,
+    password: currentPassword,
+    newPassword,
+    subdomain,
+  }: UpdatePasswordRequestBody) => {
+    if (!subdomain) {
+      throw new Error('wrong tenant');
+    }
+
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      include: {
+        members: {
+          include: {
+            tenant: {
+              select: {
+                tenantId: true,
+                subdomain: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    if (!user) {
+      throw new Error('update-password failed');
+    }
+
+    const tenant = user.members.find((m) => m.tenant.subdomain === subdomain);
+
+    if (!tenant) {
+      throw new Error('wrong subdomain');
+    }
+
+    const { password } = user;
+
+    if (password && compareSync(currentPassword, password)) {
+      if (currentPassword === newPassword) {
+        throw new Error('same-password');
+      }
+      const hashedPassword = hashSync(newPassword, 10);
+      await prisma.user.update({
+        where: {
+          id: user.id,
+        },
+        data: {
+          password: hashedPassword,
+        },
+      });
+
+      return {
+        id: user.id,
+        email: user.email,
+        tenant: {
+          tenantId: tenant.tenant.tenantId,
+          subdomain: tenant.tenant.subdomain,
+        },
+        accessLevel: tenant.accessLevel,
+        accessStatus: tenant.accessStatus,
+        accessMode: tenant.accessMode,
+      };
+    }
+
+    throw new Error('Sai mật khẩu, vui lòng thử lại.');
   };
 }
