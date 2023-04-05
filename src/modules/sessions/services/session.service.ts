@@ -130,7 +130,7 @@ export default class SessionService {
       throw new Error('update-password failed');
     }
 
-    const tenant = user.members.find((m) => m.tenant.subdomain === subdomain);
+    const tenant = user.members.find(m => m.tenant.subdomain === subdomain);
 
     if (!tenant) {
       throw new Error('wrong subdomain');
