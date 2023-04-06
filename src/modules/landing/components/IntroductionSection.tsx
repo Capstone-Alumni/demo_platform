@@ -12,14 +12,11 @@ const IntroductionSection = () => {
     <Box
       sx={{
         paddingX: theme.spacing(2),
-        backgroundImage: 'url("/landing-page-intro-background.png")',
-        backgroundPosition: 'center',
-        backgroundSize: 'cover',
       }}
     >
       <Container
         sx={{
-          minHeight: '100vh',
+          minHeight: '80vh',
           display: 'flex',
           flexDirection: 'row',
           paddingTop: theme.spacing(18),
@@ -27,7 +24,7 @@ const IntroductionSection = () => {
       >
         <Box
           sx={{
-            width: '40vw',
+            width: '50vw',
             display: 'flex',
             flexDirection: 'column',
             gap: theme.spacing(2),
@@ -47,23 +44,28 @@ const IntroductionSection = () => {
               src="/connect-alumni.jpg"
             />
             <Typography variant="h2" color="primary">
-              Alumni Connector Platform
+              Nền tảng kết nối cựu học sinh THPT
             </Typography>
           </Box>
 
-          <Typography fontSize={22}>
-            Nền tảng kết nối cựu học sinh là dịch vụ cung cấp nơi cho nhà trường
-            và các cựu học sinh kết nối lại với nhau.
+          <Typography
+            sx={{
+              mt: 4,
+              color: 'GrayText',
+            }}
+            fontSize={20}
+            variant="body2"
+          >
+            Nền tảng kết nối cựu học sinh là ứng dụng cung cấp cho nhà trường và
+            các cựu học sinh kết nối, tương tác với nhau và tạo ra một cộng đồng
+            mạnh mẽ và đoàn kết.
           </Typography>
 
-          <Typography fontSize={18}>
-            Ở đây cựu học sinh có thể tìm lại những người bạn học cũ của mình,
-            nắm được những tin tức của trường, tạo ra các hoạt động liên quan
-            đến cựu học sinh, gây quỹ ủng hộ hay tạo ra các hoạt động định hướng
-            nghề nghiệp cho các học sinh hiện tại.
-          </Typography>
-
-          <Box>
+          <Box
+            sx={{
+              mt: 5,
+            }}
+          >
             <Link
               href="/register_tenant"
               style={{ textDecoration: 'none', textUnderlineOffset: 0 }}
@@ -74,6 +76,14 @@ const IntroductionSection = () => {
             </Link>
           </Box>
         </Box>
+        <Box
+          sx={{
+            width: '100%',
+            backgroundImage: 'url("/landing-page-intro-background.png")',
+            backgroundPosition: 'center',
+            backgroundSize: 'cover',
+          }}
+        />
       </Container>
     </Box>
   );
