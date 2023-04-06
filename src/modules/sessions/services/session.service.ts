@@ -159,7 +159,7 @@ export default class SessionService {
           tenantId: alumni.tenant.tenantId,
           subdomain: alumni.tenant.subdomain,
         },
-        accessLevel: alumni.accessLevel
+        accessLevel: alumni.accessLevel,
       };
     }
 
