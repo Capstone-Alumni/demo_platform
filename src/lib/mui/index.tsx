@@ -3,7 +3,6 @@ import { ReactNode, useMemo } from 'react';
 import {
   createTheme,
   CssBaseline,
-  StyledEngineProvider,
   // ThemeOptions,
   ThemeProvider,
 } from '@mui/material';
@@ -26,36 +25,23 @@ type ThemeConfigProps = {
 };
 
 export default function ThemeConfig({ children }: ThemeConfigProps) {
-  // const { themeMode, themeDirection } = useSettings();
-  const themeMode = 'light';
-  const themeDirection = undefined;
-  const isLight = themeMode === 'light';
-
-  const themeOptions: ThemeOptions = useMemo(
-    () => ({
-      palette: isLight
-        ? { ...palette.light, mode: 'light' }
-        : { ...palette.dark, mode: 'dark' },
-      shape,
-      typography,
-      breakpoints,
-      direction: themeDirection,
-      shadows: isLight ? shadows.light : shadows.dark,
-      customShadows: isLight ? customShadows.light : customShadows.dark,
-    }),
-    [isLight, themeDirection],
-  );
+  const themeOptions: ThemeOptions = {
+    palette: { ...palette.light, mode: 'light' },
+    shape,
+    typography,
+    breakpoints,
+    shadows: shadows.light,
+    customShadows: customShadows.light,
+  };
 
   const theme = createTheme(themeOptions);
   theme.components = componentsOverride(theme);
 
   return (
-    <StyledEngineProvider injectFirst>
-      <ThemeProvider theme={theme}>
-        <CssBaseline />
-        <GlobalStyles />
-        {children}
-      </ThemeProvider>
-    </StyledEngineProvider>
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+      <GlobalStyles />
+      {children}
+    </ThemeProvider>
   );
 }
