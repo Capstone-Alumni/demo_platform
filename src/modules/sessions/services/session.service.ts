@@ -1,6 +1,6 @@
-import { compareSync } from 'bcrypt';
+import { compareSync, hashSync } from 'bcrypt';
 import { prisma } from '@lib/prisma/prisma';
-import { SignInRequestBody } from '../types';
+import { SignInRequestBody, UpdatePasswordRequestBody } from '../types';
 
 export default class SessionService {
   static signIn = async ({
@@ -98,5 +98,71 @@ export default class SessionService {
     }
 
     throw new Error('sign-in failed');
+  };
+
+  static updatePassword = async ({
+    userId,
+    password: currentPassword,
+    newPassword,
+    subdomain,
+  }: UpdatePasswordRequestBody) => {
+    if (!subdomain) {
+      throw new Error('wrong tenant');
+    }
+
+    const account = await prisma.account.findUnique({
+      where: { id: userId },
+      include: {
+        alumni: {
+          include: {
+            tenant: {
+              select: {
+                tenantId: true,
+                subdomain: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    if (!account) {
+      throw new Error('update-password failed');
+    }
+
+    const alumni = account.alumni.find(m => m.tenant.subdomain === subdomain);
+
+    if (!alumni) {
+      throw new Error('wrong subdomain');
+    }
+
+    const { password } = account;
+
+    if (password && compareSync(currentPassword, password)) {
+      if (currentPassword === newPassword) {
+        throw new Error('same-password');
+      }
+      const hashedPassword = hashSync(newPassword, 10);
+      await prisma.account.update({
+        where: {
+          id: account.id,
+        },
+        data: {
+          password: hashedPassword,
+        },
+      });
+
+      return {
+        id: account.id,
+        email: account.email,
+        tenant: {
+          tenantId: alumni.tenant.tenantId,
+          subdomain: alumni.tenant.subdomain,
+        },
+        accessLevel: alumni.accessLevel,
+      };
+    }
+
+    throw new Error('Sai mật khẩu, vui lòng thử lại.');
   };
 }

@@ -99,16 +99,17 @@ const Footer = () => {
             </Typography>
           </Box>
 
-          <Box sx={{ textAlign: 'left', maxWidth: '20rem' }}>
+          {/* <Box sx={{ textAlign: 'left', maxWidth: '20rem' }}>
             <Typography variant="h6" sx={{ mb: theme.spacing(2) }}>
-              Về chúng tôi
+              Về dịch vụ
             </Typography>
             <Typography color="GrayText" gutterBottom>
-              Lô E2a7, đường D1, khu công nghệ cao, Quận 9, Thành phố Thủ Đức Lô
-              E2a7, đường D1, khu công nghệ cao, Quận 9, Thành phố Thủ Đức Lô
-              E2a7, đường D1, khu công nghệ ca
+              Các cựu học sinh có thể cập nhật thông tin mới nhất về trường học
+              và những người bạn cũ của mình, đăng thông tin về các sự kiện sắp
+              diễn ra, gây quỹ cho các hoạt động của trường, tìm kiếm việc làm
+              hoặc tuyển dụng nhân sự và tìm kiếm các bạn cũ của mình.
             </Typography>
-          </Box>
+          </Box> */}
         </Box>
 
         <Typography color="GrayText" textAlign="center">
