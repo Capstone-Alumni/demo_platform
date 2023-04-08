@@ -23,6 +23,7 @@ import RichTextInput from '@share/components/form/RichTextInput';
 import UploadBackgroundInput from '@share/components/form/UploadBackgroundInput';
 import SelectInput from '@share/components/form/SelectInput';
 import { getCityList, getProvinceList } from '@share/utils/getLocaltionList';
+import EditorPreview from '@share/components/editor/EditorPreview';
 
 export type EditTenantFormValues = {
   email: string;
@@ -63,10 +64,12 @@ const validationSchema = yup.object({
 });
 
 const EditTenantForm = ({
+  editable = true,
   initialData,
   onClose,
   onSubmit,
 }: {
+  editable?: boolean;
   initialData: Tenant;
   onClose?: () => void;
   onSubmit?: (values: EditTenantFormValues) => Promise<void>;
@@ -159,7 +162,11 @@ const EditTenantForm = ({
         <UploadAvatarInput
           control={control}
           name="logo"
-          inputProps={{ label: 'Logo trường', sx: { margin: 0 } }}
+          inputProps={{
+            label: 'Logo trường',
+            disabled: !editable,
+            sx: { margin: 0 },
+          }}
         />
       </Box>
 
@@ -175,19 +182,31 @@ const EditTenantForm = ({
         <UploadBackgroundInput
           control={control}
           name="background1"
-          inputProps={{ label: 'Hình nền 1', sx: { margin: 0 } }}
+          inputProps={{
+            label: 'Hình nền 1',
+            disabled: !editable,
+            sx: { margin: 0 },
+          }}
         />
 
         <UploadBackgroundInput
           control={control}
           name="background2"
-          inputProps={{ label: 'Hình nền 2', sx: { margin: 0 } }}
+          inputProps={{
+            label: 'Hình nền 2',
+            disabled: !editable,
+            sx: { margin: 0 },
+          }}
         />
 
         <UploadBackgroundInput
           control={control}
           name="background3"
-          inputProps={{ label: 'Hình nền 3', sx: { margin: 0 } }}
+          inputProps={{
+            label: 'Hình nền 3',
+            disabled: !editable,
+            sx: { margin: 0 },
+          }}
         />
       </Box>
 
@@ -206,6 +225,7 @@ const EditTenantForm = ({
             <TextField
               fullWidth
               label="Subdomain"
+              disabled={!editable}
               {...field}
               InputProps={{
                 endAdornment: (
@@ -231,21 +251,38 @@ const EditTenantForm = ({
         control={control}
         name="name"
         render={({ field }) => (
-          <TextField fullWidth label="Tên trường" {...field} />
+          <TextField
+            fullWidth
+            disabled={!editable}
+            label="Tên trường"
+            {...field}
+          />
         )}
       />
 
       <Controller
         control={control}
         name="provinceName"
-        render={({ field }) => <TextField fullWidth label="Tỉnh" {...field} />}
+        render={({ field }) => (
+          <TextField
+            fullWidth
+            disabled={!editable}
+            label="Tỉnh/Thành phố"
+            {...field}
+          />
+        )}
       />
 
       <Controller
         control={control}
         name="cityName"
         render={({ field }) => (
-          <TextField fullWidth label="Thành phố" {...field} />
+          <TextField
+            fullWidth
+            disabled={!editable}
+            label="Quận/Huyện"
+            {...field}
+          />
         )}
       />
 
@@ -253,7 +290,12 @@ const EditTenantForm = ({
         control={control}
         name="address"
         render={({ field }) => (
-          <TextField fullWidth label="Địa chỉ" {...field} />
+          <TextField
+            fullWidth
+            disabled={!editable}
+            label="Địa chỉ"
+            {...field}
+          />
         )}
       />
 
@@ -287,6 +329,7 @@ const EditTenantForm = ({
         render={({ field }) => (
           <TextField
             fullWidth
+            disabled={!editable}
             variant="outlined"
             label="Màu chủ đạo"
             select
@@ -305,16 +348,29 @@ const EditTenantForm = ({
         )}
       />
 
-      <RichTextInput
-        control={control}
-        name="description"
-        inputProps={{
-          placeholder: 'Hãy mô tả thêm về trường',
-          containerSx: {
-            width: '100%',
-          },
-        }}
-      />
+      {editable ? (
+        <RichTextInput
+          control={control}
+          name="description"
+          inputProps={{
+            // disabled: !editable,
+            placeholder: 'Hãy mô tả thêm về trường',
+            containerSx: {
+              width: '100%',
+            },
+          }}
+        />
+      ) : (
+        <>
+          <Box sx={{ width: '100%' }}>
+            <Typography fontWeight={600}>Mô tả</Typography>
+          </Box>
+          <EditorPreview
+            value={initialData.description || ''}
+            sx={{ color: theme.palette.text.disabled }}
+          />
+        </>
+      )}
 
       <Box
         sx={{

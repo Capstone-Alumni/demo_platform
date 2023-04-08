@@ -56,8 +56,9 @@ const EditTenantPage = ({ initialData }: { initialData: Tenant }) => {
       <SubscriptionForm initialData={initialData} />
 
       <EditTenantForm
+        editable={false}
         initialData={initialData}
-        onSubmit={onUpdate}
+        // onSubmit={onUpdate}
         onClose={() => router.push('/dashboard/tenants')}
       />
     </Box>
