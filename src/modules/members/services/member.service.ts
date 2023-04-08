@@ -8,6 +8,8 @@ import {
   GetMemberListServiceProps,
   UpdateMemberInfoByIdServiceProps,
 } from '../types';
+import axios from 'axios';
+import getTenantHost from 'src/modules/tenants/utils/getTenantHost';
 
 const isTenantExisted = async (id: string) => {
   if (!id) {
@@ -93,6 +95,23 @@ export default class MemberService {
       user.email,
       accessLevel,
     );
+
+    const host = getTenantHost(tenant.subdomain || '');
+
+    // // run async
+    axios.post(`${process.env.NEXT_PUBLIC_MAIL_HOST}/mail/send-email`, {
+      to: user.email,
+      subject: 'Mời thành viên',
+      text: `
+            Kính gửi anh/chị,
+            
+            ${tenant.name} mời bạn sử dụng hệ thống kết nối cựu sinh viên.
+            Trang web: ${host}
+            Tài khoản đăng nhập:
+            - email: ${user.email}
+            - password: ${password}
+          `,
+    });
 
     return newMember;
   };
