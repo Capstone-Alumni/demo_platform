@@ -6,8 +6,8 @@ import { signIn } from 'next-auth/react';
 const useLogin = () => {
   const router = useRouter();
 
-  const login = (values: LoginFormValues) => {
-    signIn('credentials', {
+  const login = async (values: LoginFormValues) => {
+    await signIn('credentials', {
       email: values?.email,
       password: values?.password,
       redirect: false,
