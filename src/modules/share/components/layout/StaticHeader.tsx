@@ -11,10 +11,10 @@ import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
 import Link from 'next/link';
 import Logo from '../Logo';
+import { Session } from 'next-auth';
 
-const StaticHeader = () => {
+const StaticHeader = ({ session }: { session: Session }) => {
   const theme = useTheme();
-  const { data: session } = useSession();
   const { user } = session || { user: undefined };
 
   return (
@@ -33,7 +33,7 @@ const StaticHeader = () => {
             Alumni Platform
           </Typography>
 
-          {user ? (
+          {session?.user ? (
             <Box
               sx={{
                 display: 'flex',

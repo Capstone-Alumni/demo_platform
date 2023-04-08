@@ -17,7 +17,7 @@ export default async function Layout({
 
   return (
     <>
-      <StaticHeader />
+      <StaticHeader session={session} />
       <BodyWithSidebar>{children}</BodyWithSidebar>;
     </>
   );

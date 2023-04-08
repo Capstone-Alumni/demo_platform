@@ -62,7 +62,7 @@ const Header = () => {
                 Alumni Platform
               </Typography>
 
-              {user ? (
+              {session?.user ? (
                 <Box
                   sx={{
                     display: 'flex',

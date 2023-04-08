@@ -498,9 +498,17 @@ export default class TenantService {
       subject: 'Đăng ký Alumni App',
       text: `
         Kính gửi anh/chị,
-
+        
         Cảm ơn anh/chị đã lựa chọn The Alumn App. Mời anh/chị dùng link dưới đây để thanh toán và hoàn tất quá trình đăng ký.
         ${vnpUrl}
+      `,
+      html: `
+        <p>
+          Kính gửi anh/chị,
+          <br /><br />
+          Cảm ơn anh/chị đã lựa chọn The Alumn App. Mời anh/chị dùng link dưới đây để thanh toán và hoàn tất quá trình đăng ký.
+          <a href="${vnpUrl}">Link thanh toán</a>
+        </p>
       `,
     });
 
