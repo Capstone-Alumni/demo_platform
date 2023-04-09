@@ -191,6 +191,9 @@ export default class TenantService {
           gt: new Date(),
         },
       },
+      include: {
+        plan: true,
+      },
     });
 
     return Tenant;
