@@ -294,9 +294,16 @@ export default class TenantService {
       where: {
         email: values.email,
       },
+      include: {
+        alumni: {
+          where: {
+            isOwner: true,
+          },
+        },
+      },
     });
 
-    if (user) {
+    if (user?.alumni && user?.alumni.length > 0) {
       throw new Error('existed');
     }
 
@@ -363,9 +370,14 @@ export default class TenantService {
               accessLevel: 'SCHOOL_ADMIN',
               isOwner: true,
               account: {
-                create: {
-                  email: values.email,
-                  password: encryptedPassword,
+                connectOrCreate: {
+                  where: {
+                    email: values.email,
+                  },
+                  create: {
+                    email: values.email,
+                    password: encryptedPassword,
+                  },
                 },
               },
             },
