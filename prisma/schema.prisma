@@ -83,7 +83,6 @@ model Alumni {
   tenantId  String @map("tenant_id")
   accountId String @map("account_id")
 
-  accessLevel AccessLevel @default(ALUMNI) @map("access_level")
   lastLogin   DateTime?   @map("last_login")
   isOwner     Boolean     @default(false) @map("is_owner")
 
