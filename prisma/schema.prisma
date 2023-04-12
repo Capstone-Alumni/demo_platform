@@ -81,19 +81,18 @@ model Account {
 model Alumni {
   id        String @id @default(cuid())
   tenantId  String @map("tenant_id")
-  accountId String @map("account_id")
+  accountId String? @map("account_id")
 
   lastLogin   DateTime?   @map("last_login")
   isOwner     Boolean     @default(false) @map("is_owner")
 
   tenant  Tenant  @relation(fields: [tenantId], references: [id])
-  account Account @relation(fields: [accountId], references: [id])
+  account Account? @relation(fields: [accountId], references: [id])
 
   archived  Boolean  @default(false)
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
 
-  @@unique([tenantId, accountId])
   @@map("alumni")
 }
 

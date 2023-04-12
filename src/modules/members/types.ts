@@ -40,15 +40,28 @@ export type GetMemberListServiceProps = {
 };
 
 export type CreateMemberServiceProps = {
-  email: string;
-  password: string;
+  fullName: string;
+  gradeClass: Array<{
+    grade: Array<{ id: string; value: string; label: string }>;
+    alumClass: Array<{ id: string; value: string; label: string }>;
+  }>;
+  email?: string;
+  phone?: string;
+  dateOfBirth?: Date;
+  facebook?: string;
   tenantId: string;
-  accessLevel: AccessLevel;
 };
 
 export type ExternalCreateMemberServiceProps = {
-  email: string;
-  password: string;
+  fullName: string;
+  gradeClass: Array<{
+    grade: Array<{ id: string; value: string; label: string }>;
+    alumClass: Array<{ id: string; value: string; label: string }>;
+  }>;
+  email?: string;
+  phone?: string;
+  dateOfBirth?: Date;
+  facebook?: string;
   tenantId: string;
 };
 

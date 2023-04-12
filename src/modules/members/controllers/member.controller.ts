@@ -9,13 +9,7 @@ export default class MemberController {
     res: NextApiResponse<ApiSuccessResponse | ApiErrorResponse>,
   ) => {
     try {
-      const { email, password, tenantId, accessLevel } = req.body;
-      const newClass = await MemberService.create({
-        tenantId: tenantId as string,
-        email,
-        password,
-        accessLevel,
-      });
+      const newClass = await MemberService.create(req.body);
 
       return res.status(201).json({
         status: true,
