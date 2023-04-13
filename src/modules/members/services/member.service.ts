@@ -13,6 +13,7 @@ import axios from 'axios';
 import getTenantHost from 'src/modules/tenants/utils/getTenantHost';
 import sendEmail from '@share/utils/sendEmail';
 import { Account, Alumni } from '@prisma/client';
+import { boolean } from 'yup';
 
 const isTenantExisted = async (id: string) => {
   if (!id) {
@@ -40,54 +41,67 @@ const dualWriteAlumniProfile = async (
     dateOfBirth,
     facebook,
   }: CreateMemberServiceProps,
-  account: Account,
   alumni: Alumni,
-  rawPassword?: string,
+  option: {
+    createAlumni?: boolean;
+    createClassRef?: boolean;
+    createProfile?: boolean;
+  } = {
+    createAlumni: true,
+    createClassRef: true,
+    createProfile: true,
+  },
 ) => {
   console.log('dual write');
   // Tạo account
-  const insertAlumniQuery = `
+  if (option.createAlumni) {
+    const insertAlumniQuery = `
     INSERT INTO ${tenantId}.alumni (id, tenant_id, account_id) values ($1, $2, $3)
   `;
-  await mainAppPrisma.$executeRawUnsafe(
-    insertAlumniQuery,
-    alumni.id,
-    alumni.tenantId,
-    alumni.accountId,
-  );
+    await mainAppPrisma.$executeRawUnsafe(
+      insertAlumniQuery,
+      alumni.id,
+      alumni.tenantId,
+      alumni.accountId,
+    );
+  }
 
   // Tạo liên kết alumni - class
-  const insertAlumniClassRelationshipQuery = `
+  if (option.createClassRef) {
+    const insertAlumniClassRelationshipQuery = `
     INSERT INTO ${tenantId}.alumni_to_class (id, alum_class_id, alumni_id) values ($1, $2, $3)
   `;
-  const flattenClass = gradeClass.reduce((red: any[], { alumClass }) => {
-    return red.concat(alumClass.map(cl => cl.value));
-  }, []);
-  await Promise.all(
-    flattenClass.map(item =>
-      mainAppPrisma.$executeRawUnsafe(
-        insertAlumniClassRelationshipQuery,
-        cuid(),
-        item,
-        alumni.id,
+    const flattenClass = gradeClass.reduce((red: any[], { alumClass }) => {
+      return red.concat(alumClass.map(cl => cl.value));
+    }, []);
+    await Promise.all(
+      flattenClass.map(item =>
+        mainAppPrisma.$executeRawUnsafe(
+          insertAlumniClassRelationshipQuery,
+          cuid(),
+          item,
+          alumni.id,
+        ),
       ),
-    ),
-  );
+    );
+  }
 
   // Tạo profile
-  const insertAlumniInformationQuery = `
+  if (option.createProfile) {
+    const insertAlumniInformationQuery = `
     INSERT INTO ${tenantId}.informations (id, alumni_id, full_name, email, phone, facebook_url, date_of_birth) values ($1, $2, $3, $4, $5, $6, $7)
   `;
-  await mainAppPrisma.$executeRawUnsafe(
-    insertAlumniInformationQuery,
-    cuid(),
-    alumni.id,
-    fullName,
-    email,
-    phone,
-    facebook,
-    dateOfBirth ? new Date(dateOfBirth) : undefined,
-  );
+    await mainAppPrisma.$executeRawUnsafe(
+      insertAlumniInformationQuery,
+      cuid(),
+      alumni.id,
+      fullName,
+      email,
+      phone,
+      facebook,
+      dateOfBirth ? new Date(dateOfBirth) : undefined,
+    );
+  }
 };
 
 export default class MemberService {
@@ -98,59 +112,57 @@ export default class MemberService {
     console.log('create member');
     const tenant = await isTenantExisted(tenantId);
 
-    if (!memberData.fullName || memberData?.gradeClass?.length === 0) {
+    if (
+      !memberData.fullName ||
+      memberData?.gradeClass?.length === 0 ||
+      !memberData.email
+    ) {
       throw new Error('invalid data');
     }
 
     let account: any = {};
 
-    if (memberData.email) {
-      account = await prisma.account.findUnique({
-        where: { email: memberData.email },
+    account = await prisma.account.findUnique({
+      where: { email: memberData.email },
+    });
+
+    console.log('account: ', account);
+
+    // Case 4
+    if (!account) {
+      const randomPassword = Math.random().toString(36).slice(-8);
+      const encryptedRandomPassword = hashSync(randomPassword, 10);
+      account = await prisma.account.create({
+        data: {
+          email: memberData.email,
+          password: encryptedRandomPassword,
+        },
       });
 
-      console.log('account: ', account);
-
-      // Case 4
-      if (!account) {
-        const randomPassword = Math.random().toString(36).slice(-8);
-        const encryptedRandomPassword = hashSync(randomPassword, 10);
-        account = await prisma.account.create({
-          data: {
-            email: memberData.email,
-            password: encryptedRandomPassword,
-          },
-        });
-
-        const newMember = await prisma.alumni.create({
-          data: {
-            account: {
-              connect: {
-                id: account.id,
-              },
-            },
-            tenant: {
-              connect: {
-                id: tenant.id,
-              },
+      const newMember = await prisma.alumni.create({
+        data: {
+          account: {
+            connect: {
+              id: account.id,
             },
           },
-        });
+          tenant: {
+            connect: {
+              id: tenant.id,
+            },
+          },
+        },
+      });
 
-        console.log('alumni: ', newMember);
+      console.log('alumni: ', newMember);
 
-        dualWriteAlumniProfile(
-          { tenantId, ...memberData },
-          account,
-          newMember,
-          randomPassword,
-        );
+      dualWriteAlumniProfile({ tenantId, ...memberData }, newMember);
 
-        const host = getTenantHost(tenant.subdomain || '');
-        sendEmail(
-          account.email,
-          'Mời thành viên',
-          `<pre>
+      const host = getTenantHost(tenant.subdomain || '');
+      sendEmail(
+        account.email,
+        'Mời thành viên',
+        `<pre>
           Chào ${memberData.fullName},
               
           <a href="${host}">${tenant.name}</a> mời bạn sử dụng hệ thống kết nối cựu sinh viên.
@@ -163,70 +175,40 @@ export default class MemberService {
           </pre>
               
             `,
-        );
+      );
 
-        return newMember;
-      }
+      return newMember;
     }
 
-    // const member = await prisma.alumni.findUnique({
-    //   where: {
-    //     tenantId_accountId: {
-    //       tenantId: tenantId,
-    //       accountId: account.id || null,
-    //     },
-    //   },
-    // });
+    const newMember = await prisma.alumni.upsert({
+      where: {
+        accountId_tenantId: {
+          tenantId: tenant.id,
+          accountId: account.id,
+        },
+      },
+      create: {
+        account: {
+          connect: {
+            id: account.id,
+          },
+        },
+        tenant: {
+          connect: {
+            id: tenant.id,
+          },
+        },
+      },
+      update: {},
+    });
 
-    // if (member) {
-    //   throw new Error('member already existed');
-    // }
+    dualWriteAlumniProfile({ tenantId, ...memberData }, newMember, {
+      createAlumni: false,
+      createClassRef: true,
+      createProfile: false,
+    });
 
-    // const newMember = await prisma.alumni.create({
-    //   data: {
-    //     account: {
-    //       connect: {
-    //         email: email,
-    //       },
-    //     },
-    //     tenant: {
-    //       connect: {
-    //         id: tenantId,
-    //       },
-    //     },
-    //   },
-    // });
-
-    // const insertAlumniQuery = `
-    //   INSERT INTO ${tenant.tenantId}.alumni (id, tenant_id, account_id, account_email, access_level, access_status) values ($1, $2, $3, $4, $5::"template"."AccessLevel", 'APPROVED')
-    // `;
-    // await mainAppPrisma.$executeRawUnsafe(
-    //   insertAlumniQuery,
-    //   newMember.id,
-    //   tenant.tenantId,
-    //   user.id,
-    //   user.email,
-    //   accessLevel,
-    // );
-
-    // const host = getTenantHost(tenant.subdomain || '');
-
-    // // // run async
-    // axios.post(`${process.env.NEXT_PUBLIC_MAIL_HOST}/mail/send-email`, {
-    //   to: user.email,
-    //   subject: 'Mời thành viên',
-    //   text: `
-    //         Kính gửi anh/chị,
-
-    //         ${tenant.name} mời bạn sử dụng hệ thống kết nối cựu sinh viên.
-    //         Trang web: ${host}
-    //         Tài khoản đăng nhập:
-    //         - email: ${user.email}
-    //         - password: ${password}
-    //       `,
-    // });
-
-    return null;
+    return newMember;
   };
 
   static createMany = async ({
@@ -441,13 +423,13 @@ export default class MemberService {
   };
 
   static getList = async ({ tenantId, params }: GetMemberListServiceProps) => {
-    await isTenantExisted(tenantId);
+    const tenant = await isTenantExisted(tenantId);
 
     const { email, page, limit } = params;
 
     const whereFilter = {
       AND: [
-        { tenantId: tenantId },
+        { tenantId: tenant.id },
         {
           account: {
             email: {
