@@ -20,7 +20,7 @@ const useGetTenantList = () => {
     GetTenantListDataParams,
     GetTenantListDataResponse,
     GetTenantListDataError
-  >('getTenantList', ({ page, limit, tenantId, name }) => ({
+  >('getTenantList', ({ page, limit, tenantId, name, planName }) => ({
     method: 'GET',
     url: '/api/tenants',
     params: {
@@ -28,6 +28,7 @@ const useGetTenantList = () => {
       limit,
       name,
       tenantId,
+      planName,
     },
   }));
 

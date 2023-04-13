@@ -32,8 +32,9 @@ const AdminTenantListTable = ({
             <TableRow>
               <TableCell align="left">Id</TableCell>
               <TableCell align="left">Tên trường</TableCell>
-              <TableCell align="left">Subdomain</TableCell>
+              <TableCell align="left">Tên miền</TableCell>
               <TableCell align="left">Người quản lý</TableCell>
+              <TableCell align="center">Trạng thái</TableCell>
               <TableCell align="center">Ngày hết hạn</TableCell>
               <TableCell align="center">Thao tác</TableCell>
             </TableRow>
