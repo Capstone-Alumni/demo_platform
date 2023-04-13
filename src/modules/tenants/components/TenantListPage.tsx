@@ -2,8 +2,7 @@
 
 import { useRecoilState } from 'recoil';
 
-import { Box, Button, Typography, useTheme } from '@mui/material';
-import AddIcon from '@mui/icons-material/Add';
+import { Box, Tab, Tabs, Typography, useTheme } from '@mui/material';
 
 import LoadingIndicator from '@share/components/LoadingIndicator';
 
@@ -12,14 +11,21 @@ import useDeleteTenantById from '../hooks/useDeleteTenantById';
 import { getTenantListParamsAtom } from '../state';
 
 import TenantListTable from './TenantListTable';
-import Link from 'next/link';
 import useActivateTenantById from '../hooks/useActivateTenant';
 import useDeactivateTenantById from '../hooks/useDeactivateTenant';
+import { useState } from 'react';
+
+const planName: { [key: number]: string } = {
+  0: '3-month',
+  1: '6-month',
+  2: '1-year',
+};
 
 const TenantListPage = () => {
   const theme = useTheme();
 
   const [params, setParams] = useRecoilState(getTenantListParamsAtom);
+  const [tabValue, setTabValue] = useState(0);
 
   const { deleteTenantById } = useDeleteTenantById();
   const { activateTenantById } = useActivateTenantById();
@@ -44,6 +50,15 @@ const TenantListPage = () => {
   const onDeactivate = async (id: string) => {
     await deactivateTenantById({ id });
     reload();
+  };
+
+  const handleChangeTab = (event: React.SyntheticEvent, newValue: number) => {
+    setTabValue(newValue);
+
+    setParams(prevParams => ({
+      ...prevParams,
+      planName: planName[newValue],
+    }));
   };
 
   return (
@@ -80,18 +95,24 @@ const TenantListPage = () => {
         }}
       >
         {isGettingTenant ? <LoadingIndicator /> : null}
-
         {tenantListData?.data ? (
-          <TenantListTable
-            data={tenantListData?.data}
-            onDelete={onDelete}
-            onActivate={onActivate}
-            onDeactivate={onDeactivate}
-            page={params.page || 1}
-            onChangePage={nextPage => {
-              setParams(prevParams => ({ ...prevParams, page: nextPage }));
-            }}
-          />
+          <>
+            <Tabs value={tabValue} onChange={handleChangeTab} centered>
+              <Tab sx={{ width: '30%' }} label="Gói 3 tháng" />
+              <Tab sx={{ width: '30%' }} label="Gói 6 tháng" />
+              <Tab sx={{ width: '30%' }} label="Gói 1 năm" />
+            </Tabs>
+            <TenantListTable
+              data={tenantListData?.data}
+              onDelete={onDelete}
+              onActivate={onActivate}
+              onDeactivate={onDeactivate}
+              page={params.page || 1}
+              onChangePage={nextPage => {
+                setParams(prevParams => ({ ...prevParams, page: nextPage }));
+              }}
+            />
+          </>
         ) : null}
       </Box>
     </Box>

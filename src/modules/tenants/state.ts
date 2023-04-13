@@ -8,5 +8,6 @@ export const getTenantListParamsAtom = atom<GetTenantListParams>({
     limit: 10,
     tenantId: undefined,
     name: '',
+    planName: '',
   },
 });

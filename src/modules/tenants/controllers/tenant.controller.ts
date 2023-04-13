@@ -9,13 +9,14 @@ export default class TenantController {
     req: NextApiRequest,
     res: NextApiResponse<ApiSuccessResponse | ApiErrorResponse>,
   ) => {
-    const { page, limit, tenantId, name } = req.query;
+    const { page, limit, tenantId, name, planName } = req.query;
     const tenantListData = await TenantService.getList({
       params: {
         page: page ? parseInt(page as string, 10) : 1,
         limit: limit ? parseInt(limit as string, 10) : 20,
         tenantId: tenantId ? (tenantId as string) : '',
         name: name ? (name as string) : '',
+        planName: planName ? (planName as string) : '3-month',
       },
     });
 
