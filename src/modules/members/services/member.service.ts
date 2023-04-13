@@ -74,16 +74,21 @@ const dualWriteAlumniProfile = async (
     const flattenClass = gradeClass.reduce((red: any[], { alumClass }) => {
       return red.concat(alumClass.map(cl => cl.value));
     }, []);
-    await Promise.all(
-      flattenClass.map(item =>
-        mainAppPrisma.$executeRawUnsafe(
-          insertAlumniClassRelationshipQuery,
-          cuid(),
-          item,
-          alumni.id,
+    console.log(flattenClass);
+    try {
+      await Promise.all(
+        flattenClass.map(item =>
+          mainAppPrisma.$executeRawUnsafe(
+            insertAlumniClassRelationshipQuery,
+            cuid(),
+            item,
+            alumni.id,
+          ),
         ),
-      ),
-    );
+      );
+    } catch (err) {
+      console.log(err);
+    }
   }
 
   // Tạo profile
@@ -224,7 +229,7 @@ export default class MemberService {
     });
 
     const formattedData = await Promise.all(
-      memberListData.map(async ({ email, password, accessLevel }) => {
+      memberListData.map(async ({ email, password }) => {
         const encryptedPassword = hashSync(password, 10);
 
         const user = await prisma.account.findUnique({
@@ -233,7 +238,6 @@ export default class MemberService {
 
         return {
           accountId: user?.id,
-          accessLevel: accessLevel,
           email: email,
           password: encryptedPassword,
         };
@@ -241,7 +245,7 @@ export default class MemberService {
     );
 
     const res = await prisma.$transaction(
-      formattedData.map(({ accountId, email, password, accessLevel }) => {
+      formattedData.map(({ accountId, email, password }) => {
         return prisma.alumni.upsert({
           where: {
             tenantId_accountId: {
