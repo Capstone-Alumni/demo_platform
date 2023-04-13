@@ -5,15 +5,10 @@ import cuid from 'cuid';
 import {
   CreateManyMemberServiceProps,
   CreateMemberServiceProps,
-  ExternalCreateMemberServiceProps,
-  GetMemberListServiceProps,
-  UpdateMemberInfoByIdServiceProps,
 } from '../types';
-import axios from 'axios';
 import getTenantHost from 'src/modules/tenants/utils/getTenantHost';
 import sendEmail from '@share/utils/sendEmail';
-import { Account, Alumni } from '@prisma/client';
-import { boolean } from 'yup';
+import { Alumni } from '@prisma/client';
 
 const isTenantExisted = async (id: string) => {
   if (!id) {
@@ -56,14 +51,18 @@ const dualWriteAlumniProfile = async (
   // Tạo account
   if (option.createAlumni) {
     const insertAlumniQuery = `
-    INSERT INTO ${tenantId}.alumni (id, tenant_id, account_id) values ($1, $2, $3)
-  `;
-    await mainAppPrisma.$executeRawUnsafe(
-      insertAlumniQuery,
-      alumni.id,
-      alumni.tenantId,
-      alumni.accountId,
-    );
+      INSERT INTO ${tenantId}.alumni (id, tenant_id, account_id) values ($1, $2, $3)
+    `;
+    try {
+      await mainAppPrisma.$executeRawUnsafe(
+        insertAlumniQuery,
+        alumni.id,
+        alumni.tenantId,
+        alumni.accountId,
+      );
+    } catch (err) {
+      console.log(err);
+    }
   }
 
   // Tạo liên kết alumni - class
@@ -96,16 +95,20 @@ const dualWriteAlumniProfile = async (
     const insertAlumniInformationQuery = `
     INSERT INTO ${tenantId}.informations (id, alumni_id, full_name, email, phone, facebook_url, date_of_birth) values ($1, $2, $3, $4, $5, $6, $7)
   `;
-    await mainAppPrisma.$executeRawUnsafe(
-      insertAlumniInformationQuery,
-      cuid(),
-      alumni.id,
-      fullName,
-      email,
-      phone,
-      facebook,
-      dateOfBirth ? new Date(dateOfBirth) : undefined,
-    );
+    try {
+      await mainAppPrisma.$executeRawUnsafe(
+        insertAlumniInformationQuery,
+        cuid(),
+        alumni.id,
+        fullName,
+        email,
+        phone,
+        facebook,
+        dateOfBirth ? new Date(dateOfBirth) : undefined,
+      );
+    } catch (err) {
+      console.log(err);
+    }
   }
 };
 
@@ -133,7 +136,6 @@ export default class MemberService {
 
     console.log('account: ', account);
 
-    // Case 4
     if (!account) {
       const randomPassword = Math.random().toString(36).slice(-8);
       const encryptedRandomPassword = hashSync(randomPassword, 10);
@@ -208,9 +210,9 @@ export default class MemberService {
     });
 
     dualWriteAlumniProfile({ tenantId, ...memberData }, newMember, {
-      createAlumni: false,
+      createAlumni: true,
       createClassRef: true,
-      createProfile: false,
+      createProfile: true,
     });
 
     return newMember;
@@ -248,7 +250,7 @@ export default class MemberService {
       formattedData.map(({ accountId, email, password }) => {
         return prisma.alumni.upsert({
           where: {
-            tenantId_accountId: {
+            accountId_tenantId: {
               tenantId: tenantId,
               accountId: accountId || '',
             },
@@ -353,119 +355,6 @@ export default class MemberService {
     // return newMember;
   };
 
-  static externalCreate = async ({
-    tenantId,
-    ...memberData
-  }: ExternalCreateMemberServiceProps) => {
-    const tenant = await isTenantExisted(tenantId);
-
-    if (!memberData.fullName || memberData?.gradeClass?.length === 0) {
-      throw new Error('invalid data');
-    }
-
-    let account = {};
-
-    if (memberData.email) {
-      account = await prisma.account.findUnique({
-        where: { email: memberData.email },
-      });
-
-      const randomPassword = Math.random().toString(36).slice(-8);
-      const encryptedRandomPassword = hashSync(randomPassword, 10);
-
-      if (!account) {
-        account = await prisma.account.create({
-          data: {
-            email: memberData.email,
-            password: encryptedRandomPassword,
-          },
-        });
-      }
-    }
-
-    const member = await prisma.alumni.findUnique({
-      where: {
-        tenantId_accountId: {
-          tenantId: tenantId,
-          accountId: user.id,
-        },
-      },
-    });
-
-    if (member) {
-      throw new Error('member already existed');
-    }
-
-    const newMember = await prisma.alumni.create({
-      data: {
-        accessLevel: 'ALUMNI',
-        account: {
-          connect: {
-            email: email,
-          },
-        },
-        tenant: {
-          connect: {
-            id: tenantId,
-          },
-        },
-      },
-    });
-
-    const insertAlumniQuery = `
-      INSERT INTO ${tenant.tenantId}.alumni (id, tenant_id, account_id, account_email, access_level, access_status) values ($1, $2, $3, $4, 'ALUMNI', 'PENDING')
-    `;
-    await mainAppPrisma.$executeRawUnsafe(
-      insertAlumniQuery,
-      newMember.id,
-      tenant.id,
-      user.id,
-      user.email,
-    );
-
-    return newMember;
-  };
-
-  static getList = async ({ tenantId, params }: GetMemberListServiceProps) => {
-    const tenant = await isTenantExisted(tenantId);
-
-    const { email, page, limit } = params;
-
-    const whereFilter = {
-      AND: [
-        { tenantId: tenant.id },
-        {
-          account: {
-            email: {
-              contains: email,
-            },
-          },
-        },
-        { archived: false },
-      ],
-    };
-
-    const [totalMemberItem, MemberItems] = await prisma.$transaction([
-      prisma.alumni.count({
-        where: whereFilter,
-      }),
-      prisma.alumni.findMany({
-        skip: (page - 1) * limit,
-        take: limit,
-        where: whereFilter,
-        include: {
-          account: true,
-        },
-      }),
-    ]);
-
-    return {
-      totalItems: totalMemberItem,
-      items: MemberItems,
-      itemPerPage: limit,
-    };
-  };
-
   // static getById = async (id: string) => {
   //   const grade = await prisma.Member.findUnique({
   //     where: {
@@ -476,62 +365,7 @@ export default class MemberService {
   //   return grade;
   // };
 
-  static updateInfoById = async (
-    id: string,
-    data: UpdateMemberInfoByIdServiceProps,
-  ) => {
-    let member = await prisma.alumni.findUnique({
-      where: {
-        id: id,
-      },
-      include: {
-        tenant: true,
-      },
-    });
-
-    if (data.password) {
-      const encryptedPassword = hashSync(data.password, 10);
-
-      await prisma.account.update({
-        where: {
-          id: member?.accountId,
-        },
-        data: {
-          password: encryptedPassword,
-        },
-      });
-    }
-
-    if (data.accessLevel) {
-      if (
-        member?.accessLevel === 'SCHOOL_ADMIN' ||
-        data.accessLevel === 'SCHOOL_ADMIN'
-      ) {
-        return member;
-      }
-
-      member = await prisma.alumni.update({
-        where: {
-          id: id,
-        },
-        data: {
-          accessLevel: data.accessLevel,
-        },
-        include: {
-          tenant: true,
-        },
-      });
-
-      const alumniQuery = `
-        UPDATE ${member?.tenant.tenantId}.alumni SET access_level = $1::"template"."AccessLevel" WHERE id = $2;
-      `;
-      await mainAppPrisma.$executeRawUnsafe(alumniQuery, data.accessLevel, id);
-    }
-
-    return member;
-  };
-
-  static deleteById = async (id: string) => {
+  static deleteById = async (tenantId: string, id: string) => {
     const member = await prisma.alumni.findUnique({
       where: { id: id },
       include: {
@@ -539,21 +373,23 @@ export default class MemberService {
       },
     });
 
-    if (member?.isOwner) {
-      throw new Error('cannot delete');
+    if (member) {
+      if (member?.isOwner) {
+        throw new Error('cannot delete');
+      }
+
+      await prisma.alumni.delete({
+        where: {
+          id: id,
+        },
+      });
     }
 
-    const memberDeleted = await prisma.alumni.delete({
-      where: {
-        id: id,
-      },
-    });
-
     const alumniQuery = `
-      DELETE FROM ${member?.tenant.tenantId}.alumni WHERE id = $1;
+      DELETE FROM ${tenantId}.alumni WHERE id = $1;
     `;
     await mainAppPrisma.$executeRawUnsafe(alumniQuery, id);
 
-    return memberDeleted;
+    return member;
   };
 }

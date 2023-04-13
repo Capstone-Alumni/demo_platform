@@ -19,3 +19,23 @@ export const authMiddleware = async (
 
   next();
 };
+
+export type NextApiRequestWithTenant = {
+  tenantId: string;
+} & NextApiRequest;
+
+export const extractTenantId = async (
+  req: NextApiRequestWithTenant,
+  res: NextApiResponse,
+  next: NextHandler,
+) => {
+  const tenantId = req.headers['tenant-id'] as string;
+
+  if (!tenantId) {
+    throw new Error('unauthorized');
+  }
+
+  req.tenantId = tenantId;
+
+  next();
+};

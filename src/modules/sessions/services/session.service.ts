@@ -57,7 +57,7 @@ export default class SessionService {
           tenantId: alumni.tenant.tenantId,
           subdomain: alumni.tenant.subdomain,
         },
-        accessLevel: alumni.accessLevel,
+        isOwner: alumni.isOwner,
       };
     }
 
@@ -70,13 +70,6 @@ export default class SessionService {
   }: SignInRequestBody) => {
     const account = await prisma.account.findUnique({
       where: { email: email },
-      // include: {
-      //   alumni: {
-      //     where: {
-      //       accessLevel: 'SCHOOL_ADMIN',
-      //     },
-      //   },
-      // },
     });
 
     if (!account) {
@@ -159,7 +152,7 @@ export default class SessionService {
           tenantId: alumni.tenant.tenantId,
           subdomain: alumni.tenant.subdomain,
         },
-        accessLevel: alumni.accessLevel,
+        isOwner: alumni.isOwner,
       };
     }
 

@@ -1,3 +1,4 @@
+import { extractTenantId } from '@share/utils/middlewareAPI';
 import onErrorAPIHandler from '@share/utils/onErrorAPIHandler';
 import onNoMatchAPIHandler from '@share/utils/onNoMatchAPIHandler';
 import nc from 'next-connect';
@@ -7,6 +8,7 @@ const handler = nc({
   onError: onErrorAPIHandler,
   onNoMatch: onNoMatchAPIHandler,
 })
+  .use(extractTenantId)
   .get(MemberController.getList)
   .post(MemberController.create);
 
