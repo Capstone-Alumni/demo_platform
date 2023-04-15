@@ -48,6 +48,7 @@ export type CreateMemberServiceProps = {
   dateOfBirth?: Date;
   facebook?: string;
   tenantId: string;
+  password?: string;
 };
 
 export type ExternalCreateMemberServiceProps = {

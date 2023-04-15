@@ -137,7 +137,9 @@ export default class MemberService {
     console.log('account: ', account);
 
     if (!account) {
-      const randomPassword = Math.random().toString(36).slice(-8);
+      const randomPassword = memberData.password
+        ? memberData.password
+        : Math.random().toString(36).slice(-8);
       const encryptedRandomPassword = hashSync(randomPassword, 10);
       account = await prisma.account.create({
         data: {
@@ -166,23 +168,39 @@ export default class MemberService {
       dualWriteAlumniProfile({ tenantId, ...memberData }, newMember);
 
       const host = getTenantHost(tenant.subdomain || '');
-      sendEmail(
-        account.email,
-        'Mời thành viên',
-        `<pre>
-          Chào ${memberData.fullName},
-              
-          <a href="${host}">${tenant.name}</a> mời bạn sử dụng hệ thống kết nối cựu sinh viên.
-          Địa chỉ website: ${host}
-          Tài khoản đăng nhập:
-          - email: ${account.email}
-          - password: ${randomPassword}
-  
-          *Lưu ý: đổi password sau khi đăng nhập
-          </pre>
-              
-            `,
-      );
+
+      if (!memberData.password) {
+        sendEmail(
+          account.email,
+          'Mời thành viên',
+          `<pre>
+            Chào ${memberData.fullName},
+                
+            <a href="${host}">${tenant.name}</a> mời bạn sử dụng hệ thống kết nối cựu sinh viên.
+            Địa chỉ website: ${host}
+            Tài khoản đăng nhập:
+            - email: ${account.email}
+            - password: ${randomPassword}
+    
+            *Lưu ý: đổi password sau khi đăng nhập
+            </pre>
+                
+              `,
+        );
+      } else {
+        sendEmail(
+          account.email,
+          'Tham gia cộng đồng cựu học sinh',
+          `<pre>
+            Chào ${memberData.fullName},
+            
+            Cảm ơn bạn đã nộp đơn tham gia vào hội alumni của trường. <a href="${host}">${tenant.name}</a> mời bạn sử dụng hệ thống kết nối cựu sinh viên.
+            Địa chỉ website: ${host}
+            </pre>
+                
+              `,
+        );
+      }
 
       return newMember;
     }
@@ -214,6 +232,38 @@ export default class MemberService {
       createClassRef: true,
       createProfile: true,
     });
+
+    const host = getTenantHost(tenant.subdomain || '');
+
+    if (!memberData.password) {
+      sendEmail(
+        account.email,
+        'Mời thành viên',
+        `<pre>
+          Chào ${memberData.fullName},
+              
+          <a href="${host}">${tenant.name}</a> mời bạn sử dụng hệ thống kết nối cựu sinh viên.
+          Địa chỉ website: ${host}
+  
+          *Lưu ý: đổi password sau khi đăng nhập
+          </pre>
+              
+            `,
+      );
+    } else {
+      sendEmail(
+        account.email,
+        'Tham gia cộng đồng cựu học sinh',
+        `<pre>
+          Chào ${memberData.fullName},
+          
+          Cảm ơn bạn đã nộp đơn tham gia vào hội alumni của trường. <a href="${host}">${tenant.name}</a> mời bạn sử dụng hệ thống kết nối cựu sinh viên.
+          Địa chỉ website: ${host}
+          </pre>
+              
+            `,
+      );
+    }
 
     return newMember;
   };
