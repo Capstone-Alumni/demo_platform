@@ -10,7 +10,6 @@ import {
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import BorderColorIcon from '@mui/icons-material/BorderColor';
 import ConfirmDeleteModal from '@share/components/ConfirmDeleteModal';
-import LightbulbIcon from '@mui/icons-material/Lightbulb';
 import DeleteIcon from '@mui/icons-material/Delete';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import React, { useState } from 'react';
@@ -20,6 +19,8 @@ import { useRouter } from 'next/navigation';
 import { noop } from 'lodash/fp';
 import getTenantHost from '../utils/getTenantHost';
 import { formatDate } from '@share/utils/formatDate';
+import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone';
+import { isEmpty } from 'lodash';
 
 const ActionButton = ({
   actions,
@@ -92,6 +93,40 @@ const AdminTenantListItem = ({
 }) => {
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
   const router = useRouter();
+  const isWaitForPay =
+    data.approved &&
+    (isEmpty(data.transactions) ||
+      !data.transactions.some(transaction => transaction.paymentStatus === 1));
+
+  const isPaid =
+    data.approved &&
+    data.transactions.some(transaction => transaction.paymentStatus === 1);
+
+  const getTenantStatus = () => {
+    if (isWaitForPay) {
+      return 'Đang chờ thanh toán';
+    }
+    if (isPaid) {
+      return 'Đã thanh toán';
+    }
+    if (!data.approved) {
+      return 'Đang chờ xác thực';
+    }
+    return 'Đã xác thực';
+  };
+
+  const getTenantStatusColor = () => {
+    if (isWaitForPay) {
+      return '#0288d1';
+    }
+    if (isPaid) {
+      return '#689f38';
+    }
+    if (!data.approved) {
+      return '#fbc02d';
+    }
+    return '#29b6f6';
+  };
 
   return (
     <>
@@ -109,15 +144,34 @@ const AdminTenantListItem = ({
           <Typography>{data.alumni?.[0]?.account.email}</Typography>
         </TableCell>
         <TableCell align="center">
+          <Button
+            variant="outlined"
+            sx={{
+              color: getTenantStatusColor(),
+              borderColor: getTenantStatusColor(),
+            }}
+          >
+            {getTenantStatus()}
+          </Button>
+        </TableCell>
+        <TableCell align="center">
           <Typography>
             {data.approved
               ? formatDate(new Date(data?.subcriptionEndTime || ''))
-              : 'Chưa xác nhận'}
+              : ''}
           </Typography>
         </TableCell>
         <TableCell align="center">
           <ActionButton
             actions={[
+              isPaid
+                ? {
+                    id: 'reminder',
+                    icon: <NotificationsNoneIcon color="inherit" />,
+                    text: 'Nhắc nhở gia hạn',
+                    onClick: () => noop,
+                  }
+                : null,
               data.approved && data.subdomain
                 ? {
                     id: 'view',

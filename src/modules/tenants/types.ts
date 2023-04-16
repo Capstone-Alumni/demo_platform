@@ -34,6 +34,9 @@ export type Tenant = {
   address: string;
   planId: string;
   plan: Plan | null;
+  transactions: Array<{
+    paymentStatus: number;
+  }>;
 };
 
 export type GetTenantListData = {
@@ -47,6 +50,7 @@ export type GetTenantListParams = {
   limit?: number;
   tenantId?: string;
   name?: string;
+  planName?: string;
 };
 
 /** ========================== BE ================================= */
@@ -57,6 +61,7 @@ export type GetTenantListServiceParams = {
   limit: number;
   name: string;
   tenantId: string | undefined;
+  planName: string;
 };
 
 export type GetTenantListServiceProps = {

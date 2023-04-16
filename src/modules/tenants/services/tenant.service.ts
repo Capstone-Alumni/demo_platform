@@ -33,13 +33,18 @@ const cloneSchema = async (tenant: any) => {
 
 export default class TenantService {
   static getList = async ({ params }: GetTenantListServiceProps) => {
-    const { name, tenantId, page, limit } = params;
+    const { name, tenantId, page, limit, planName } = params;
 
     const whereFilter = {
       AND: [
         { tenantId: { contains: tenantId } },
         { name: { contains: name } },
         { archived: false },
+        {
+          plan: {
+            name: planName,
+          },
+        },
       ],
     };
 
@@ -66,6 +71,11 @@ export default class TenantService {
                   email: true,
                 },
               },
+            },
+          },
+          transactions: {
+            select: {
+              paymentStatus: true,
             },
           },
         },
