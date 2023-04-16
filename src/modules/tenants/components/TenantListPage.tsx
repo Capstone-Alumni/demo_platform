@@ -81,12 +81,6 @@ const TenantListPage = () => {
         }}
       >
         <Typography variant="h3">Khách hàng</Typography>
-
-        {/* <Link href="/tenants/create">
-          <Button variant="contained" startIcon={<AddIcon />}>
-            Add tenant
-          </Button>
-        </Link> */}
       </Box>
 
       <Box

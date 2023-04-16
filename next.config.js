@@ -39,6 +39,10 @@ const nextConfig = {
         source: '/mailHost/:path*',
         destination: `${mailHost}/:path*`,
       },
+      {
+        source: '/api/update_tenant_transaction',
+        destination: '/api/transaction_ipn',
+      },
     ];
   },
 };

@@ -9,9 +9,7 @@ export default async function RootLayout({
 }) {
   return (
     <>
-      <Header />
       <Body sx={{ paddingY: 0 }}>{children}</Body>
-      <Footer />
     </>
   );
 }

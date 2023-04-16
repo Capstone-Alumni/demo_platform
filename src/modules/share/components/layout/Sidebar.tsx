@@ -82,7 +82,6 @@ const Sidebar = () => {
                 selected={pathname?.startsWith(item.link)}
                 sx={{ borderRadius: theme.shape.borderRadiusSm }}
               >
-                <ListItemIcon>{item.icon}</ListItemIcon>
                 <ListItemText>
                   <Typography variant="button">{item.text}</Typography>
                 </ListItemText>

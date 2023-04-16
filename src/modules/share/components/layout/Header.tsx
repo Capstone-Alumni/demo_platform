@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import { signOut, useSession } from 'next-auth/react';
 
 import { Button, Toolbar, useScrollTrigger, useTheme } from '@mui/material';
@@ -12,6 +12,7 @@ import IconButton from '@mui/material/IconButton';
 import Link from 'next/link';
 import Logo from '../Logo';
 import { Container } from '@mui/material';
+import { usePathname } from 'next/navigation';
 
 interface Props {
   /**
@@ -20,10 +21,11 @@ interface Props {
    */
   window?: () => Window;
   children: React.ReactElement;
+  isStatic?: boolean;
 }
 
 function ElevationScroll(props: Props) {
-  const { children, window } = props;
+  const { children, window, isStatic } = props;
   // Note that you normally won't need to set the window ref as useScrollTrigger
   // will default to window.
   // This is only being set here because the demo is in an iframe.
@@ -34,8 +36,8 @@ function ElevationScroll(props: Props) {
   });
 
   return React.cloneElement(children, {
-    elevation: trigger ? 4 : 0,
-    color: trigger ? 'default' : 'transparent',
+    elevation: trigger && !isStatic ? 4 : 0,
+    color: trigger || isStatic ? 'default' : 'transparent',
   });
 }
 
@@ -44,10 +46,17 @@ const Header = () => {
   const { data: session } = useSession();
   const { user } = session || { user: undefined };
 
+  const pathname = usePathname();
+
+  const isStatic = useMemo(
+    () => pathname?.startsWith('/dashboard'),
+    [pathname],
+  );
+
   return (
     <Box sx={{ flexGrow: 1 }}>
-      <ElevationScroll>
-        <AppBar color="inherit">
+      <ElevationScroll isStatic={isStatic}>
+        <AppBar color="inherit" position={isStatic ? 'static' : undefined}>
           <Container>
             <Toolbar disableGutters>
               <IconButton
