@@ -9,7 +9,7 @@ export default class SchoolService {
       include: {
         alumni: {
           where: {
-            accessLevel: 'SCHOOL_ADMIN',
+            isOwner: true,
           },
           include: {
             tenant: true,

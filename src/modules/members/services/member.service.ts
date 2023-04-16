@@ -307,7 +307,6 @@ export default class MemberService {
           },
           update: {},
           create: {
-            accessLevel: accessLevel,
             account: {
               connectOrCreate: {
                 where: { email: email },
@@ -332,9 +331,9 @@ export default class MemberService {
       }),
     );
 
-    res.forEach(async ({ id, accessLevel, account: user }) => {
+    res.forEach(async ({ id, account: user }) => {
       const insertAlumniQuery = `
-        INSERT INTO ${tenant.tenantId}.alumni (id, tenant_id, account_id, account_email, access_level, access_status) values ($1, $2, $3, $4, $5::"template"."AccessLevel", 'APPROVED')
+        INSERT INTO ${tenant.tenantId}.alumni (id, tenant_id, account_id, account_email, access_level, access_status) values ($1, $2, $3, $4, 'APPROVED')
       `;
       await mainAppPrisma.$executeRawUnsafe(
         insertAlumniQuery,
@@ -342,67 +341,10 @@ export default class MemberService {
         tenant.id,
         user.id,
         user.email,
-        accessLevel,
       );
     });
 
     return res;
-
-    // let user = await prisma.account.findUnique({
-    //   where: { email: email },
-    // });
-
-    // if (!user) {
-    //   user = await prisma.account.create({
-    //     data: {
-    //       email: email,
-    //       password: encryptedPassword,
-    //     },
-    //   });
-    // }
-
-    // const member = await prisma.alumni.findUnique({
-    //   where: {
-    //     tenantId_accountId: {
-    //       tenantId: tenantId,
-    //       accountId: user.id,
-    //     },
-    //   },
-    // });
-
-    // if (member) {
-    //   throw new Error('member already existed');
-    // }
-
-    // const newMember = await prisma.alumni.create({
-    //   data: {
-    //     accessLevel: accessLevel,
-    //     account: {
-    //       connect: {
-    //         email: email,
-    //       },
-    //     },
-    //     tenant: {
-    //       connect: {
-    //         id: tenantId,
-    //       },
-    //     },
-    //   },
-    // });
-
-    // const insertAlumniQuery = `
-    //   INSERT INTO ${tenant.tenantId}.alumni (id, tenant_id, account_id, account_email, access_level, access_status) values ($1, $2, $3, $4, $5::"template"."AccessLevel", 'APPROVED')
-    // `;
-    // await mainAppPrisma.$executeRawUnsafe(
-    //   insertAlumniQuery,
-    //   newMember.id,
-    //   tenant.id,
-    //   user.id,
-    //   user.email,
-    //   accessLevel,
-    // );
-
-    // return newMember;
   };
 
   // static getById = async (id: string) => {

@@ -13,7 +13,7 @@ export default async function Page({ params }: { params: { id: string } }) {
         plan: true,
         alumni: {
           where: {
-            accessLevel: 'SCHOOL_ADMIN',
+            isOwner: true,
           },
           include: {
             account: {

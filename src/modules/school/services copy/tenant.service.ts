@@ -37,7 +37,7 @@ export default class TenantService {
         include: {
           alumni: {
             where: {
-              accessLevel: 'SCHOOL_ADMIN',
+              isOwner: true,
             },
             include: {
               account: {
@@ -131,7 +131,7 @@ export default class TenantService {
         alumni: {
           create: [
             {
-              accessLevel: 'SCHOOL_ADMIN',
+              isOwner: true,
               account: {
                 create: {
                   email: values.email,
@@ -280,11 +280,11 @@ export default class TenantService {
       data: {
         name: values.name,
         tenantId: tenantId,
-        activated: false,
+        approved: false,
         alumni: {
           create: [
             {
-              accessLevel: 'SCHOOL_ADMIN',
+              isOwner: true,
               account: {
                 create: {
                   email: values.email,
@@ -355,7 +355,7 @@ export default class TenantService {
       },
       data: {
         subdomain: subdomain,
-        activated: true,
+        approved: true,
       },
     });
 
@@ -393,7 +393,7 @@ export default class TenantService {
       },
       data: {
         subdomain: null,
-        activated: false,
+        approved: false,
       },
     });
 

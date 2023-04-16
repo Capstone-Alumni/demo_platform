@@ -51,7 +51,7 @@ export default class SessionService {
       });
 
       return {
-        id: account.id,
+        id: alumni.id,
         email: account.email,
         tenant: {
           tenantId: alumni.tenant.tenantId,
