@@ -13,19 +13,15 @@ import { getTenantListParamsAtom } from '../state';
 import TenantListTable from './TenantListTable';
 import useActivateTenantById from '../hooks/useActivateTenant';
 import useDeactivateTenantById from '../hooks/useDeactivateTenant';
-import { useState } from 'react';
-
-const planName: { [key: number]: string } = {
-  0: '3-month',
-  1: '6-month',
-  2: '1-year',
-};
+import { useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
 
 const TenantListPage = () => {
   const theme = useTheme();
 
   const [params, setParams] = useRecoilState(getTenantListParamsAtom);
-  const [tabValue, setTabValue] = useState(0);
+  const searchParam = useSearchParams();
+  const planSearchParams = searchParam.get('plan') || '3-month';
 
   const { deleteTenantById } = useDeleteTenantById();
   const { activateTenantById } = useActivateTenantById();
@@ -52,14 +48,12 @@ const TenantListPage = () => {
     reload();
   };
 
-  const handleChangeTab = (event: React.SyntheticEvent, newValue: number) => {
-    setTabValue(newValue);
-
+  useEffect(() => {
     setParams(prevParams => ({
       ...prevParams,
-      planName: planName[newValue],
+      planName: planSearchParams,
     }));
-  };
+  }, [planSearchParams]);
 
   return (
     <Box
@@ -91,11 +85,6 @@ const TenantListPage = () => {
         {isGettingTenant ? <LoadingIndicator /> : null}
         {tenantListData?.data ? (
           <>
-            <Tabs value={tabValue} onChange={handleChangeTab} centered>
-              <Tab sx={{ width: '30%' }} label="Gói 3 tháng" />
-              <Tab sx={{ width: '30%' }} label="Gói 6 tháng" />
-              <Tab sx={{ width: '30%' }} label="Gói 1 năm" />
-            </Tabs>
             <TenantListTable
               data={tenantListData?.data}
               onDelete={onDelete}

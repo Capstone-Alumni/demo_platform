@@ -2,7 +2,7 @@ import { useRouter } from 'next/navigation';
 import { AxiosError } from 'axios';
 import { toast } from 'react-toastify';
 import useApi from 'src/modules/share/hooks/useApi';
-import { EditTenantFormValues } from '../components/EditTenantForm';
+import { EditTenantFormValues } from '../components/TenantDetail';
 
 type UpdateTenantByIdDataParams = {
   id: string;

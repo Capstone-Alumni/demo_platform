@@ -1,5 +1,7 @@
 'use client';
 
+import uniqid from 'uniqid';
+
 import { useMemo, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 
@@ -20,6 +22,7 @@ import {
 import useYupValidateionResolver from 'src/modules/share/utils/useYupValidationResolver';
 import {
   requiredEmailValidator,
+  requiredFullNameValidator,
   requiredPasswordValidator,
 } from '@share/utils/validators';
 import Logo from '@share/components/Logo';
@@ -27,6 +30,9 @@ import UploadAvatarInput from '@share/components/form/UploadAvatarInput';
 import { getCityList, getProvinceList } from '@share/utils/getLocaltionList';
 import SelectInput from '@share/components/form/SelectInput';
 import Image from 'next/image';
+import { toast } from 'react-toastify';
+import { noop } from 'lodash';
+import { setStorage } from '@lib/firebase/methods/setStorage';
 
 const StyledPlanBox = styled('div')(({ theme }) => ({
   display: 'flex',
@@ -47,6 +53,7 @@ const StyledPlanBox = styled('div')(({ theme }) => ({
 }));
 
 export type RegisterTenantFormValues = {
+  fullName: string;
   email: string;
   password: string;
   logo: string;
@@ -58,9 +65,11 @@ export type RegisterTenantFormValues = {
   address: string;
   plan: string;
   subdomain: string;
+  evidenceUrl: string;
 };
 
 const validationSchema = yup.object({
+  fullName: requiredFullNameValidator,
   email: requiredEmailValidator,
   password: requiredPasswordValidator,
   name: yup.string().required('Bắt buộc'),
@@ -70,9 +79,11 @@ const validationSchema = yup.object({
   address: yup.string().required('Bắt buộc'),
   plan: yup.string().required('Bẳt buộc'),
   subdomain: yup.string().required('Bẳt buộc'),
+  evidenceUrl: yup.string().required('Bẳt buộc'),
 });
 
 const MAINAPP_DOMAIN = '.vercel.app';
+const LOADING_TOAST_ID = 'evidence file';
 
 const RegisterTenantForm = ({
   onSubmit,
@@ -87,6 +98,7 @@ const RegisterTenantForm = ({
   const { control, handleSubmit, watch, setValue } = useForm({
     defaultValues: {
       email: '',
+      fullName: '',
       password: '',
       name: '',
       logo: '',
@@ -98,6 +110,7 @@ const RegisterTenantForm = ({
 
   const planWatcher = watch('plan');
   const provinceCodenameWatcher = watch('provinceCodename');
+  const evidenceUrlWatcher = watch('evidenceUrl');
 
   const provinceOptions = getProvinceList().map(p => ({
     name: p.name,
@@ -112,16 +125,41 @@ const RegisterTenantForm = ({
     [provinceCodenameWatcher],
   );
 
+  const [uploading, setUploading] = useState(false);
+
+  const onUploadFile = async (file?: File) => {
+    if (!file) {
+      return;
+    }
+
+    setValue('evidenceUrl', file);
+
+    // setUploading(true);
+    // toast.loading('Đang xử lý', { toastId: LOADING_TOAST_ID });
+
+    // const { uploadAvatar } = setStorage();
+    // const url = await uploadAvatar(uniqid(), file);
+    // setValue('evidenceUrl', url);
+
+    // toast.dismiss(LOADING_TOAST_ID);
+    // setUploading(false);
+  };
+
   const onSubmitHandler = async (values: RegisterTenantFormValues) => {
     setSubmitting(true);
     const provinceData = provinceOptions.find(
       p => p.value === values.provinceCodename,
     );
     const cityData = cityOptions.find(c => c.value === values.cityCodename);
+
+    const { uploadAvatar } = setStorage();
+    const url = await uploadAvatar(uniqid(), values.evidenceUrl);
+
     await onSubmit({
       ...values,
       provinceName: provinceData?.name,
       cityName: cityData?.name,
+      evidenceUrl: url,
     });
     setSubmitting(false);
   };
@@ -175,6 +213,20 @@ const RegisterTenantForm = ({
             Tài khoản quản lý
           </Typography>
         </Box>
+
+        <Controller
+          control={control}
+          name="fullName"
+          render={({ field, fieldState: { error } }) => (
+            <TextField
+              fullWidth
+              label="Họ và tên"
+              {...field}
+              error={Boolean(error?.message)}
+              helperText={error?.message}
+            />
+          )}
+        />
 
         <Controller
           control={control}
@@ -296,6 +348,37 @@ const RegisterTenantForm = ({
             />
           )}
         />
+
+        <Box sx={{ width: '100%' }}>
+          <Typography variant="body1" fontWeight="bold" sx={{ mb: 1 }}>
+            Văn bản có dấu mộc
+          </Typography>
+          <Box sx={{ position: 'relative', width: '100%' }}>
+            <Button variant="outlined" onClick={noop} disabled={uploading}>
+              Chọn file
+            </Button>
+            <input
+              type="file"
+              disabled={uploading}
+              onChange={e => onUploadFile(e.target.files?.[0])}
+              style={{
+                width: '100px',
+                height: '30px',
+                position: 'absolute',
+                left: 0,
+                top: 0,
+                opacity: 0,
+              }}
+            />
+            {evidenceUrlWatcher ? (
+              <Typography color="primary">{evidenceUrlWatcher.name}</Typography>
+            ) : null}
+          </Box>
+          <Typography variant="body2" color="GrayText" sx={{ mt: 1 }}>
+            Thêm văn bản quyết định sử dụng dịch vụ có đóng dấu từ phía nhà
+            trường
+          </Typography>
+        </Box>
 
         <Button
           variant="contained"

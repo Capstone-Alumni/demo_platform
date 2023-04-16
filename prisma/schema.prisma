@@ -2,7 +2,8 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["filteredRelationCount"]
 }
 
 datasource db {
@@ -27,7 +28,6 @@ model Plan {
 
 model Tenant {
   id               String  @id @default(cuid())
-  tenantId         String  @unique
   name             String
   subdomain        String? @unique
   customDomain     String? @unique @map("custom_domain")
@@ -47,8 +47,9 @@ model Tenant {
   vnp_tmnCode    String? @map("vnp_tmn_code")
   vnp_hashSecret String? @map("vnp_hash_secret")
 
-  requestStatus      Int       @default(0) @map("request_status") // 0 pending, 1 approve, 2 rejected
-  subcriptionEndTime DateTime? @default(now()) @map("subscription_end")
+  requestStatus       Int       @default(0) @map("request_status") // 0 pending, 1 approve, 2 rejected
+  subscriptionEndTime DateTime? @default(now()) @map("subscription_end")
+  evidenceUrl         String?
 
   archived  Boolean  @default(false)
   createdAt DateTime @default(now()) @map("created_at")
@@ -84,6 +85,7 @@ model Alumni {
   tenantId  String @map("tenant_id")
   accountId String @map("account_id")
 
+  fullName  String?   @map("full_name")
   lastLogin DateTime? @map("last_login")
   isOwner   Boolean   @default(false) @map("is_owner")
 
@@ -96,15 +98,6 @@ model Alumni {
 
   @@unique([accountId, tenantId])
   @@map("alumni")
-}
-
-model TransactionRequest {
-  id        String   @id @default(cuid())
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
-  archived Boolean @default(false)
-
-  token String @unique // { tenant-id, plan-id, expired-at}
 }
 
 model Transaction {

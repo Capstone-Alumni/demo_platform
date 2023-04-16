@@ -79,7 +79,7 @@ handler.get(async function (req: NextApiRequest, res: NextApiResponse) {
             //paymentStatus = '1'
             // Ở đây cập nhật trạng thái giao dịch thanh toán thành công vào CSDL của bạn
             const currentEndTime = new Date(
-              transaction.tenant.subcriptionEndTime || '',
+              transaction.tenant.subscriptionEndTime || '',
             );
             const currentDate = new Date();
             const endTime =
@@ -94,7 +94,7 @@ handler.get(async function (req: NextApiRequest, res: NextApiResponse) {
                 paymentStatus: 1,
                 tenant: {
                   update: {
-                    subcriptionEndTime: endTime,
+                    subscriptionEndTime: endTime,
                   },
                 },
               },

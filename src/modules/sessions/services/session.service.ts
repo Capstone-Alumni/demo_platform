@@ -19,7 +19,7 @@ export default class SessionService {
           include: {
             tenant: {
               select: {
-                tenantId: true,
+                id: true,
                 subdomain: true,
               },
             },
@@ -54,7 +54,7 @@ export default class SessionService {
         id: alumni.id,
         email: account.email,
         tenant: {
-          tenantId: alumni.tenant.tenantId,
+          tenantId: alumni.tenant.id,
           subdomain: alumni.tenant.subdomain,
         },
         isOwner: alumni.isOwner,
@@ -110,7 +110,7 @@ export default class SessionService {
           include: {
             tenant: {
               select: {
-                tenantId: true,
+                id: true,
                 subdomain: true,
               },
             },
@@ -149,7 +149,7 @@ export default class SessionService {
         id: account.id,
         email: account.email,
         tenant: {
-          tenantId: alumni.tenant.tenantId,
+          tenantId: alumni.tenant.id,
           subdomain: alumni.tenant.subdomain,
         },
         isOwner: alumni.isOwner,

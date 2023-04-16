@@ -1,6 +1,6 @@
 import { prisma } from '@lib/prisma/prisma';
 import { redirect } from 'next/navigation';
-import EditTenantPage from 'src/modules/tenants/components/EditTenantPage';
+import TenantDetailPage from 'src/modules/tenants/components/TenantDetailPage';
 
 export default async function Page({ params }: { params: { id: string } }) {
   const { id } = params;
@@ -34,19 +34,18 @@ export default async function Page({ params }: { params: { id: string } }) {
     // }
 
     return (
-      <EditTenantPage
+      <TenantDetailPage
         initialData={{
           id: data.id,
           name: data.name,
           subdomain: data.subdomain,
-          tenantId: data.tenantId,
           description: data.description,
           logo: data.logo,
           background1: data.background1,
           background2: data.background2,
           background3: data.background3,
           createdAt: data.createdAt.toString(),
-          subcriptionEndTime: data.subcriptionEndTime?.toString(),
+          subscriptionEndTime: data.subscriptionEndTime?.toString(),
           alumni: data.alumni,
           theme: data.theme || undefined,
           provinceCodename: data.provinceCodename || '',
@@ -56,7 +55,8 @@ export default async function Page({ params }: { params: { id: string } }) {
           plan: data?.plan,
           planId: data.planId || '',
           address: data.address || '',
-          approved: data.approved,
+          requestStatus: data.requestStatus,
+          evidenceUrl: data.evidenceUrl || '',
         }}
       />
     );

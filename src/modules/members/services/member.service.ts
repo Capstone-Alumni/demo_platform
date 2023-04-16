@@ -16,7 +16,7 @@ const isTenantExisted = async (id: string) => {
   }
 
   const tenant = await prisma.tenant.findUnique({
-    where: { tenantId: id },
+    where: { id: id },
   });
 
   if (!tenant) {
@@ -301,7 +301,7 @@ export default class MemberService {
         return prisma.alumni.upsert({
           where: {
             accountId_tenantId: {
-              tenantId: tenantId,
+              tenantId: tenant.id,
               accountId: accountId || '',
             },
           },
@@ -315,7 +315,7 @@ export default class MemberService {
             },
             tenant: {
               connect: {
-                id: tenantId,
+                id: tenant.id,
               },
             },
           },
@@ -333,7 +333,7 @@ export default class MemberService {
 
     res.forEach(async ({ id, account: user }) => {
       const insertAlumniQuery = `
-        INSERT INTO ${tenant.tenantId}.alumni (id, tenant_id, account_id, account_email, access_level, access_status) values ($1, $2, $3, $4, 'APPROVED')
+        INSERT INTO ${tenant.id}.alumni (id, tenant_id, account_id, account_email, access_level, access_status) values ($1, $2, $3, $4, 'APPROVED')
       `;
       await mainAppPrisma.$executeRawUnsafe(
         insertAlumniQuery,
