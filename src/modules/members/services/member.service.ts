@@ -75,7 +75,7 @@ const dualWriteAlumniProfile = async (
     }, []);
     console.log(flattenClass);
     try {
-      await Promise.all(
+      Promise.all(
         flattenClass.map(item =>
           mainAppPrisma.$executeRawUnsafe(
             insertAlumniClassRelationshipQuery,
@@ -96,7 +96,7 @@ const dualWriteAlumniProfile = async (
     INSERT INTO ${tenantId}.informations (id, alumni_id, full_name, email, phone, facebook_url, date_of_birth) values ($1, $2, $3, $4, $5, $6, $7)
   `;
     try {
-      await mainAppPrisma.$executeRawUnsafe(
+      mainAppPrisma.$executeRawUnsafe(
         insertAlumniInformationQuery,
         cuid(),
         alumni.id,
@@ -170,33 +170,34 @@ export default class MemberService {
       const host = getTenantHost(tenant.subdomain || '');
 
       if (!memberData.password) {
-        await sendEmail(
+        sendEmail(
           account.email,
           'Mời thành viên',
-          `<pre>
-            Chào ${memberData.fullName},
-                
-            <a href="${host}">${tenant.name}</a> mời bạn sử dụng hệ thống kết nối cựu sinh viên.
-            Địa chỉ website: ${host}
-            Tài khoản đăng nhập:
-            - email: ${account.email}
-            - password: ${randomPassword}
+          `
+<pre>
+Chào ${memberData.fullName},
     
-            *Lưu ý: đổi password sau khi đăng nhập
-            </pre>
-                
+<a href="${host}">${tenant.name}</a> mời bạn sử dụng hệ thống kết nối cựu sinh viên.
+Địa chỉ website: ${host}
+Tài khoản đăng nhập:
+- email: ${account.email}
+- password: ${randomPassword}
+
+*Lưu ý: đổi password sau khi đăng nhập
+</pre>
               `,
         );
       } else {
-        await sendEmail(
+        sendEmail(
           account.email,
           'Tham gia cộng đồng cựu học sinh',
-          `<pre>
-            Chào ${memberData.fullName},
-            
-            Cảm ơn bạn đã nộp đơn tham gia vào hội alumni của trường. <a href="${host}">${tenant.name}</a> mời bạn sử dụng hệ thống kết nối cựu sinh viên.
-            Địa chỉ website: ${host}
-            </pre>
+          `
+<pre>
+Chào ${memberData.fullName},
+
+Cảm ơn bạn đã nộp đơn tham gia vào hội alumni của trường. <a href="${host}">${tenant.name}</a> mời bạn sử dụng hệ thống kết nối cựu sinh viên.
+Địa chỉ website: ${host}
+</pre>
                 
               `,
         );
@@ -236,7 +237,7 @@ export default class MemberService {
     const host = getTenantHost(tenant.subdomain || '');
 
     if (!memberData.password) {
-      await sendEmail(
+      sendEmail(
         account.email,
         'Mời thành viên',
         `
@@ -251,7 +252,7 @@ Chào ${memberData.fullName},
             `,
       );
     } else {
-      await sendEmail(
+      sendEmail(
         account.email,
         'Tham gia cộng đồng cựu học sinh',
         `
