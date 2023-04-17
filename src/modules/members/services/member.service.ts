@@ -165,12 +165,12 @@ export default class MemberService {
 
       console.log('alumni: ', newMember);
 
-      dualWriteAlumniProfile({ tenantId, ...memberData }, newMember);
+      await dualWriteAlumniProfile({ tenantId, ...memberData }, newMember);
 
       const host = getTenantHost(tenant.subdomain || '');
 
       if (!memberData.password) {
-        sendEmail(
+        await sendEmail(
           account.email,
           'Mời thành viên',
           `<pre>
@@ -188,7 +188,7 @@ export default class MemberService {
               `,
         );
       } else {
-        sendEmail(
+        await sendEmail(
           account.email,
           'Tham gia cộng đồng cựu học sinh',
           `<pre>
@@ -227,7 +227,7 @@ export default class MemberService {
       update: {},
     });
 
-    dualWriteAlumniProfile({ tenantId, ...memberData }, newMember, {
+    await dualWriteAlumniProfile({ tenantId, ...memberData }, newMember, {
       createAlumni: true,
       createClassRef: true,
       createProfile: true,
@@ -236,31 +236,31 @@ export default class MemberService {
     const host = getTenantHost(tenant.subdomain || '');
 
     if (!memberData.password) {
-      sendEmail(
+      await sendEmail(
         account.email,
         'Mời thành viên',
-        `<pre>
-          Chào ${memberData.fullName},
-              
-          <a href="${host}">${tenant.name}</a> mời bạn sử dụng hệ thống kết nối cựu sinh viên.
-          Địa chỉ website: ${host}
-  
-          *Lưu ý: đổi password sau khi đăng nhập
-          </pre>
-              
+        `
+<pre>
+Chào ${memberData.fullName},
+    
+<a href="${host}">${tenant.name}</a> mời bạn sử dụng hệ thống kết nối cựu sinh viên.
+Địa chỉ website: ${host}
+
+*Lưu ý: đổi password sau khi đăng nhập
+</pre>
             `,
       );
     } else {
-      sendEmail(
+      await sendEmail(
         account.email,
         'Tham gia cộng đồng cựu học sinh',
-        `<pre>
-          Chào ${memberData.fullName},
-          
-          Cảm ơn bạn đã nộp đơn tham gia vào hội alumni của trường. <a href="${host}">${tenant.name}</a> mời bạn sử dụng hệ thống kết nối cựu sinh viên.
-          Địa chỉ website: ${host}
-          </pre>
-              
+        `
+<pre>
+Chào ${memberData.fullName},
+
+Cảm ơn bạn đã nộp đơn tham gia vào hội alumni của trường. <a href="${host}">${tenant.name}</a> mời bạn sử dụng hệ thống kết nối cựu sinh viên.
+Địa chỉ website: ${host}
+</pre>
             `,
       );
     }
