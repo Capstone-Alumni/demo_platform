@@ -158,9 +158,11 @@ export default function UploadAvatar({
               icon={roundAddAPhoto}
               sx={{ width: 24, height: 24, mb: 1 }}
             />
-            <Typography variant="caption">
-              {file ? 'Cập nhập' : 'Tải ảnh lên'}
-            </Typography>
+            {!other.disabled ? (
+              <Typography variant="caption">
+                {file ? 'Cập nhập' : 'Tải ảnh lên'}
+              </Typography>
+            ) : null}
           </PlaceholderStyle>
         </DropZoneStyle>
       </RootStyle>

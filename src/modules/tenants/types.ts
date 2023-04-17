@@ -13,12 +13,11 @@ export type Tenant = {
   background1: string | null;
   background2: string | null;
   background3: string | null;
-  tenantId: string;
   name: string;
   subdomain: string | null;
   description: string | null;
   createdAt: string | Date;
-  subcriptionEndTime?: string | Date;
+  subscriptionEndTime?: string | Date;
   alumni: Array<{
     account: {
       id: string;
@@ -26,7 +25,7 @@ export type Tenant = {
     };
   }>;
   theme?: string;
-  approved: boolean;
+  requestStatus: number;
   provinceCodename: string;
   provinceName: string;
   cityCodename: string;
@@ -34,9 +33,10 @@ export type Tenant = {
   address: string;
   planId: string;
   plan: Plan | null;
-  transactions: Array<{
+  transactions?: Array<{
     paymentStatus: number;
   }>;
+  evidenceUrl: string;
 };
 
 export type GetTenantListData = {
@@ -80,7 +80,6 @@ export type CreateTenantServiceProps = {
 
 export type UpdateTenantInfoByIdServiceProps = {
   name?: string;
-  tenantId?: string;
   description?: string;
   logo?: string;
   background1?: string;
@@ -91,6 +90,7 @@ export type UpdateTenantInfoByIdServiceProps = {
 };
 
 export type RegisterTenantServiceProps = {
+  fullName: string;
   email: string;
   password: string;
   name: string;
@@ -102,4 +102,5 @@ export type RegisterTenantServiceProps = {
   address: string;
   plan: string;
   subdomain: string;
+  evidenceUrl: string;
 };

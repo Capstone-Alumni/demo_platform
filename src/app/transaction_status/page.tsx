@@ -27,13 +27,9 @@ const Page = async ({ searchParams }: any) => {
   const signed = hmac.update(new Buffer(signData, 'utf-8')).digest('hex');
 
   return (
-    <div>
-      <Header />
-      <Body>
-        <TransactionSuccess />
-      </Body>
-      <Footer />
-    </div>
+    <Body>
+      <TransactionSuccess />
+    </Body>
   );
 
   // TODO: Has bug

@@ -30,7 +30,6 @@ const AdminTenantListTable = ({
         <Table aria-label="Tenant table">
           <TableHead>
             <TableRow>
-              <TableCell align="left">Id</TableCell>
               <TableCell align="left">Tên trường</TableCell>
               <TableCell align="left">Tên miền</TableCell>
               <TableCell align="left">Người quản lý</TableCell>
@@ -42,7 +41,7 @@ const AdminTenantListTable = ({
           <TableBody>
             {data.items.map(row => (
               <TenantListItem
-                key={row.tenantId}
+                key={row.id}
                 data={row}
                 onDelete={onDelete}
                 onActivate={onActivate}

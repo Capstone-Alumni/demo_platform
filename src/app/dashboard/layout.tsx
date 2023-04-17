@@ -2,7 +2,6 @@ import BodyWithSidebar from '@share/components/layout/BodyWidthSidebar';
 import { unstable_getServerSession } from 'next-auth';
 import { nextAuthOptions } from 'src/pages/api/auth/[...nextauth]';
 import { redirect } from 'next/navigation';
-import StaticHeader from '@share/components/layout/StaticHeader';
 
 export default async function Layout({
   children,
@@ -17,7 +16,6 @@ export default async function Layout({
 
   return (
     <>
-      <StaticHeader session={session} />
       <BodyWithSidebar>{children}</BodyWithSidebar>;
     </>
   );

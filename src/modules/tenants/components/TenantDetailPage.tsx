@@ -1,24 +1,16 @@
 'use client';
 
 import { Box, Button, Link, Typography, useTheme } from '@mui/material';
-import { useRouter } from 'next/navigation';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 
-import useUpdateTenantById from '../hooks/useUpdateTenantById';
 import { Tenant } from '../types';
 import getTenantHost from '../utils/getTenantHost';
-import EditTenantForm, { EditTenantFormValues } from './EditTenantForm';
 import SubscriptionForm from './SubscriptionForm';
+import TenantDetail from './TenantDetail';
+import ActionBoard from './ActionBoard';
 
-const EditTenantPage = ({ initialData }: { initialData: Tenant }) => {
+const TenantDetailPage = ({ initialData }: { initialData: Tenant }) => {
   const theme = useTheme();
-  const router = useRouter();
-
-  const { updateTenantById } = useUpdateTenantById();
-
-  const onUpdate = async (values: EditTenantFormValues) => {
-    await updateTenantById({ id: initialData.id, ...values });
-  };
 
   return (
     <Box
@@ -41,7 +33,7 @@ const EditTenantPage = ({ initialData }: { initialData: Tenant }) => {
         <Typography variant="h3" sx={{ flex: 1 }}>
           {initialData.name}
           <br />
-          {initialData.subdomain && initialData.approved ? (
+          {initialData.subdomain && initialData.requestStatus ? (
             <Link
               href={getTenantHost(initialData.subdomain)}
               target="_blank"
@@ -53,16 +45,13 @@ const EditTenantPage = ({ initialData }: { initialData: Tenant }) => {
         </Typography>
       </Box>
 
+      <ActionBoard tenantData={initialData} />
+
       <SubscriptionForm initialData={initialData} />
 
-      <EditTenantForm
-        editable={false}
-        initialData={initialData}
-        // onSubmit={onUpdate}
-        onClose={() => router.push('/dashboard/tenants')}
-      />
+      <TenantDetail initialData={initialData} />
     </Box>
   );
 };
 
-export default EditTenantPage;
+export default TenantDetailPage;

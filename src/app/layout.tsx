@@ -1,6 +1,8 @@
+import Header from '@share/components/layout/Header';
 import CSRProvider from '../modules/share/components/CSRProider';
 
 import 'quill/dist/quill.snow.css';
+import Footer from '@share/components/layout/Footer';
 
 export default async function RootLayout({
   children,
@@ -15,7 +17,11 @@ export default async function RootLayout({
         <link rel="shortcut icon" href="/logo.png" />
       </head>
       <body style={{ margin: 0, minHeight: '100vh' }}>
-        <CSRProvider>{children}</CSRProvider>
+        <CSRProvider>
+          <Header />
+          {children}
+          <Footer />
+        </CSRProvider>
       </body>
     </html>
   );

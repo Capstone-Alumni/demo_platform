@@ -2,6 +2,7 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import { ApiErrorResponse, ApiSuccessResponse } from 'src/types';
 
 import MemberService from '../services/member.service';
+import { NextApiRequestWithTenant } from '@share/utils/middlewareAPI';
 
 export default class MemberController {
   static create = async (
@@ -9,13 +10,7 @@ export default class MemberController {
     res: NextApiResponse<ApiSuccessResponse | ApiErrorResponse>,
   ) => {
     try {
-      const { email, password, tenantId, accessLevel } = req.body;
-      const newClass = await MemberService.create({
-        tenantId: tenantId as string,
-        email,
-        password,
-        accessLevel,
-      });
+      const newClass = await MemberService.create(req.body);
 
       return res.status(201).json({
         status: true,
@@ -191,11 +186,14 @@ export default class MemberController {
   };
 
   static deleteById = async (
-    req: NextApiRequest,
+    req: NextApiRequestWithTenant,
     res: NextApiResponse<ApiSuccessResponse | ApiErrorResponse>,
   ) => {
     const { id } = req.query;
-    const classDeleted = await MemberService.deleteById(id as string);
+    const classDeleted = await MemberService.deleteById(
+      req.tenantId,
+      id as string,
+    );
 
     return res.status(200).json({
       status: true,

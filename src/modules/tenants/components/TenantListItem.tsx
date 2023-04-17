@@ -1,4 +1,4 @@
-import { ListItemIcon, MenuItem } from '@mui/material';
+import { ListItemIcon, MenuItem, useTheme } from '@mui/material';
 import { Menu } from '@mui/material';
 import {
   Button,
@@ -8,7 +8,7 @@ import {
   Typography,
 } from '@mui/material';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
-import BorderColorIcon from '@mui/icons-material/BorderColor';
+import RemoveRedEyeOutlinedIcon from '@mui/icons-material/RemoveRedEyeOutlined';
 import ConfirmDeleteModal from '@share/components/ConfirmDeleteModal';
 import DeleteIcon from '@mui/icons-material/Delete';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
@@ -91,38 +91,49 @@ const AdminTenantListItem = ({
   onActivate: (id: string) => void;
   onDeactivate: (id: string) => void;
 }) => {
+  const theme = useTheme();
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
   const router = useRouter();
+
   const isWaitForPay =
-    data.approved &&
+    data.requestStatus &&
     (isEmpty(data.transactions) ||
-      !data.transactions.some(transaction => transaction.paymentStatus === 1));
+      !data.transactions?.some(transaction => transaction.paymentStatus === 1));
 
   const isPaid =
-    data.approved &&
-    data.transactions.some(transaction => transaction.paymentStatus === 1);
+    data.requestStatus &&
+    data.transactions?.some(transaction => transaction.paymentStatus === 1);
 
   const getTenantStatus = () => {
-    if (isWaitForPay) {
-      return 'Đang chờ thanh toán';
+    if (data.requestStatus === 0) {
+      return 'Đang chờ xác thực';
+    }
+    if (data.requestStatus === 2) {
+      return 'Đã từ chối';
     }
     if (isPaid) {
       return 'Đã thanh toán';
     }
-    if (!data.approved) {
+    if (!data.requestStatus) {
       return 'Đang chờ xác thực';
     }
     return 'Đã xác thực';
   };
 
   const getTenantStatusColor = () => {
+    if (data.requestStatus === 0) {
+      return theme.palette.warning.main;
+    }
+    if (data.requestStatus === 2) {
+      return theme.palette.error.main;
+    }
     if (isWaitForPay) {
       return '#0288d1';
     }
     if (isPaid) {
       return '#689f38';
     }
-    if (!data.approved) {
+    if (!data.requestStatus) {
       return '#fbc02d';
     }
     return '#29b6f6';
@@ -131,9 +142,6 @@ const AdminTenantListItem = ({
   return (
     <>
       <TableRow>
-        <TableCell align="left">
-          <Typography>{data.tenantId}</Typography>
-        </TableCell>
         <TableCell align="left">
           <Typography>{data.name}</Typography>
         </TableCell>
@@ -156,8 +164,8 @@ const AdminTenantListItem = ({
         </TableCell>
         <TableCell align="center">
           <Typography>
-            {data.approved
-              ? formatDate(new Date(data?.subcriptionEndTime || ''))
+            {data.requestStatus === 1
+              ? formatDate(new Date(data?.subscriptionEndTime || ''))
               : ''}
           </Typography>
         </TableCell>
@@ -172,7 +180,7 @@ const AdminTenantListItem = ({
                     onClick: () => noop,
                   }
                 : null,
-              data.approved && data.subdomain
+              data.requestStatus && data.subdomain
                 ? {
                     id: 'view',
                     icon: <OpenInNewIcon />,
@@ -186,18 +194,10 @@ const AdminTenantListItem = ({
                 : null,
               {
                 id: 'edit',
-                icon: <BorderColorIcon />,
+                icon: <RemoveRedEyeOutlinedIcon />,
                 text: 'Chi tiết',
                 onClick: () => router.push(`/dashboard/tenants/${data.id}`),
               },
-              // data.approved
-              //   ? null
-              //   : {
-              //       id: 'activate',
-              //       icon: <LightbulbIcon color="primary" />,
-              //       text: 'Kích hoạt',
-              //       onClick: () => onActivate(data.id),
-              //     },
               {
                 id: 'delete',
                 icon: <DeleteIcon color="error" />,

@@ -53,7 +53,7 @@ const TenantForm = ({
 
   const { control, handleSubmit } = useForm({
     defaultValues: {
-      tenantId: initialData?.tenantId ?? '',
+      tenantId: initialData?.id ?? '',
       name: initialData?.name ?? '',
       subdomain: initialData?.subdomain ?? '',
       description: initialData?.description ?? '',

@@ -2,7 +2,8 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["filteredRelationCount"]
 }
 
 datasource db {
@@ -27,7 +28,6 @@ model Plan {
 
 model Tenant {
   id               String  @id @default(cuid())
-  tenantId         String  @unique
   name             String
   subdomain        String? @unique
   customDomain     String? @unique @map("custom_domain")
@@ -41,13 +41,15 @@ model Tenant {
   cityCodename     String?
   cityName         String?
   address          String?
-  approved         Boolean @default(false)
-  theme            String? @default("purple")
+
+  theme String? @default("purple")
 
   vnp_tmnCode    String? @map("vnp_tmn_code")
   vnp_hashSecret String? @map("vnp_hash_secret")
 
-  subcriptionEndTime DateTime? @default(now()) @map("subscription_end")
+  requestStatus       Int       @default(0) @map("request_status") // 0 pending, 1 approve, 2 rejected
+  subscriptionEndTime DateTime? @default(now()) @map("subscription_end")
+  evidenceUrl         String?
 
   archived  Boolean  @default(false)
   createdAt DateTime @default(now()) @map("created_at")
@@ -83,9 +85,9 @@ model Alumni {
   tenantId  String @map("tenant_id")
   accountId String @map("account_id")
 
-  accessLevel AccessLevel @default(ALUMNI) @map("access_level")
-  lastLogin   DateTime?   @map("last_login")
-  isOwner     Boolean     @default(false) @map("is_owner")
+  fullName  String?   @map("full_name")
+  lastLogin DateTime? @map("last_login")
+  isOwner   Boolean   @default(false) @map("is_owner")
 
   tenant  Tenant  @relation(fields: [tenantId], references: [id])
   account Account @relation(fields: [accountId], references: [id])
@@ -94,7 +96,7 @@ model Alumni {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
 
-  @@unique([tenantId, accountId])
+  @@unique([accountId, tenantId])
   @@map("alumni")
 }
 
@@ -129,11 +131,4 @@ model Transaction {
   tenant   Tenant @relation(fields: [tenantId], references: [id])
 
   @@map("transactions")
-}
-
-enum AccessLevel {
-  SCHOOL_ADMIN
-  ALUMNI
-  CLASS_MOD
-  GRADE_MOD
 }

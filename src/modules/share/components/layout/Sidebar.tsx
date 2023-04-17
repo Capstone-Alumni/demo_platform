@@ -4,19 +4,13 @@ import {
   List,
   ListItem,
   ListItemButton,
-  ListItemIcon,
   ListItemText,
   styled,
   Typography,
   useTheme,
 } from '@mui/material';
-import Groups2Icon from '@mui/icons-material/Groups2';
-import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
-import RememberMeIcon from '@mui/icons-material/RememberMe';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { useSession } from 'next-auth/react';
-import { useMemo } from 'react';
+import { usePathname, useSearchParams } from 'next/navigation';
 
 const SidebarWrapper = styled('div')(({ theme }) => ({
   height: '100vh',
@@ -42,47 +36,37 @@ const SidebarWrapper = styled('div')(({ theme }) => ({
 
 const tenantAdminItems = [
   {
-    link: '/dashboard/tenants',
-    icon: <Groups2Icon />,
-    text: 'Khách hàng',
-  },
-];
-
-const schoolAdminItems = [
-  {
-    link: '/dashboard/school',
-    icon: <AccountBalanceIcon />,
-    text: 'Thiết lập trường',
+    link: '/dashboard/tenants?plan=3-month',
+    text: 'Gói 3 tháng',
   },
   {
-    link: '/dashboard/members',
-    icon: <RememberMeIcon />,
-    text: 'Danh sách thành viên',
+    link: '/dashboard/tenants?plan=6-month',
+    text: 'Gói 6 tháng',
+  },
+  {
+    link: '/dashboard/tenants?plan=1-year',
+    text: 'Gói 1 năm',
   },
 ];
 
 const Sidebar = () => {
   const theme = useTheme();
   const pathname = usePathname();
-  const { data: session } = useSession();
-  const { user } = session || { user: undefined };
-
-  const items = useMemo(
-    () => (user?.isTenantAdmin ? tenantAdminItems : schoolAdminItems),
-    [user?.isTenantAdmin],
-  );
+  const searchParam = useSearchParams();
+  const planSearchParams = searchParam.get('plan') || '3-month';
 
   return (
     <SidebarWrapper>
       <List>
-        {items.map(item => (
+        {tenantAdminItems.map(item => (
           <ListItem key={item.link}>
             <Link href={item.link} style={{ width: '100%' }}>
               <ListItemButton
-                selected={pathname?.startsWith(item.link)}
+                selected={`${pathname}?plan=${planSearchParams}`?.startsWith(
+                  item.link,
+                )}
                 sx={{ borderRadius: theme.shape.borderRadiusSm }}
               >
-                <ListItemIcon>{item.icon}</ListItemIcon>
                 <ListItemText>
                   <Typography variant="button">{item.text}</Typography>
                 </ListItemText>

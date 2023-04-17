@@ -1,34 +1,17 @@
-import useApi from '@share/hooks/useApi';
+import axios from 'axios';
 
-type SendEmailParams = {
-  to: string;
-  subject?: string | 'no-reply';
-  text: string;
+const sendEmail = async (
+  to: string,
+  subject: string,
+  text: string,
+  html?: string,
+) => {
+  await axios.post(`${process.env.NEXT_PUBLIC_MAIL_HOST}/mail/send-email`, {
+    to,
+    subject,
+    text,
+    html,
+  });
 };
 
-type SendEmailResponse = unknown;
-
-type SendEmailError = unknown;
-
-const useSendEmail = () => {
-  const { fetchApi, isLoading } = useApi<
-    SendEmailParams,
-    SendEmailResponse,
-    SendEmailError
-  >('sendEmail', ({ to, subject, text }) => ({
-    method: 'POST',
-    url: '/mailHost/mail/send-email',
-    body: {
-      to,
-      subject,
-      text,
-    },
-  }));
-
-  return {
-    isLoading,
-    fetchApi,
-  };
-};
-
-export default useSendEmail;
+export default sendEmail;

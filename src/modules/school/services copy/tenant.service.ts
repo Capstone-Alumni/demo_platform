@@ -1,5 +1,4 @@
 import { mainAppPrisma, prisma } from '@lib/prisma/prisma';
-import { genTenantId } from '@share/utils/genTenantId';
 import { createSubdomain, deleteSubdomain } from '@share/utils/subdomainAPI';
 import axios from 'axios';
 import { hashSync } from 'bcrypt';
@@ -37,7 +36,7 @@ export default class TenantService {
         include: {
           alumni: {
             where: {
-              accessLevel: 'SCHOOL_ADMIN',
+              isOwner: true,
             },
             include: {
               account: {
@@ -73,7 +72,7 @@ export default class TenantService {
 
     const existingTenantId = await prisma.tenant.findUnique({
       where: {
-        tenantId: values.tenantId,
+        id: values.tenantId,
       },
     });
 
@@ -124,14 +123,13 @@ export default class TenantService {
     const newTenant = await prisma.tenant.create({
       data: {
         name: values.name,
-        tenantId: values.tenantId,
         description: values.description,
         logo: values.logo,
         subdomain: values.subdomain,
         alumni: {
           create: [
             {
-              accessLevel: 'SCHOOL_ADMIN',
+              isOwner: true,
               account: {
                 create: {
                   email: values.email,
@@ -270,21 +268,16 @@ export default class TenantService {
       throw new Error('existed');
     }
 
-    /** Gen data */
-    const tenantId = genTenantId(values.name);
-
     /** Create database  */
     const encryptedPassword = hashSync(values.password, 10);
 
     const newTenant = await prisma.tenant.create({
       data: {
         name: values.name,
-        tenantId: tenantId,
-        activated: false,
         alumni: {
           create: [
             {
-              accessLevel: 'SCHOOL_ADMIN',
+              isOwner: true,
               account: {
                 create: {
                   email: values.email,
@@ -309,7 +302,7 @@ export default class TenantService {
       throw new Error('tenant is non-existed');
     }
 
-    const subdomain = tenant.tenantId.replace('_', '');
+    const subdomain = tenant.subdomain;
 
     const domain = `${subdomain}${process.env.MAINAPP_DOMAIN}`;
     /** Create subdomain */
@@ -346,7 +339,7 @@ export default class TenantService {
 
     /** Create schema in mainApp */
     await mainAppPrisma.$executeRaw`
-      SELECT template.clone_schema('template', ${tenant.tenantId});
+      SELECT template.clone_schema('template', ${tenant.id});
     `;
 
     const newTenant = await prisma.tenant.update({
@@ -354,8 +347,7 @@ export default class TenantService {
         id: id,
       },
       data: {
-        subdomain: subdomain,
-        activated: true,
+        requestStatus: 1,
       },
     });
 
@@ -384,7 +376,7 @@ export default class TenantService {
     }
 
     /** Create schema in mainApp */
-    const query = `DROP SCHEMA IF EXISTS ${tenant.tenantId} CASCADE;`;
+    const query = `DROP SCHEMA IF EXISTS ${tenant.id} CASCADE;`;
     await mainAppPrisma.$executeRawUnsafe(query);
 
     const newTenant = await prisma.tenant.update({
@@ -393,7 +385,7 @@ export default class TenantService {
       },
       data: {
         subdomain: null,
-        activated: false,
+        requestStatus: 2,
       },
     });
 

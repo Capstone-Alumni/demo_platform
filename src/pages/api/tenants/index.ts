@@ -8,8 +8,6 @@ import TenantController from 'src/modules/tenants/controllers/tenant.controller'
 const handler = nc({
   onError: onErrorAPIHandler,
   onNoMatch: onNoMatchAPIHandler,
-})
-  .get(TenantController.getList)
-  .post(TenantController.create);
+}).get(TenantController.getList);
 
 export default handler;
