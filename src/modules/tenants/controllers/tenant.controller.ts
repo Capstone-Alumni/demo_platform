@@ -194,45 +194,45 @@ export default class TenantController {
   };
 
   // Bỏ
-  static create = async (
-    req: NextApiRequest,
-    res: NextApiResponse<ApiSuccessResponse | ApiErrorResponse>,
-  ) => {
-    try {
-      const values = req.body;
-      const newTenant = await TenantService.create(values);
+  // static create = async (
+  //   req: NextApiRequest,
+  //   res: NextApiResponse<ApiSuccessResponse | ApiErrorResponse>,
+  // ) => {
+  //   try {
+  //     const values = req.body;
+  //     const newTenant = await TenantService.create(values);
 
-      return res.status(201).json({
-        status: true,
-        data: newTenant,
-      });
-    } catch (error) {
-      if (error.message?.includes('existed')) {
-        if (error.message?.includes('tenantId')) {
-          return res.status(400).json({
-            status: false,
-            message: 'tenantId is existed',
-          });
-        }
+  //     return res.status(201).json({
+  //       status: true,
+  //       data: newTenant,
+  //     });
+  //   } catch (error) {
+  //     if (error.message?.includes('existed')) {
+  //       if (error.message?.includes('tenantId')) {
+  //         return res.status(400).json({
+  //           status: false,
+  //           message: 'tenantId is existed',
+  //         });
+  //       }
 
-        if (error.message?.includes('subdomain')) {
-          return res.status(400).json({
-            status: false,
-            message: 'subdomain is existed',
-          });
-        }
-      }
+  //       if (error.message?.includes('subdomain')) {
+  //         return res.status(400).json({
+  //           status: false,
+  //           message: 'subdomain is existed',
+  //         });
+  //       }
+  //     }
 
-      if (error.message?.includes('forbidden')) {
-        return res.status(403).json({
-          status: false,
-          message: 'subdomain is taken',
-        });
-      }
+  //     if (error.message?.includes('forbidden')) {
+  //       return res.status(403).json({
+  //         status: false,
+  //         message: 'subdomain is taken',
+  //       });
+  //     }
 
-      throw error;
-    }
-  };
+  //     throw error;
+  //   }
+  // };
 
   static getById = async (
     req: NextApiRequest,
@@ -317,76 +317,76 @@ export default class TenantController {
     }
   };
 
-  static activateById = async (
-    req: NextApiRequest,
-    res: NextApiResponse<ApiSuccessResponse | ApiErrorResponse>,
-  ) => {
-    try {
-      const { id } = req.query;
-      const newTenant = await TenantService.activateById(id as string);
+  // static activateById = async (
+  //   req: NextApiRequest,
+  //   res: NextApiResponse<ApiSuccessResponse | ApiErrorResponse>,
+  // ) => {
+  //   try {
+  //     const { id } = req.query;
+  //     const newTenant = await TenantService.activateById(id as string);
 
-      return res.status(201).json({
-        status: true,
-        data: newTenant,
-      });
-    } catch (error) {
-      if (error.message?.includes('existed')) {
-        if (error.message?.includes('tenantId')) {
-          return res.status(400).json({
-            status: false,
-            message: 'tenantId is existed',
-          });
-        }
+  //     return res.status(201).json({
+  //       status: true,
+  //       data: newTenant,
+  //     });
+  //   } catch (error) {
+  //     if (error.message?.includes('existed')) {
+  //       if (error.message?.includes('tenantId')) {
+  //         return res.status(400).json({
+  //           status: false,
+  //           message: 'tenantId is existed',
+  //         });
+  //       }
 
-        if (error.message?.includes('subdomain')) {
-          return res.status(400).json({
-            status: false,
-            message: 'subdomain is existed',
-          });
-        }
-      }
+  //       if (error.message?.includes('subdomain')) {
+  //         return res.status(400).json({
+  //           status: false,
+  //           message: 'subdomain is existed',
+  //         });
+  //       }
+  //     }
 
-      if (error.message?.includes('forbidden')) {
-        return res.status(403).json({
-          status: false,
-          message: 'subdomain is taken',
-        });
-      }
+  //     if (error.message?.includes('forbidden')) {
+  //       return res.status(403).json({
+  //         status: false,
+  //         message: 'subdomain is taken',
+  //       });
+  //     }
 
-      if (error.message?.includes('non-existed')) {
-        return res.status(400).json({
-          status: false,
-          message: 'Tenant not existed',
-        });
-      }
+  //     if (error.message?.includes('non-existed')) {
+  //       return res.status(400).json({
+  //         status: false,
+  //         message: 'Tenant not existed',
+  //       });
+  //     }
 
-      throw error;
-    }
-  };
+  //     throw error;
+  //   }
+  // };
 
-  static deactivateById = async (
-    req: NextApiRequest,
-    res: NextApiResponse<ApiSuccessResponse | ApiErrorResponse>,
-  ) => {
-    try {
-      const { id } = req.query;
-      const newTenant = await TenantService.deactivateById(id as string);
+  // static deactivateById = async (
+  //   req: NextApiRequest,
+  //   res: NextApiResponse<ApiSuccessResponse | ApiErrorResponse>,
+  // ) => {
+  //   try {
+  //     const { id } = req.query;
+  //     const newTenant = await TenantService.deactivateById(id as string);
 
-      return res.status(201).json({
-        status: true,
-        data: newTenant,
-      });
-    } catch (error) {
-      if (error.message?.includes('non-existed')) {
-        return res.status(400).json({
-          status: false,
-          message: 'Tenant not existed',
-        });
-      }
+  //     return res.status(201).json({
+  //       status: true,
+  //       data: newTenant,
+  //     });
+  //   } catch (error) {
+  //     if (error.message?.includes('non-existed')) {
+  //       return res.status(400).json({
+  //         status: false,
+  //         message: 'Tenant not existed',
+  //       });
+  //     }
 
-      throw error;
-    }
-  };
+  //     throw error;
+  //   }
+  // };
 
   static updateVnpayById = async (
     req: NextApiRequest,

@@ -83,7 +83,6 @@ const validationSchema = yup.object({
 });
 
 const MAINAPP_DOMAIN = '.vercel.app';
-const LOADING_TOAST_ID = 'evidence file';
 
 const RegisterTenantForm = ({
   onSubmit,
@@ -125,24 +124,11 @@ const RegisterTenantForm = ({
     [provinceCodenameWatcher],
   );
 
-  const [uploading, setUploading] = useState(false);
-
   const onUploadFile = async (file?: File) => {
     if (!file) {
       return;
     }
-
     setValue('evidenceUrl', file);
-
-    // setUploading(true);
-    // toast.loading('Đang xử lý', { toastId: LOADING_TOAST_ID });
-
-    // const { uploadAvatar } = setStorage();
-    // const url = await uploadAvatar(uniqid(), file);
-    // setValue('evidenceUrl', url);
-
-    // toast.dismiss(LOADING_TOAST_ID);
-    // setUploading(false);
   };
 
   const onSubmitHandler = async (values: RegisterTenantFormValues) => {
@@ -354,12 +340,11 @@ const RegisterTenantForm = ({
             Văn bản có dấu mộc
           </Typography>
           <Box sx={{ position: 'relative', width: '100%' }}>
-            <Button variant="outlined" onClick={noop} disabled={uploading}>
+            <Button variant="outlined" onClick={noop}>
               Chọn file
             </Button>
             <input
               type="file"
-              disabled={uploading}
               onChange={e => onUploadFile(e.target.files?.[0])}
               style={{
                 width: '100px',

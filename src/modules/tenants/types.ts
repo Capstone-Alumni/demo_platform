@@ -80,7 +80,6 @@ export type CreateTenantServiceProps = {
 
 export type UpdateTenantInfoByIdServiceProps = {
   name?: string;
-  tenantId?: string;
   description?: string;
   logo?: string;
   background1?: string;

@@ -22,7 +22,7 @@ const cloneSchema = async (tenant: any) => {
     SELECT template.clone_schema('template', ${tenant.id});
   `;
   const insertAlumniQuery = `
-    INSERT INTO ${tenant.id}.alumni (id, tenant_id, account_id) values ($1, $2, $3)
+    INSERT INTO ${tenant.id}.alumni (id, tenant_id, account_id, is_owner) values ($1, $2, $3, true)
   `;
   await mainAppPrisma.$executeRawUnsafe(
     insertAlumniQuery,
@@ -258,11 +258,11 @@ export default class TenantService {
       to: tenant.alumni[0].account.email,
       subject: 'Từ chối đơn đăng ký Alumni App',
       text: `
-      <pre>
-        Kính gửi,
-        
-        Thông tin đăng ký của bạn chưa chính xác, bạn vui lòng kiểm tra thông tin và đăng ký lại.
-      </pre>
+<pre>
+Kính gửi,
+
+Thông tin đăng ký của bạn chưa chính xác, bạn vui lòng kiểm tra thông tin và đăng ký lại.
+</pre>
       `,
     });
 
@@ -329,18 +329,18 @@ export default class TenantService {
       to: tenant.alumni[0].account.email,
       subject: 'Đăng ký Alumni App',
       text: `
-      <pre>
-        Kính gửi,
-        <br /><br />
-        Cảm ơn bạn đã lựa chọn The Alumn App. Mời bạn dùng link dưới đây để thanh toán và hoàn tất quá trình đăng ký.
-        <a href="${host}/api/payment?token=${token}">Link thanh toán</a>
-        * Link thanh toán sẽ hết hạn sau 72h.
+<pre>
+Kính gửi,
+<br /><br />
+Cảm ơn bạn đã lựa chọn The Alumn App. Mời bạn dùng link dưới đây để thanh toán và hoàn tất quá trình đăng ký.
+<a href="${host}/api/payment?token=${token}">Link thanh toán</a>
+* Link thanh toán sẽ hết hạn sau 72h.
 
-        Gói ${getSubscriptionDisplay(tenant.plan.name)}
-        Số tiền: ${tenant.plan.price} VNĐ
-        Số ngày gia hạn: ${tenant.plan.duration}
-        Ngày bắt đầu gia hạn: tính từ lúc thanh toán thành công
-      </pre>
+Gói ${getSubscriptionDisplay(tenant.plan.name)}
+Số tiền: ${tenant.plan.price} VNĐ
+Số ngày gia hạn: ${tenant.plan.duration}
+Ngày bắt đầu gia hạn: tính từ lúc thanh toán thành công
+</pre>
       `,
     });
 
@@ -415,17 +415,17 @@ export default class TenantService {
       to: tenant.alumni[0].account.email,
       subject: 'Gia hạn Alumni App',
       text: `
-      <pre>
-        Kính gửi,
-        <br /><br />
-        Mời bạn dùng link dưới đây để thanh toán và gia hạn tài khoản của mình.
-        <a href="${host}/api/payment?token=${token}">Link thanh toán</a>
-        * Link thanh toán sẽ hết hạn sau 72h.
+<pre>
+Kính gửi,
+<br /><br />
+Mời bạn dùng link dưới đây để thanh toán và gia hạn tài khoản của mình.
+<a href="${host}/api/payment?token=${token}">Link thanh toán</a>
+* Link thanh toán sẽ hết hạn sau 72h.
 
-        Gói ${getSubscriptionDisplay(tenant.plan.name)}
-        Số tiền: ${tenant.plan.price} VNĐ
-        Số ngày gia hạn thêm: ${tenant.plan.duration}
-      </pre>
+Gói ${getSubscriptionDisplay(tenant.plan.name)}
+Số tiền: ${tenant.plan.price} VNĐ
+Số ngày gia hạn thêm: ${tenant.plan.duration}
+</pre>
       `,
     });
 
@@ -489,16 +489,7 @@ export default class TenantService {
       where: {
         id: id,
       },
-      data: {
-        subdomain: data.subdomain,
-        name: data.name,
-        description: data.description,
-        logo: data.logo,
-        background1: data.background1,
-        background2: data.background2,
-        background3: data.background3,
-        theme: data.theme,
-      },
+      data: data,
     });
 
     return newTenant;
@@ -547,127 +538,129 @@ export default class TenantService {
     return deletedTenant;
   };
 
-  static activateById = async (id: string) => {
-    const tenant = await prisma.tenant.findUnique({
-      where: { id: id },
-      include: {
-        alumni: {
-          where: {
-            isOwner: true,
-          },
-          include: {
-            account: true,
-          },
-        },
-      },
-    });
+  // // bỏ
+  // static activateById = async (id: string) => {
+  //   const tenant = await prisma.tenant.findUnique({
+  //     where: { id: id },
+  //     include: {
+  //       alumni: {
+  //         where: {
+  //           isOwner: true,
+  //         },
+  //         include: {
+  //           account: true,
+  //         },
+  //       },
+  //     },
+  //   });
 
-    if (!tenant) {
-      throw new Error('tenant is non-existed');
-    }
+  //   if (!tenant) {
+  //     throw new Error('tenant is non-existed');
+  //   }
 
-    const subdomain = tenant.tenantId.replace('_', '');
+  //   const subdomain = tenant.tenantId.replace('_', '');
 
-    const domain = `${subdomain}${process.env.MAINAPP_DOMAIN}`;
-    /** Create subdomain */
-    if (process.env.GEN_DOMAIN) {
-      const payload = {
-        name: domain,
-      };
+  //   const domain = `${subdomain}${process.env.MAINAPP_DOMAIN}`;
+  //   /** Create subdomain */
+  //   if (process.env.GEN_DOMAIN) {
+  //     const payload = {
+  //       name: domain,
+  //     };
 
-      const response = await axios({
-        method: 'POST',
-        url: `https://api.vercel.com/v8/projects/${process.env.PROJECT_ID_VERCEL}/domains?teamId=${process.env.TEAM_ID_VERCEL}`,
-        data: payload,
-        headers: {
-          Authorization: `Bearer ${process.env.AUTH_BEARER_TOKEN}`,
-          'Content-Type': 'application/json',
-          accept: 'application/json',
-        },
-      });
+  //     const response = await axios({
+  //       method: 'POST',
+  //       url: `https://api.vercel.com/v8/projects/${process.env.PROJECT_ID_VERCEL}/domains?teamId=${process.env.TEAM_ID_VERCEL}`,
+  //       data: payload,
+  //       headers: {
+  //         Authorization: `Bearer ${process.env.AUTH_BEARER_TOKEN}`,
+  //         'Content-Type': 'application/json',
+  //         accept: 'application/json',
+  //       },
+  //     });
 
-      const { data } = response;
+  //     const { data } = response;
 
-      // const data = await response.json();
+  //     // const data = await response.json();
 
-      // Domain is already owned by another team but you can request delegation to access it
-      if (data.error?.code === 'forbidden') {
-        throw new Error('forbidden');
-      }
+  //     // Domain is already owned by another team but you can request delegation to access it
+  //     if (data.error?.code === 'forbidden') {
+  //       throw new Error('forbidden');
+  //     }
 
-      // Domain is already being used by a different project
-      if (data.error?.code === 'domain_taken') {
-        throw new Error('existed subdomain');
-      }
-    }
-    /** Create schema in mainApp */
-    const tenantId = tenant.id;
-    const alumniId = tenant.alumni?.[0].id;
-    const accountId = tenant.alumni?.[0].account.id;
-    const accountEmail = tenant.alumni?.[0].account.email;
-    await mainAppPrisma.$executeRaw`
-      SELECT template.clone_schema('template', ${tenant.tenantId});
-    `;
-    const insertAlumniQuery = `
-      INSERT INTO ${tenant.tenantId}.alumni (id, tenant_id, account_id, account_email, access_level, access_status) values ($1, $1, $2, $3, 'SCHOOL_ADMIN', 'APPROVED')
-    `;
-    await mainAppPrisma.$executeRawUnsafe(
-      insertAlumniQuery,
-      alumniId,
-      accountId,
-      accountEmail,
-    );
+  //     // Domain is already being used by a different project
+  //     if (data.error?.code === 'domain_taken') {
+  //       throw new Error('existed subdomain');
+  //     }
+  //   }
+  //   /** Create schema in mainApp */
+  //   const tenantId = tenant.id;
+  //   const alumniId = tenant.alumni?.[0].id;
+  //   const accountId = tenant.alumni?.[0].account.id;
+  //   const accountEmail = tenant.alumni?.[0].account.email;
+  //   await mainAppPrisma.$executeRaw`
+  //     SELECT template.clone_schema('template', ${tenant.tenantId});
+  //   `;
+  //   const insertAlumniQuery = `
+  //     INSERT INTO ${tenant.tenantId}.alumni (id, tenant_id, account_id, account_email, access_level, access_status) values ($1, $1, $2, $3, 'SCHOOL_ADMIN', 'APPROVED')
+  //   `;
+  //   await mainAppPrisma.$executeRawUnsafe(
+  //     insertAlumniQuery,
+  //     alumniId,
+  //     accountId,
+  //     accountEmail,
+  //   );
 
-    const newTenant = await prisma.tenant.update({
-      where: {
-        id: id,
-      },
-      data: {
-        subdomain: subdomain,
-        approved: true,
-      },
-    });
+  //   const newTenant = await prisma.tenant.update({
+  //     where: {
+  //       id: id,
+  //     },
+  //     data: {
+  //       subdomain: subdomain,
+  //       approved: true,
+  //     },
+  //   });
 
-    return newTenant;
-  };
+  //   return newTenant;
+  // };
 
-  static deactivateById = async (id: string) => {
-    const tenant = await prisma.tenant.findUnique({
-      where: { id: id },
-    });
+  // // bỏ
+  // static deactivateById = async (id: string) => {
+  //   const tenant = await prisma.tenant.findUnique({
+  //     where: { id: id },
+  //   });
 
-    if (!tenant) {
-      throw new Error('tenant is non-existed');
-    }
+  //   if (!tenant) {
+  //     throw new Error('tenant is non-existed');
+  //   }
 
-    const domain = `${tenant.subdomain}${process.env.MAINAPP_DOMAIN}`;
+  //   const domain = `${tenant.subdomain}${process.env.MAINAPP_DOMAIN}`;
 
-    if (process.env.GEN_DOMAIN) {
-      await axios({
-        method: 'DELETE',
-        url: `https://api.vercel.com/v8/projects/${process.env.PROJECT_ID_VERCEL}/domains/${domain}?teamId=${process.env.TEAM_ID_VERCEL}`,
-        headers: {
-          Authorization: `Bearer ${process.env.AUTH_BEARER_TOKEN}`,
-        },
-      });
-    }
+  //   if (process.env.GEN_DOMAIN) {
+  //     await axios({
+  //       method: 'DELETE',
+  //       url: `https://api.vercel.com/v8/projects/${process.env.PROJECT_ID_VERCEL}/domains/${domain}?teamId=${process.env.TEAM_ID_VERCEL}`,
+  //       headers: {
+  //         Authorization: `Bearer ${process.env.AUTH_BEARER_TOKEN}`,
+  //       },
+  //     });
+  //   }
 
-    /** Create schema in mainApp */
-    const query = `DROP SCHEMA IF EXISTS ${tenant.tenantId} CASCADE;`;
-    await mainAppPrisma.$executeRawUnsafe(query);
+  //   /** Create schema in mainApp */
+  //   const query = `DROP SCHEMA IF EXISTS ${tenant.tenantId} CASCADE;`;
+  //   await mainAppPrisma.$executeRawUnsafe(query);
 
-    const newTenant = await prisma.tenant.update({
-      where: {
-        id: id,
-      },
-      data: {
-        subdomain: null,
-        approved: false,
-      },
-    });
+  //   const newTenant = await prisma.tenant.update({
+  //     where: {
+  //       id: id,
+  //     },
+  //     data: {
+  //       subdomain: null,
+  //       approved: false,
+  //     },
+  //   });
 
-    return newTenant;
-  };
+  //   return newTenant;
+  // };
 
   static updateVnpayById = async (
     id: string,
@@ -696,14 +689,7 @@ export default class TenantService {
   static getVnpayById = async (id: string) => {
     const data = await prisma.tenant.findFirst({
       where: {
-        OR: [
-          {
-            tenantId: id,
-          },
-          {
-            id: id,
-          },
-        ],
+        id: id,
       },
       select: {
         vnp_tmnCode: true,

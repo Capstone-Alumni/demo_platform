@@ -106,12 +106,14 @@ handler.get(async function (req: NextApiRequest, res: NextApiResponse) {
                 to: transaction.tenant.alumni[0].account.email,
                 subject: 'Thông tin tài khoản',
                 text: `
-                  Kính gửi anh/chị,
+<pre>
+Kính gửi,
 
-                  Thủ tục đăng ký đã hoàn tất, dưới đây là thông tin trang web của anh chị:
+Thanh toán, dưới đây là thông tin trang web của bạn:
 
-                  - Địa chỉ web: https://${transaction.tenant.subdomain}.vercel.app
-                  - Tên đăng nhập/mật khẩu: là email và mât khẩu anh/chị dùng để đăng ký ban đầu
+- Địa chỉ web: https://${transaction.tenant.subdomain}.vercel.app
+- Tên đăng nhập/mật khẩu: là email và mât khẩu bạn dùng để đăng ký ban đầu
+</pre>
                 `,
               },
             );
