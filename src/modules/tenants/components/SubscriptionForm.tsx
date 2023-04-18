@@ -30,8 +30,8 @@ const SubscriptionForm = ({ initialData: data }: { initialData: Tenant }) => {
       <Box sx={{ width: '100%' }}>
         <Typography variant="h6">Ngày hết hạn</Typography>
         <Typography>
-          {data.subscriptionEndTime
-            ? formatDate(new Date(data.subscriptionEndTime))
+          {!data.paymentToken
+            ? formatDate(new Date(data?.subscriptionEndTime || ''))
             : 'Chưa thanh toán'}
         </Typography>
       </Box>

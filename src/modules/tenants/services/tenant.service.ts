@@ -69,9 +69,14 @@ export default class TenantService {
         skip: (page - 1) * limit,
         take: limit,
         where: whereFilter,
-        orderBy: {
-          createdAt: 'desc',
-        },
+        orderBy: [
+          {
+            requestStatus: 'asc',
+          },
+          {
+            subscriptionEndTime: 'asc',
+          },
+        ],
         include: {
           alumni: {
             where: {

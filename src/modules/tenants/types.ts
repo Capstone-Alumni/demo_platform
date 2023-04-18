@@ -35,6 +35,7 @@ export type Tenant = {
     paymentStatus: number;
   }>;
   evidenceUrl: string;
+  paymentToken?: string;
 };
 
 export type GetTenantListData = {

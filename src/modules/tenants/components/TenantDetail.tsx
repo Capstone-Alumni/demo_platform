@@ -82,7 +82,7 @@ const TenantDetail = ({ initialData }: { initialData: Tenant }) => {
         <Box sx={{ width: '100%' }}>
           <Typography variant="h6">Văn bản</Typography>
         </Box>
-        <a href={initialData.evidenceUrl}>
+        <a href={initialData.evidenceUrl} target="_blank">
           <Typography>File</Typography>
         </a>
       </Box>

@@ -54,6 +54,7 @@ export default async function Page({ params }: { params: { id: string } }) {
           address: data.address || '',
           requestStatus: data.requestStatus,
           evidenceUrl: data.evidenceUrl || '',
+          paymentToken: data.paymentToken || undefined,
         }}
       />
     );
