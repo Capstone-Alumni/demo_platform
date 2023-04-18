@@ -1,4 +1,5 @@
 import { AxiosError } from 'axios';
+import { useRouter } from 'next/navigation';
 import { toast } from 'react-toastify';
 import useApi from 'src/modules/share/hooks/useApi';
 
@@ -11,6 +12,8 @@ type ResendPaymentTenantByIdDataResponse = unknown;
 type ResendPaymentTenantByIdDataError = AxiosError;
 
 const useResendPaymentTenantById = () => {
+  const router = useRouter();
+
   const { fetchApi, isLoading } = useApi<
     ResendPaymentTenantByIdDataParams,
     ResendPaymentTenantByIdDataResponse,
@@ -24,6 +27,9 @@ const useResendPaymentTenantById = () => {
     {
       onError: ({ response }: AxiosError) => {
         toast.error('Xảy ra lỗi, vui lòng thử lại');
+      },
+      onSuccess: () => {
+        router.refresh();
       },
     },
   );

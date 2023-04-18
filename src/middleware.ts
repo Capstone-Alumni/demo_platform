@@ -24,13 +24,7 @@ export default withAuth(
       if (!request.nextauth.token) {
         url.pathname = '/';
       } else {
-        const user = request.nextauth.token?.user;
-
-        if (user.isTenantAdmin) {
-          url.pathname = '/dashboard/tenants';
-        } else {
-          url.pathname = '/dashboard/school';
-        }
+        url.pathname = '/dashboard/tenants';
       }
 
       return NextResponse.redirect(url);

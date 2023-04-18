@@ -26,26 +26,30 @@ const ActionBoard = ({ tenantData }: { tenantData: Tenant }) => {
       }}
     >
       <Stack direction="row" gap={2}>
-        <Button
-          color="error"
-          variant="contained"
-          disabled={rejecting || approving || tenantData.requestStatus !== 0}
-          onClick={() => {
-            rejectTenantById({ id: tenantData.id });
-          }}
-        >
-          Từ chối
-        </Button>
-        <Button
-          color="success"
-          variant="contained"
-          disabled={rejecting || approving || tenantData.requestStatus !== 0}
-          onClick={() => {
-            approveTenantById({ id: tenantData.id });
-          }}
-        >
-          Chấp nhận
-        </Button>
+        {tenantData.requestStatus !== 0 ? null : (
+          <Button
+            color="error"
+            variant="contained"
+            disabled={rejecting || approving || tenantData.requestStatus !== 0}
+            onClick={() => {
+              rejectTenantById({ id: tenantData.id });
+            }}
+          >
+            Từ chối
+          </Button>
+        )}
+        {tenantData.requestStatus !== 0 ? null : (
+          <Button
+            color="success"
+            variant="contained"
+            disabled={rejecting || approving}
+            onClick={() => {
+              approveTenantById({ id: tenantData.id });
+            }}
+          >
+            Chấp nhận
+          </Button>
+        )}
         {tenantData.requestStatus === 1 ? (
           <Button
             variant="outlined"

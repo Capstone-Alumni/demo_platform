@@ -15,17 +15,23 @@ export default async function Page({ params }: { params: { id: string } }) {
           where: {
             isOwner: true,
           },
-          include: {
-            account: {
-              select: {
-                id: true,
-                email: true,
+          select: {
+            id: true,
+            accountEmail: true,
+          },
+        },
+        _count: {
+          select: {
+            transactions: {
+              where: {
+                paymentStatus: 1,
               },
             },
           },
         },
       },
     });
+    console.log(data);
     if (!data || data.archived) {
       throw new Error('cannot fetch tenant data');
     }
@@ -57,6 +63,8 @@ export default async function Page({ params }: { params: { id: string } }) {
           address: data.address || '',
           requestStatus: data.requestStatus,
           evidenceUrl: data.evidenceUrl || '',
+          paymentToken: data.paymentToken || undefined,
+          _count: data._count,
         }}
       />
     );

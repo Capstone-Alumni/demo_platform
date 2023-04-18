@@ -50,9 +50,6 @@ handler.get(async function (req: NextApiRequest, res: NextApiResponse) {
             where: {
               isOwner: true,
             },
-            include: {
-              account: true,
-            },
           },
         },
       },
@@ -95,6 +92,7 @@ handler.get(async function (req: NextApiRequest, res: NextApiResponse) {
                 tenant: {
                   update: {
                     subscriptionEndTime: endTime,
+                    paymentToken: null,
                   },
                 },
               },
@@ -103,16 +101,16 @@ handler.get(async function (req: NextApiRequest, res: NextApiResponse) {
             await axios.post(
               `${process.env.NEXT_PUBLIC_MAIL_HOST}/mail/send-email`,
               {
-                to: transaction.tenant.alumni[0].account.email,
+                to: transaction.tenant.alumni[0].accountEmail,
                 subject: 'Thông tin tài khoản',
                 text: `
 <pre>
 Kính gửi,
 
-Thanh toán, dưới đây là thông tin trang web của bạn:
+Thanh toán thành công, dưới đây là thông tin trang web của bạn:
 
 - Địa chỉ web: https://${transaction.tenant.subdomain}.vercel.app
-- Tên đăng nhập/mật khẩu: là email và mât khẩu bạn dùng để đăng ký ban đầu
+- Tên đăng nhập/mật khẩu: là email và mât khẩu ban đầu bạn đăng ký ở platform
 </pre>
                 `,
               },

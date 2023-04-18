@@ -28,7 +28,6 @@ declare module 'next-auth' {
 
   interface User extends NextUser {
     email: string;
-    isTenantAdmin: boolean;
     members: Array<Member>;
     tenant: {
       id: string;
