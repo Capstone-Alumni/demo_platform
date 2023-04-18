@@ -111,11 +111,8 @@ const AdminTenantListItem = ({
     if (data.requestStatus === 2) {
       return 'Đã từ chối';
     }
-    if (isPaid) {
+    if (data.transactions) {
       return 'Đã thanh toán';
-    }
-    if (!data.requestStatus) {
-      return 'Đang chờ xác thực';
     }
     return 'Đã xác thực';
   };
@@ -172,15 +169,15 @@ const AdminTenantListItem = ({
         <TableCell align="center">
           <ActionButton
             actions={[
-              isPaid
-                ? {
-                    id: 'reminder',
-                    icon: <NotificationsNoneIcon color="inherit" />,
-                    text: 'Nhắc nhở gia hạn',
-                    onClick: () => noop,
-                  }
-                : null,
-              data.requestStatus && data.subdomain
+              // isPaid
+              //   ? {
+              //       id: 'reminder',
+              //       icon: <NotificationsNoneIcon color="inherit" />,
+              //       text: 'Nhắc nhở gia hạn',
+              //       onClick: () => noop,
+              //     }
+              //   : null,
+              data.requestStatus && !isEmpty(data.transactions)
                 ? {
                     id: 'view',
                     icon: <OpenInNewIcon />,

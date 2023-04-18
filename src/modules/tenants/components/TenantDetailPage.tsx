@@ -8,6 +8,7 @@ import getTenantHost from '../utils/getTenantHost';
 import SubscriptionForm from './SubscriptionForm';
 import TenantDetail from './TenantDetail';
 import ActionBoard from './ActionBoard';
+import { isEmpty } from 'lodash';
 
 const TenantDetailPage = ({ initialData }: { initialData: Tenant }) => {
   const theme = useTheme();
@@ -33,7 +34,7 @@ const TenantDetailPage = ({ initialData }: { initialData: Tenant }) => {
         <Typography variant="h3" sx={{ flex: 1 }}>
           {initialData.name}
           <br />
-          {initialData.subdomain && initialData.transactions ? (
+          {initialData.subdomain && !isEmpty(initialData.transactions) ? (
             <Link
               href={getTenantHost(initialData.subdomain)}
               target="_blank"

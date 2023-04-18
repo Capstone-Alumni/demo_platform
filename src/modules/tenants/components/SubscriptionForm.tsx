@@ -5,6 +5,7 @@ import { Box, Paper, Typography, useTheme } from '@mui/material';
 import { Tenant } from '../types';
 import { formatDate } from '@share/utils/formatDate';
 import getSubscriptionDisplay from '@share/utils/getSubscriptionDisplay';
+import { isEmpty } from 'lodash';
 
 const SubscriptionForm = ({ initialData: data }: { initialData: Tenant }) => {
   const theme = useTheme();
@@ -30,7 +31,7 @@ const SubscriptionForm = ({ initialData: data }: { initialData: Tenant }) => {
       <Box sx={{ width: '100%' }}>
         <Typography variant="h6">Ngày hết hạn</Typography>
         <Typography>
-          {data.transactions && data.subscriptionEndTime
+          {!isEmpty(data.transactions) && data.subscriptionEndTime
             ? formatDate(new Date(data.subscriptionEndTime))
             : 'Chưa thanh toán'}
         </Typography>
