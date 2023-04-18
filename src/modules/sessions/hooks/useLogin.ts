@@ -7,6 +7,7 @@ const useLogin = () => {
   const router = useRouter();
 
   const login = async (values: LoginFormValues) => {
+    router.prefetch('/');
     await signIn('credentials', {
       email: values?.email,
       password: values?.password,
@@ -16,7 +17,7 @@ const useLogin = () => {
         toast.error('Đăng nhập thất bại');
       } else {
         toast.success('Đăng nhập thành công');
-        router.push('/dashboard');
+        router.refresh();
       }
     });
   };
