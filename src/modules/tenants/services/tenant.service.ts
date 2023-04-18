@@ -306,7 +306,7 @@ Ngày bắt đầu gia hạn: tính từ lúc thanh toán thành công
     }
 
     /** Create schema in mainApp */
-    cloneSchema(tenant);
+    await cloneSchema(tenant);
 
     const newTenant = await prisma.tenant.update({
       where: {
