@@ -361,7 +361,10 @@ const RegisterTenantForm = ({
           </Box>
           <Typography variant="body2" color="GrayText" sx={{ mt: 1 }}>
             Thêm văn bản quyết định sử dụng dịch vụ có đóng dấu từ phía nhà
-            trường
+            trường.
+            <Typography variant="body2" color="red">
+              (chỉ chấp nhận file .pdf)
+            </Typography>
           </Typography>
         </Box>
 

@@ -33,7 +33,7 @@ const TenantDetailPage = ({ initialData }: { initialData: Tenant }) => {
         <Typography variant="h3" sx={{ flex: 1 }}>
           {initialData.name}
           <br />
-          {initialData.subdomain && initialData.requestStatus ? (
+          {initialData.subdomain && initialData.transactions ? (
             <Link
               href={getTenantHost(initialData.subdomain)}
               target="_blank"

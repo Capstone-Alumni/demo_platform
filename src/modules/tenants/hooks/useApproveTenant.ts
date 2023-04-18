@@ -1,4 +1,5 @@
 import { AxiosError } from 'axios';
+import { useRouter } from 'next/navigation';
 import { toast } from 'react-toastify';
 import useApi from 'src/modules/share/hooks/useApi';
 
@@ -11,6 +12,8 @@ type ApproveTenantByIdDataResponse = unknown;
 type ApproveTenantByIdDataError = AxiosError;
 
 const useApproveTenantById = () => {
+  const router = useRouter();
+
   const { fetchApi, isLoading } = useApi<
     ApproveTenantByIdDataParams,
     ApproveTenantByIdDataResponse,
@@ -30,6 +33,10 @@ const useApproveTenantById = () => {
         } else {
           toast.error('Xảy ra lỗi, vui lòng thử lại');
         }
+      },
+      onSuccess: () => {
+        toast.success('Chấp nhận thành công');
+        router.refresh();
       },
     },
   );

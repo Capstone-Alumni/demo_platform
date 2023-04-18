@@ -164,9 +164,9 @@ const AdminTenantListItem = ({
         </TableCell>
         <TableCell align="center">
           <Typography>
-            {data.requestStatus === 1
-              ? formatDate(new Date(data?.subscriptionEndTime || ''))
-              : ''}
+            {data.transactions && data.subscriptionEndTime
+              ? formatDate(new Date(data.subscriptionEndTime))
+              : 'Chưa thanh toán'}
           </Typography>
         </TableCell>
         <TableCell align="center">

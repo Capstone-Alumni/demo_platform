@@ -12,6 +12,19 @@ const ActionBoard = ({ tenantData }: { tenantData: Tenant }) => {
   const { resendPaymentTenantById, isLoading: resending } =
     useResendPaymentTenantById();
 
+  const shouldShowResendRequest = () => {
+    if (!tenantData.transactions) {
+      return true;
+    }
+    if (tenantData.transactions && tenantData.subscriptionEndTime) {
+      const diffDate = // show resend button when expire time less than 10
+        (new Date(tenantData.subscriptionEndTime).getTime() -
+          new Date().getTime()) /
+        (1000 * 3600 * 24);
+      return diffDate < 10;
+    }
+  };
+
   return (
     <Paper
       sx={{
@@ -46,7 +59,7 @@ const ActionBoard = ({ tenantData }: { tenantData: Tenant }) => {
         >
           Chấp nhận
         </Button>
-        {tenantData.requestStatus === 1 ? (
+        {shouldShowResendRequest() ? (
           <Button
             variant="outlined"
             color="warning"

@@ -57,19 +57,31 @@ const Header = () => {
     <Box sx={{ flexGrow: 1 }}>
       <ElevationScroll isStatic={isStatic}>
         <AppBar color="inherit" position={isStatic ? 'static' : undefined}>
-          <Container>
+          <Container maxWidth={false}>
             <Toolbar disableGutters>
-              <IconButton
-                size="large"
-                edge="start"
-                color="inherit"
-                aria-label="menu"
-              >
-                <Logo />
-              </IconButton>
-              <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-                Alumni Platform
-              </Typography>
+              <Link href="/">
+                <Box
+                  sx={{
+                    display: 'flex',
+                  }}
+                >
+                  <IconButton
+                    size="large"
+                    edge="start"
+                    color="inherit"
+                    aria-label="menu"
+                  >
+                    <Logo />
+                  </IconButton>
+                  <Typography
+                    variant="h6"
+                    component="div"
+                    sx={{ flexGrow: 1, margin: 'auto' }}
+                  >
+                    Alumni Platform
+                  </Typography>
+                </Box>
+              </Link>
 
               {session?.user ? (
                 <Box
@@ -78,6 +90,7 @@ const Header = () => {
                     flexDirection: 'row',
                     alignItems: 'center',
                     gap: theme.spacing(2),
+                    marginLeft: 'auto',
                   }}
                 >
                   <Typography>{user?.email}</Typography>
@@ -104,6 +117,7 @@ const Header = () => {
                     flexDirection: 'row',
                     alignItems: 'center',
                     gap: theme.spacing(2),
+                    marginLeft: 'auto',
                   }}
                 >
                   <Link

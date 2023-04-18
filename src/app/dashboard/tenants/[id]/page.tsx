@@ -24,6 +24,13 @@ export default async function Page({ params }: { params: { id: string } }) {
             },
           },
         },
+        transactions: {
+          where: {
+            paymentStatus: {
+              equals: 1,
+            },
+          },
+        },
       },
     });
     if (!data || data.archived) {
@@ -57,6 +64,7 @@ export default async function Page({ params }: { params: { id: string } }) {
           address: data.address || '',
           requestStatus: data.requestStatus,
           evidenceUrl: data.evidenceUrl || '',
+          transactions: data.transactions || [],
         }}
       />
     );
