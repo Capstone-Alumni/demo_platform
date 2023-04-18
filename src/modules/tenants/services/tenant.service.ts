@@ -17,18 +17,16 @@ import getSubscriptionDisplay from '@share/utils/getSubscriptionDisplay';
 
 const cloneSchema = async (tenant: any) => {
   const alumni = tenant.alumni?.[0];
-  const account = tenant.alumni?.[0].account;
   await mainAppPrisma.$executeRaw`
     SELECT template.clone_schema('template', ${tenant.id});
   `;
   const insertAlumniQuery = `
-    INSERT INTO ${tenant.id}.alumni (id, tenant_id, account_id, is_owner) values ($1, $2, $3, true)
+    INSERT INTO ${tenant.id}.alumni (id, tenant_id, is_owner) values ($1, $2, true)
   `;
   await mainAppPrisma.$executeRawUnsafe(
     insertAlumniQuery,
     alumni.id,
     tenant.id,
-    account.id,
   );
 
   const insertAlumniInformationQuery = `
@@ -40,7 +38,7 @@ const cloneSchema = async (tenant: any) => {
       cuid(),
       alumni.id,
       alumni.fullName,
-      account.email,
+      alumni.accountEmail,
     );
   } catch (err) {
     console.log(err);
@@ -79,13 +77,12 @@ export default class TenantService {
             where: {
               isOwner: true,
             },
-            include: {
-              account: {
-                select: {
-                  id: true,
-                  email: true,
-                },
-              },
+            select: {
+              id: true,
+              tenantId: true,
+              accountEmail: true,
+              fullName: true,
+              isOwner: true,
             },
           },
           _count: {
@@ -110,31 +107,167 @@ export default class TenantService {
 
   static registerTenant = async (values: RegisterTenantServiceProps) => {
     /** pre-check */
-    const user = await prisma.account.findUnique({
+    const user = await prisma.alumni.findMany({
       where: {
-        email: values.email,
+        accountEmail: values.email,
+        isOwner: true,
       },
+      include: {
+        tenant: true,
+      },
+    });
+
+    if (user && user.length > 0 && user.find(u => u.tenant.requestStatus < 2)) {
+      throw new Error('existed');
+    }
+
+    /** Add info  */
+    const encryptedPassword = hashSync(values.password, 10);
+
+    const newTenant = await prisma.tenant.create({
+      data: {
+        name: values.name,
+        logo: values.logo,
+        subscriptionEndTime: new Date(),
+        provinceCodename: values.provinceCodename,
+        provinceName: values.provinceName,
+        cityCodename: values.cityCodename,
+        cityName: values.cityName,
+        address: values.address,
+        subdomain: values.subdomain,
+        evidenceUrl: values.evidenceUrl,
+        plan: {
+          connect: {
+            name: values.plan,
+          },
+        },
+        alumni: {
+          create: [
+            {
+              fullName: values.fullName,
+              isOwner: true,
+              accountEmail: values.email,
+              password: encryptedPassword,
+            },
+          ],
+        },
+      },
+    });
+
+    return newTenant;
+  };
+
+  static rejectById = async (id: string, req: NextApiRequest) => {
+    const tenant = await prisma.tenant.findUnique({
+      where: { id: id },
       include: {
         alumni: {
           where: {
             isOwner: true,
           },
-          include: {
-            tenant: true,
-          },
         },
       },
     });
 
-    if (
-      user?.alumni &&
-      user?.alumni.length > 0 &&
-      user?.alumni[0].tenant.requestStatus < 2
-    ) {
-      throw new Error('existed');
+    if (!tenant) {
+      throw new Error('tenant is non-existed');
     }
 
-    const domain = `${values.subdomain}${process.env.MAINAPP_DOMAIN}`;
+    // // run async
+    axios.post(`${process.env.NEXT_PUBLIC_MAIL_HOST}/mail/send-email`, {
+      to: tenant.alumni[0].accountEmail,
+      subject: 'Từ chối đơn đăng ký Alumni App',
+      text: `
+<pre>
+Kính gửi,
+
+Thông tin đăng ký của bạn chưa chính xác, bạn vui lòng kiểm tra thông tin và đăng ký lại.
+</pre>
+      `,
+    });
+
+    const newTenant = await prisma.tenant.update({
+      where: {
+        id: id,
+      },
+      data: {
+        requestStatus: 2,
+        subdomain: null,
+      },
+    });
+
+    return newTenant;
+  };
+
+  static approveById = async (id: string, req: NextApiRequest) => {
+    const tenant = await prisma.tenant.findUnique({
+      where: { id: id },
+      include: {
+        alumni: {
+          where: {
+            isOwner: true,
+          },
+        },
+        plan: true,
+      },
+    });
+
+    if (!tenant || !tenant?.plan || !tenant?.planId) {
+      throw new Error('tenant is non-existed');
+    }
+
+    // const ipAddr =
+    //   req.headers['x-forwarded-for'] ||
+    //   req.connection.remoteAddress ||
+    //   req.socket.remoteAddress;
+
+    // const vnpUrl = await getVnpUrl({
+    //   ipAddr: ipAddr as string,
+    //   amount: tenant.plan.price,
+    //   orderDescription: 'thanh_toan_hoa_don_the_alumni_app',
+    //   orderType: 250000,
+    //   tenantId: tenant.id,
+    //   planId: tenant.planId,
+    // });
+
+    const tokenSecret = process.env.JWT_SECRET as string;
+    const token = jwt.sign(
+      {
+        exp: Math.floor(Date.now() / 1000) + 60 * 60 * 72,
+        data: {
+          // vnpUrl: vnpUrl,
+          amount: tenant.plan.price,
+          orderDescription: 'thanh_toan_hoa_don_the_alumni_app',
+          orderType: 250000,
+          tenantId: tenant.id,
+          planId: tenant.planId,
+        },
+      },
+      tokenSecret,
+    );
+
+    // // run async
+    const host = process.env.NEXTAUTH_URL;
+    axios.post(`${process.env.NEXT_PUBLIC_MAIL_HOST}/mail/send-email`, {
+      to: tenant.alumni[0].accountEmail,
+      subject: 'Đăng ký Alumni App',
+      text: `
+<pre>
+Kính gửi,
+<br /><br />
+Cảm ơn bạn đã lựa chọn The Alumn App. Mời bạn dùng link dưới đây để thanh toán và hoàn tất quá trình đăng ký.
+<a href="${host}/api/payment?token=${token}">Link thanh toán</a>
+* Link thanh toán sẽ hết hạn sau 72h.
+
+Gói ${getSubscriptionDisplay(tenant.plan.name)}
+Số tiền: ${tenant.plan.price} VNĐ
+Số ngày gia hạn: ${tenant.plan.duration}
+Ngày bắt đầu gia hạn: tính từ lúc thanh toán thành công
+</pre>
+      `,
+    });
+
+    const domain = `${tenant.subdomain}${process.env.MAINAPP_DOMAIN}`;
     /** Create subdomain */
     if (process.env.GEN_DOMAIN) {
       const payload = {
@@ -167,183 +300,6 @@ export default class TenantService {
       }
     }
 
-    /** Add info  */
-    const encryptedPassword = hashSync(values.password, 10);
-
-    const existingTenantId = user?.alumni[0].tenantId || '';
-    const newTenant = await prisma.tenant.upsert({
-      where: {
-        id: existingTenantId,
-      },
-      update: {
-        name: values.name,
-        logo: values.logo,
-        subscriptionEndTime: new Date(),
-        provinceCodename: values.provinceCodename,
-        provinceName: values.provinceName,
-        cityCodename: values.cityCodename,
-        cityName: values.cityName,
-        address: values.address,
-        subdomain: values.subdomain,
-        evidenceUrl: values.evidenceUrl,
-        plan: {
-          connect: {
-            name: values.plan,
-          },
-        },
-        requestStatus: 0,
-      },
-      create: {
-        name: values.name,
-        logo: values.logo,
-        subscriptionEndTime: new Date(),
-        provinceCodename: values.provinceCodename,
-        provinceName: values.provinceName,
-        cityCodename: values.cityCodename,
-        cityName: values.cityName,
-        address: values.address,
-        subdomain: values.subdomain,
-        evidenceUrl: values.evidenceUrl,
-        plan: {
-          connect: {
-            name: values.plan,
-          },
-        },
-        alumni: {
-          create: [
-            {
-              fullName: values.fullName,
-              isOwner: true,
-              account: {
-                connectOrCreate: {
-                  where: {
-                    email: values.email,
-                  },
-                  create: {
-                    email: values.email,
-                    password: encryptedPassword,
-                  },
-                },
-              },
-            },
-          ],
-        },
-      },
-    });
-
-    return newTenant;
-  };
-
-  static rejectById = async (id: string, req: NextApiRequest) => {
-    const tenant = await prisma.tenant.findUnique({
-      where: { id: id },
-      include: {
-        alumni: {
-          where: {
-            isOwner: true,
-          },
-          include: {
-            account: true,
-          },
-        },
-      },
-    });
-
-    if (!tenant) {
-      throw new Error('tenant is non-existed');
-    }
-
-    // // run async
-    axios.post(`${process.env.NEXT_PUBLIC_MAIL_HOST}/mail/send-email`, {
-      to: tenant.alumni[0].account.email,
-      subject: 'Từ chối đơn đăng ký Alumni App',
-      text: `
-<pre>
-Kính gửi,
-
-Thông tin đăng ký của bạn chưa chính xác, bạn vui lòng kiểm tra thông tin và đăng ký lại.
-</pre>
-      `,
-    });
-
-    const newTenant = await prisma.tenant.update({
-      where: {
-        id: id,
-      },
-      data: {
-        requestStatus: 2,
-      },
-    });
-
-    return newTenant;
-  };
-
-  static approveById = async (id: string, req: NextApiRequest) => {
-    const tenant = await prisma.tenant.findUnique({
-      where: { id: id },
-      include: {
-        alumni: {
-          where: {
-            isOwner: true,
-          },
-          include: {
-            account: true,
-          },
-        },
-        plan: true,
-      },
-    });
-
-    if (!tenant || !tenant?.plan || !tenant?.planId) {
-      throw new Error('tenant is non-existed');
-    }
-
-    const ipAddr =
-      req.headers['x-forwarded-for'] ||
-      req.connection.remoteAddress ||
-      req.socket.remoteAddress;
-
-    const vnpUrl = await getVnpUrl({
-      ipAddr: ipAddr as string,
-      amount: tenant.plan.price,
-      orderDescription: 'thanh_toan_hoa_don_the_alumni_app',
-      orderType: 250000,
-      tenantId: tenant.id,
-      planId: tenant.planId,
-    });
-
-    const tokenSecret = process.env.JWT_SECRET as string;
-    const token = jwt.sign(
-      {
-        exp: Math.floor(Date.now() / 1000) + 60 * 60 * 72,
-        data: {
-          vnpUrl: vnpUrl,
-        },
-      },
-      tokenSecret,
-    );
-
-    // // run async
-    const host = process.env.NEXTAUTH_URL;
-    axios.post(`${process.env.NEXT_PUBLIC_MAIL_HOST}/mail/send-email`, {
-      to: tenant.alumni[0].account.email,
-      subject: 'Đăng ký Alumni App',
-      text: `
-<pre>
-Kính gửi,
-<br /><br />
-Cảm ơn bạn đã lựa chọn The Alumn App. Mời bạn dùng link dưới đây để thanh toán và hoàn tất quá trình đăng ký.
-<a href="${host}/api/payment?token=${token}">Link thanh toán</a>
-* Link thanh toán sẽ hết hạn sau 72h.
-
-Gói ${getSubscriptionDisplay(tenant.plan.name)}
-Số tiền: ${tenant.plan.price} VNĐ
-Số ngày gia hạn: ${tenant.plan.duration}
-Ngày bắt đầu gia hạn: tính từ lúc thanh toán thành công
-</pre>
-      `,
-    });
-
     /** Create schema in mainApp */
     cloneSchema(tenant);
 
@@ -353,6 +309,7 @@ Ngày bắt đầu gia hạn: tính từ lúc thanh toán thành công
       },
       data: {
         requestStatus: 1,
+        paymentToken: token,
       },
     });
 
@@ -366,9 +323,6 @@ Ngày bắt đầu gia hạn: tính từ lúc thanh toán thành công
         alumni: {
           where: {
             isOwner: true,
-          },
-          include: {
-            account: true,
           },
         },
         plan: true,
@@ -384,35 +338,47 @@ Ngày bắt đầu gia hạn: tính từ lúc thanh toán thành công
       throw new Error('tenant is non-existed');
     }
 
-    const ipAddr =
-      req.headers['x-forwarded-for'] ||
-      req.connection.remoteAddress ||
-      req.socket.remoteAddress;
+    // const ipAddr =
+    //   req.headers['x-forwarded-for'] ||
+    //   req.connection.remoteAddress ||
+    //   req.socket.remoteAddress;
 
-    const vnpUrl = await getVnpUrl({
-      ipAddr: ipAddr as string,
-      amount: tenant.plan.price,
-      orderDescription: 'thanh_toan_hoa_don_the_alumni_app',
-      orderType: 250000,
-      tenantId: tenant.id,
-      planId: tenant.planId,
-    });
+    // const vnpUrl = await getVnpUrl({
+    //   ipAddr: ipAddr as string,
+    //   amount: tenant.plan.price,
+    //   orderDescription: 'thanh_toan_hoa_don_the_alumni_app',
+    //   orderType: 250000,
+    //   tenantId: tenant.id,
+    //   planId: tenant.planId,
+    // });
 
     const tokenSecret = process.env.JWT_SECRET as string;
     const token = jwt.sign(
       {
         exp: Math.floor(Date.now() / 1000) + 60 * 60 * 72,
         data: {
-          vnpUrl: vnpUrl,
+          amount: tenant.plan.price,
+          orderDescription: 'thanh_toan_hoa_don_the_alumni_app',
+          orderType: 250000,
+          tenantId: tenant.id,
+          planId: tenant.planId,
         },
       },
       tokenSecret,
     );
+    await prisma.tenant.update({
+      where: {
+        id: id,
+      },
+      data: {
+        paymentToken: token,
+      },
+    });
 
     // // run async
     const host = process.env.NEXTAUTH_URL;
     axios.post(`${process.env.NEXT_PUBLIC_MAIL_HOST}/mail/send-email`, {
-      to: tenant.alumni[0].account.email,
+      to: tenant.alumni[0].accountEmail,
       subject: 'Gia hạn Alumni App',
       text: `
 <pre>
@@ -518,22 +484,16 @@ Số ngày gia hạn thêm: ${tenant.plan.duration}
 
     await response.json();
 
-    const [deletedTenant] = await prisma.$transaction([
-      prisma.tenant.update({
-        where: {
-          id: id,
-        },
-        data: {
-          subdomain: null,
-          archived: true,
-        },
-      }),
-      prisma.alumni.deleteMany({
-        where: {
-          tenantId: id,
-        },
-      }),
-    ]);
+    await prisma.alumni.deleteMany({
+      where: {
+        tenantId: id,
+      },
+    });
+    const deletedTenant = await prisma.tenant.delete({
+      where: {
+        id: id,
+      },
+    });
 
     return deletedTenant;
   };

@@ -19,10 +19,8 @@ export type Tenant = {
   createdAt: string | Date;
   subscriptionEndTime?: string | Date;
   alumni: Array<{
-    account: {
-      id: string;
-      email: string;
-    };
+    id: string;
+    accountEmail: string | null;
   }>;
   theme?: string;
   requestStatus: number;

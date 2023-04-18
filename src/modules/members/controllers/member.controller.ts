@@ -17,6 +17,7 @@ export default class MemberController {
         data: newClass,
       });
     } catch (error) {
+      console.log(error);
       if (error.message?.includes('invalid')) {
         return res.status(400).json({
           status: false,

@@ -103,4 +103,98 @@ export default class SessionController {
       throw error;
     }
   };
+
+  static resetInvitation = async (
+    req: NextApiRequest,
+    res: NextApiResponse<ApiSuccessResponse | ApiErrorResponse>,
+  ) => {
+    try {
+      // update
+      const user = await SessionService.resetInvitation({
+        ...req.body,
+      });
+      return res.status(200).json({
+        status: true,
+        data: user,
+      });
+    } catch (error) {
+      if (error.message === 'email non exist') {
+        return res.status(400).json({
+          status: false,
+          message: 'Người dùng không tồn tại.',
+        });
+      }
+
+      if (error.message === 'activated') {
+        return res.status(403).json({
+          status: false,
+          message: 'Không thể đổi mật khẩu của người dùng đã kích hoạt',
+        });
+      }
+      throw error;
+    }
+  };
+
+  static precheckAlumniToken = async (
+    req: NextApiRequest,
+    res: NextApiResponse<ApiSuccessResponse | ApiErrorResponse>,
+  ) => {
+    try {
+      // update
+      const user = await SessionService.precheckAlumniToken({
+        token: req.query.token as string,
+      });
+      return res.status(200).json({
+        status: true,
+        data: user,
+      });
+    } catch (error) {
+      if (error.message === 'email non exist') {
+        return res.status(400).json({
+          status: false,
+          message: 'Người dùng không tồn tại.',
+        });
+      }
+
+      if (error.message === 'activated') {
+        return res.status(403).json({
+          status: false,
+          message: 'Không thể đổi mật khẩu của người dùng đã kích hoạt',
+        });
+      }
+      throw error;
+    }
+  };
+
+  static updatePasswordByToken = async (
+    req: NextApiRequest,
+    res: NextApiResponse<ApiSuccessResponse | ApiErrorResponse>,
+  ) => {
+    try {
+      // update
+      const user = await SessionService.updatePasswordByToken({
+        token: req.body.token,
+        newPassword: req.body.password,
+      });
+      return res.status(200).json({
+        status: true,
+        data: user,
+      });
+    } catch (error) {
+      if (error.message === 'email non exist') {
+        return res.status(400).json({
+          status: false,
+          message: 'Người dùng không tồn tại.',
+        });
+      }
+
+      if (error.message === 'activated') {
+        return res.status(403).json({
+          status: false,
+          message: 'Không thể đổi mật khẩu của người dùng đã kích hoạt',
+        });
+      }
+      throw error;
+    }
+  };
 }

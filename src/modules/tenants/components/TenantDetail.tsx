@@ -29,7 +29,7 @@ const TenantDetail = ({ initialData }: { initialData: Tenant }) => {
 
       <Box sx={{ width: '100%' }}>
         <Typography fontWeight={600}>Email</Typography>
-        <Typography>{initialData.alumni[0].account.email}</Typography>
+        <Typography>{initialData.alumni[0]?.accountEmail}</Typography>
       </Box>
 
       <Divider sx={{ width: '100%' }} />
