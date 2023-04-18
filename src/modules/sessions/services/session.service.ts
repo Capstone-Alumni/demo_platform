@@ -1,6 +1,6 @@
 import { compareSync, hashSync } from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import { prisma } from '@lib/prisma/prisma';
+import { mainAppPrisma, prisma } from '@lib/prisma/prisma';
 import { SignInRequestBody, UpdatePasswordRequestBody } from '../types';
 import { isTenantExisted } from 'src/modules/members/services/member.service';
 import getTenantHost from 'src/modules/tenants/utils/getTenantHost';
@@ -58,6 +58,19 @@ export default class SessionService {
           lastLogin: new Date(),
         },
       });
+
+      const insertAlumniQuery = `
+        UPDATE ${alumni.tenantId}.alumni SET last_login = $1 where id = $2;
+      `;
+      try {
+        await mainAppPrisma.$executeRawUnsafe(
+          insertAlumniQuery,
+          new Date(),
+          alumni.id,
+        );
+      } catch (err) {
+        console.log(err);
+      }
 
       return {
         id: alumni.id,
@@ -204,7 +217,7 @@ export default class SessionService {
       'Mời gia nhập cộng đồng cựu học sinh',
       `
 <pre>
-Chào ${existingAlumni.fullName},
+Chào bạn,
   
 <a href="${host}">${tenant.name}</a> mời bạn sử dụng hệ thống kết nối cựu học sinh <a href="${setupLink}">theo link sau</a>. 
 
