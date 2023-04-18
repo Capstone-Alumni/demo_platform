@@ -94,7 +94,7 @@ export default class TenantService {
             select: {
               transactions: {
                 where: {
-                  paymentStatus: 0,
+                  paymentStatus: 1,
                 },
               },
             },

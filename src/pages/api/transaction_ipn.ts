@@ -92,6 +92,7 @@ handler.get(async function (req: NextApiRequest, res: NextApiResponse) {
                 tenant: {
                   update: {
                     subscriptionEndTime: endTime,
+                    paymentToken: null,
                   },
                 },
               },

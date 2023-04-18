@@ -20,6 +20,15 @@ export default async function Page({ params }: { params: { id: string } }) {
             accountEmail: true,
           },
         },
+        _count: {
+          select: {
+            transactions: {
+              where: {
+                paymentStatus: 1,
+              },
+            },
+          },
+        },
       },
     });
     console.log(data);
@@ -55,6 +64,7 @@ export default async function Page({ params }: { params: { id: string } }) {
           requestStatus: data.requestStatus,
           evidenceUrl: data.evidenceUrl || '',
           paymentToken: data.paymentToken || undefined,
+          _count: data._count,
         }}
       />
     );

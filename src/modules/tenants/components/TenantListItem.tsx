@@ -1,4 +1,4 @@
-import { ListItemIcon, MenuItem, useTheme } from '@mui/material';
+import { ListItemIcon, MenuItem, Stack, useTheme } from '@mui/material';
 import { Menu } from '@mui/material';
 import {
   Button,
@@ -20,7 +20,9 @@ import { noop } from 'lodash/fp';
 import getTenantHost from '../utils/getTenantHost';
 import { formatDate } from '@share/utils/formatDate';
 import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone';
-import { isEmpty } from 'lodash';
+import { differenceInDays } from 'date-fns';
+import useResendPaymentTenantById from '../hooks/useResendPaymentTenant';
+import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 
 const ActionButton = ({
   actions,
@@ -95,14 +97,18 @@ const AdminTenantListItem = ({
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
   const router = useRouter();
 
-  const isWaitForPay =
-    data.requestStatus &&
-    (isEmpty(data.transactions) ||
-      !data.transactions?.some(transaction => transaction.paymentStatus === 1));
+  const { resendPaymentTenantById, isLoading: resending } =
+    useResendPaymentTenantById();
 
-  const isPaid =
-    data.requestStatus &&
-    data.transactions?.some(transaction => transaction.paymentStatus === 1);
+  const isWaitForPay = data.requestStatus && data.paymentToken;
+
+  const isNearEndTime =
+    data.requestStatus === 1 &&
+    data._count?.transactions &&
+    differenceInDays(new Date(data.subscriptionEndTime ?? ''), new Date()) <=
+      10;
+
+  const hasTransaction = data.requestStatus && data._count?.transactions;
 
   const getTenantStatus = () => {
     if (data.requestStatus === 0) {
@@ -110,12 +116,6 @@ const AdminTenantListItem = ({
     }
     if (data.requestStatus === 2) {
       return 'Đã từ chối';
-    }
-    if (isPaid) {
-      return 'Đã thanh toán';
-    }
-    if (!data.requestStatus) {
-      return 'Đang chờ xác thực';
     }
     return 'Đã xác thực';
   };
@@ -129,12 +129,6 @@ const AdminTenantListItem = ({
     }
     if (isWaitForPay) {
       return '#0288d1';
-    }
-    if (isPaid) {
-      return '#689f38';
-    }
-    if (!data.requestStatus) {
-      return '#fbc02d';
     }
     return '#29b6f6';
   };
@@ -163,21 +157,32 @@ const AdminTenantListItem = ({
           </Button>
         </TableCell>
         <TableCell align="center">
-          <Typography>
-            {data.requestStatus === 1
+          {data.paymentToken ? (
+            <Stack direction="row">
+              <WarningAmberIcon color="warning" />
+              <Typography>Đã gửi yêu cầu thanh toán</Typography>
+            </Stack>
+          ) : null}
+          <Typography
+            color={isNearEndTime ? 'error' : ''}
+            fontWeight={isNearEndTime ? 600 : undefined}
+          >
+            {hasTransaction
               ? formatDate(new Date(data?.subscriptionEndTime || ''))
+              : data?.requestStatus === 1
+              ? 'Chưa thanh toán'
               : ''}
           </Typography>
         </TableCell>
         <TableCell align="center">
           <ActionButton
             actions={[
-              isPaid
+              hasTransaction
                 ? {
                     id: 'reminder',
                     icon: <NotificationsNoneIcon color="inherit" />,
                     text: 'Nhắc nhở gia hạn',
-                    onClick: () => noop,
+                    onClick: () => resendPaymentTenantById({ id: data.id }),
                   }
                 : null,
               data.requestStatus && data.subdomain
