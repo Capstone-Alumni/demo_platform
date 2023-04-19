@@ -189,7 +189,7 @@ export default class TenantService {
     }
 
     // // run async
-    axios.post(`${process.env.NEXT_PUBLIC_MAIL_HOST}/mail/send-email`, {
+    await axios.post(`${process.env.NEXT_PUBLIC_MAIL_HOST}/mail/send-email`, {
       to: tenant.alumni[0].accountEmail,
       subject: 'Từ chối đơn đăng ký Alumni App',
       text: `
@@ -263,7 +263,7 @@ Thông tin đăng ký của bạn chưa chính xác, bạn vui lòng kiểm tra 
 
     // // run async
     const host = process.env.NEXTAUTH_URL;
-    axios.post(`${process.env.NEXT_PUBLIC_MAIL_HOST}/mail/send-email`, {
+    await axios.post(`${process.env.NEXT_PUBLIC_MAIL_HOST}/mail/send-email`, {
       to: tenant.alumni[0].accountEmail,
       subject: 'Đăng ký Alumni App',
       text: `
@@ -392,7 +392,7 @@ Ngày bắt đầu gia hạn: tính từ lúc thanh toán thành công
 
     // // run async
     const host = process.env.NEXTAUTH_URL;
-    axios.post(`${process.env.NEXT_PUBLIC_MAIL_HOST}/mail/send-email`, {
+    await axios.post(`${process.env.NEXT_PUBLIC_MAIL_HOST}/mail/send-email`, {
       to: tenant.alumni[0].accountEmail,
       subject: 'Gia hạn Alumni App',
       text: `
