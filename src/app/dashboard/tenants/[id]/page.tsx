@@ -29,9 +29,16 @@ export default async function Page({ params }: { params: { id: string } }) {
             },
           },
         },
+        transactions: {
+          where: {
+            paymentStatus: {
+              equals: 1,
+            },
+          },
+        },
       },
     });
-    console.log(data);
+    // console.log(data);
     if (!data || data.archived) {
       throw new Error('cannot fetch tenant data');
     }
@@ -63,6 +70,7 @@ export default async function Page({ params }: { params: { id: string } }) {
           address: data.address || '',
           requestStatus: data.requestStatus,
           evidenceUrl: data.evidenceUrl || '',
+          transactions: data.transactions || [],
           paymentToken: data.paymentToken || undefined,
           _count: data._count,
         }}

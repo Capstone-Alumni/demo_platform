@@ -35,6 +35,7 @@ const useApproveTenantById = () => {
         }
       },
       onSuccess: () => {
+        toast.success('Chấp nhận thành công');
         router.refresh();
       },
     },

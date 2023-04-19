@@ -23,6 +23,7 @@ import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone';
 import { differenceInDays } from 'date-fns';
 import useResendPaymentTenantById from '../hooks/useResendPaymentTenant';
 import WarningAmberIcon from '@mui/icons-material/WarningAmber';
+import { isEmpty } from 'lodash';
 
 const ActionButton = ({
   actions,
@@ -100,8 +101,6 @@ const AdminTenantListItem = ({
   const { resendPaymentTenantById, isLoading: resending } =
     useResendPaymentTenantById();
 
-  const isWaitForPay = data.requestStatus && data.paymentToken;
-
   const isNearEndTime =
     data.requestStatus === 1 &&
     data._count?.transactions &&
@@ -117,7 +116,12 @@ const AdminTenantListItem = ({
     if (data.requestStatus === 2) {
       return 'Đã từ chối';
     }
-    return 'Đã xác thực';
+    if (data.requestStatus && isEmpty(data.transactions)) {
+      return 'Đang chờ thanh toán';
+    }
+    if (data.transactions) {
+      return 'Đã thanh toán';
+    }
   };
 
   const getTenantStatusColor = () => {
@@ -127,11 +131,16 @@ const AdminTenantListItem = ({
     if (data.requestStatus === 2) {
       return theme.palette.error.main;
     }
-    if (isWaitForPay) {
+    if (data.requestStatus && isEmpty(data.transactions)) {
       return '#0288d1';
     }
-    return '#29b6f6';
   };
+
+  console.log(
+    hasTransaction
+      ? formatDate(new Date(data?.subscriptionEndTime || ''))
+      : data?.requestStatus === 1,
+  );
 
   return (
     <>
@@ -170,8 +179,8 @@ const AdminTenantListItem = ({
             {hasTransaction
               ? formatDate(new Date(data?.subscriptionEndTime || ''))
               : data?.requestStatus === 1
-              ? 'Chưa thanh toán'
-              : ''}
+              ? ''
+              : 'Chưa thanh toán'}
           </Typography>
         </TableCell>
         <TableCell align="center">
@@ -185,7 +194,7 @@ const AdminTenantListItem = ({
                     onClick: () => resendPaymentTenantById({ id: data.id }),
                   }
                 : null,
-              data.requestStatus && data.subdomain
+              data.requestStatus && !isEmpty(data.transactions)
                 ? {
                     id: 'view',
                     icon: <OpenInNewIcon />,

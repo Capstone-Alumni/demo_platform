@@ -3,6 +3,7 @@ import { Tenant } from '../types';
 import useRejectTenantById from '../hooks/useRejectTenant';
 import useApproveTenantById from '../hooks/useApproveTenant';
 import useResendPaymentTenantById from '../hooks/useResendPaymentTenant';
+import { isEmpty } from 'lodash';
 
 const ActionBoard = ({ tenantData }: { tenantData: Tenant }) => {
   const theme = useTheme();
@@ -11,6 +12,20 @@ const ActionBoard = ({ tenantData }: { tenantData: Tenant }) => {
   const { approveTenantById, isLoading: approving } = useApproveTenantById();
   const { resendPaymentTenantById, isLoading: resending } =
     useResendPaymentTenantById();
+
+  const shouldShowResendRequest = () => {
+    if (isEmpty(tenantData.transactions) && tenantData.requestStatus === 0) {
+      return false;
+    }
+    if (tenantData.transactions && tenantData.subscriptionEndTime) {
+      const diffDate = // show resend button when expire time less than 10
+        (new Date(tenantData.subscriptionEndTime).getTime() -
+          new Date().getTime()) /
+        (1000 * 3600 * 24);
+
+      return diffDate < 10;
+    }
+  };
 
   return (
     <Paper
@@ -50,7 +65,7 @@ const ActionBoard = ({ tenantData }: { tenantData: Tenant }) => {
             Chấp nhận
           </Button>
         )}
-        {tenantData.requestStatus === 1 ? (
+        {shouldShowResendRequest() ? (
           <Button
             variant="outlined"
             color="warning"
