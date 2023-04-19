@@ -99,6 +99,16 @@ export default class TenantService {
               },
             },
           },
+          transactions: {
+            where: {
+              paymentStatus: {
+                equals: 1,
+              },
+            },
+            select: {
+              paymentStatus: true,
+            },
+          },
         },
       }),
     ]);
