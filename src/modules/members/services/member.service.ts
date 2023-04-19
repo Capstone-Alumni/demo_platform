@@ -1,5 +1,6 @@
 import { mainAppPrisma, prisma } from '@lib/prisma/prisma';
 import { hashSync } from 'bcrypt';
+import jwt from 'jsonwebtoken';
 import cuid from 'cuid';
 
 import {
@@ -10,7 +11,7 @@ import getTenantHost from 'src/modules/tenants/utils/getTenantHost';
 import sendEmail from '@share/utils/sendEmail';
 import { Alumni } from '@prisma/client';
 
-const isTenantExisted = async (id: string) => {
+export const isTenantExisted = async (id: string) => {
   if (!id) {
     throw new Error('tenant not exist');
   }
@@ -51,14 +52,13 @@ const dualWriteAlumniProfile = async (
   // Tạo account
   if (option.createAlumni) {
     const insertAlumniQuery = `
-      INSERT INTO ${tenantId}.alumni (id, tenant_id, account_id) values ($1, $2, $3)
+      INSERT INTO ${tenantId}.alumni (id, tenant_id) values ($1, $2)
     `;
     try {
       await mainAppPrisma.$executeRawUnsafe(
         insertAlumniQuery,
         alumni.id,
         alumni.tenantId,
-        alumni.accountId,
       );
     } catch (err) {
       console.log(err);
@@ -75,7 +75,7 @@ const dualWriteAlumniProfile = async (
     }, []);
     console.log(flattenClass);
     try {
-      Promise.all(
+      await Promise.all(
         flattenClass.map(item =>
           mainAppPrisma.$executeRawUnsafe(
             insertAlumniClassRelationshipQuery,
@@ -96,7 +96,7 @@ const dualWriteAlumniProfile = async (
     INSERT INTO ${tenantId}.informations (id, alumni_id, full_name, email, phone, facebook_url, date_of_birth) values ($1, $2, $3, $4, $5, $6, $7)
   `;
     try {
-      mainAppPrisma.$executeRawUnsafe(
+      await mainAppPrisma.$executeRawUnsafe(
         insertAlumniInformationQuery,
         cuid(),
         alumni.id,
@@ -113,162 +113,94 @@ const dualWriteAlumniProfile = async (
 };
 
 export default class MemberService {
+  // invite / approve after register
   static create = async ({
     tenantId,
     ...memberData
   }: CreateMemberServiceProps) => {
     console.log('create member');
-    const tenant = await isTenantExisted(tenantId);
 
     if (
       !memberData.fullName ||
       memberData?.gradeClass?.length === 0 ||
+      memberData?.gradeClass?.[0].alumClass?.length === 0 ||
       !memberData.email
     ) {
       throw new Error('invalid data');
     }
 
-    let account: any = {};
-
-    account = await prisma.account.findUnique({
-      where: { email: memberData.email },
-    });
-
-    console.log('account: ', account);
-
-    if (!account) {
-      const randomPassword = memberData.password
-        ? memberData.password
-        : Math.random().toString(36).slice(-8);
-      const encryptedRandomPassword = hashSync(randomPassword, 10);
-      account = await prisma.account.create({
-        data: {
-          email: memberData.email,
-          password: encryptedRandomPassword,
-        },
-      });
-
-      const newMember = await prisma.alumni.create({
-        data: {
-          account: {
-            connect: {
-              id: account.id,
-            },
-          },
-          tenant: {
-            connect: {
-              id: tenant.id,
-            },
-          },
-        },
-      });
-
-      console.log('alumni: ', newMember);
-
-      await dualWriteAlumniProfile({ tenantId, ...memberData }, newMember);
-
-      const host = getTenantHost(tenant.subdomain || '');
-
-      if (!memberData.password) {
-        sendEmail(
-          account.email,
-          'Mời thành viên',
-          `
-<pre>
-Chào ${memberData.fullName},
-    
-<a href="${host}">${tenant.name}</a> mời bạn sử dụng hệ thống kết nối cựu sinh viên.
-Địa chỉ website: ${host}
-Tài khoản đăng nhập:
-- email: ${account.email}
-- password: ${randomPassword}
-
-*Lưu ý: đổi password sau khi đăng nhập
-</pre>
-              `,
-        );
-      } else {
-        sendEmail(
-          account.email,
-          'Tham gia cộng đồng cựu học sinh',
-          `
-<pre>
-Chào ${memberData.fullName},
-
-Cảm ơn bạn đã nộp đơn tham gia vào hội alumni của trường. <a href="${host}">${tenant.name}</a> mời bạn sử dụng hệ thống kết nối cựu sinh viên.
-Địa chỉ website: ${host}
-</pre>
-                
-              `,
-        );
-      }
-
-      return newMember;
-    }
-
-    const newMember = await prisma.alumni.upsert({
+    const existingAlumni = await prisma.alumni.findUnique({
       where: {
-        accountId_tenantId: {
-          tenantId: tenant.id,
-          accountId: account.id,
+        accountEmail_tenantId: {
+          accountEmail: memberData.email,
+          tenantId: tenantId,
         },
       },
-      create: {
-        account: {
-          connect: {
-            id: account.id,
-          },
+    });
+
+    console.log('existingAlumni: ', existingAlumni);
+
+    if (existingAlumni) {
+      throw new Error('email existed');
+    }
+
+    const tokenSecret = process.env.JWT_SECRET as string;
+    const token = jwt.sign(
+      {
+        exp: Math.floor(Date.now() / 1000) + 60 * 60 * 48,
+        data: {
+          alumniEmail: memberData.email,
+          tenantId: tenantId,
         },
+      },
+      tokenSecret,
+    );
+    const newAlumni = await prisma.alumni.create({
+      data: {
+        accountEmail: memberData.email,
+        token: token,
         tenant: {
           connect: {
-            id: tenant.id,
+            id: tenantId,
           },
         },
       },
-      update: {},
+      include: {
+        tenant: {
+          select: {
+            name: true,
+            subdomain: true,
+          },
+        },
+      },
     });
 
-    await dualWriteAlumniProfile({ tenantId, ...memberData }, newMember, {
-      createAlumni: true,
-      createClassRef: true,
-      createProfile: true,
-    });
+    console.log('alumni: ', newAlumni);
 
-    const host = getTenantHost(tenant.subdomain || '');
+    await dualWriteAlumniProfile({ tenantId, ...memberData }, newAlumni);
 
-    if (!memberData.password) {
-      sendEmail(
-        account.email,
-        'Mời thành viên',
-        `
+    const host = getTenantHost(newAlumni.tenant.subdomain || '');
+    const setupLink = `${host}/setup_account?token=${token}&email=${memberData.email}`;
+
+    console.log(setupLink);
+
+    await sendEmail(
+      memberData.email,
+      'Mời gia nhập cộng đồng cựu học sinh',
+      `
 <pre>
 Chào ${memberData.fullName},
-    
-<a href="${host}">${tenant.name}</a> mời bạn sử dụng hệ thống kết nối cựu sinh viên.
-Địa chỉ website: ${host}
+  
+<a href="${host}">${newAlumni.tenant.name}</a> mời bạn sử dụng hệ thống kết nối cựu học sinh <a href="${setupLink}">theo link sau</a>. 
 
-*Lưu ý: đổi password sau khi đăng nhập
 </pre>
             `,
-      );
-    } else {
-      sendEmail(
-        account.email,
-        'Tham gia cộng đồng cựu học sinh',
-        `
-<pre>
-Chào ${memberData.fullName},
+    );
 
-Cảm ơn bạn đã nộp đơn tham gia vào hội alumni của trường. <a href="${host}">${tenant.name}</a> mời bạn sử dụng hệ thống kết nối cựu sinh viên.
-Địa chỉ website: ${host}
-</pre>
-            `,
-      );
-    }
-
-    return newMember;
+    return newAlumni;
   };
 
+  // Bỏ
   static createMany = async ({
     memberListData,
     tenantId,
@@ -301,30 +233,17 @@ Cảm ơn bạn đã nộp đơn tham gia vào hội alumni của trường. <a 
       formattedData.map(({ accountId, email, password }) => {
         return prisma.alumni.upsert({
           where: {
-            accountId_tenantId: {
+            accountEmail_tenantId: {
               tenantId: tenant.id,
-              accountId: accountId || '',
+              accountEmail: email || '',
             },
           },
           update: {},
           create: {
-            account: {
-              connectOrCreate: {
-                where: { email: email },
-                create: { email: email, password: password },
-              },
-            },
+            accountEmail: email,
             tenant: {
               connect: {
                 id: tenant.id,
-              },
-            },
-          },
-          include: {
-            account: {
-              select: {
-                id: true,
-                email: true,
               },
             },
           },
@@ -332,32 +251,22 @@ Cảm ơn bạn đã nộp đơn tham gia vào hội alumni của trường. <a 
       }),
     );
 
-    res.forEach(async ({ id, account: user }) => {
+    res.forEach(async ({ id, accountEmail }) => {
       const insertAlumniQuery = `
-        INSERT INTO ${tenant.id}.alumni (id, tenant_id, account_id, account_email, access_level, access_status) values ($1, $2, $3, $4, 'APPROVED')
+        INSERT INTO ${tenant.id}.alumni (id, tenant_id, account_email) values ($1, $2, $3, $4)
       `;
       await mainAppPrisma.$executeRawUnsafe(
         insertAlumniQuery,
         id,
         tenant.id,
-        user.id,
-        user.email,
+        accountEmail,
       );
     });
 
     return res;
   };
 
-  // static getById = async (id: string) => {
-  //   const grade = await prisma.Member.findUnique({
-  //     where: {
-  //       id: id,
-  //     },
-  //   });
-
-  //   return grade;
-  // };
-
+  // On going
   static deleteById = async (tenantId: string, id: string) => {
     const member = await prisma.alumni.findUnique({
       where: { id: id },

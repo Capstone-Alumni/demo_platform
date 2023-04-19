@@ -46,7 +46,9 @@ const TenantDetailPage = ({ initialData }: { initialData: Tenant }) => {
         </Typography>
       </Box>
 
-      <ActionBoard tenantData={initialData} />
+      {initialData.requestStatus < 2 ? (
+        <ActionBoard tenantData={initialData} />
+      ) : null}
 
       <SubscriptionForm initialData={initialData} />
 

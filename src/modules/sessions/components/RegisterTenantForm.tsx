@@ -79,7 +79,6 @@ const validationSchema = yup.object({
   address: yup.string().required('Bắt buộc'),
   plan: yup.string().required('Bẳt buộc'),
   subdomain: yup.string().required('Bẳt buộc'),
-  evidenceUrl: yup.string().required('Bẳt buộc'),
 });
 
 const MAINAPP_DOMAIN = '.vercel.app';
@@ -140,6 +139,8 @@ const RegisterTenantForm = ({
 
     const { uploadAvatar } = setStorage();
     const url = await uploadAvatar(uniqid(), values.evidenceUrl);
+
+    console.log(values);
 
     await onSubmit({
       ...values,
@@ -345,6 +346,7 @@ const RegisterTenantForm = ({
             </Button>
             <input
               type="file"
+              accept="application/pdf"
               onChange={e => onUploadFile(e.target.files?.[0])}
               style={{
                 width: '100px',

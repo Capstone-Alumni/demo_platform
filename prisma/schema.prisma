@@ -49,6 +49,7 @@ model Tenant {
 
   requestStatus       Int       @default(0) @map("request_status") // 0 pending, 1 approve, 2 rejected
   subscriptionEndTime DateTime? @default(now()) @map("subscription_end")
+  paymentToken        String?   @map("payment_token")
   evidenceUrl         String?
 
   archived  Boolean  @default(false)
@@ -69,34 +70,31 @@ model Account {
   email    String @unique
   password String
 
-  isTenantAdmin Boolean @default(false) @map("is_tenant_admin")
-
   archived  Boolean  @default(false)
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
-
-  alumni Alumni[]
 
   @@map("accounts")
 }
 
 model Alumni {
-  id        String @id @default(cuid())
-  tenantId  String @map("tenant_id")
-  accountId String @map("account_id")
+  id           String  @id @default(cuid())
+  tenantId     String  @map("tenant_id")
+  accountEmail String? @map("account_email")
+  password     String?
+  token        String?
 
   fullName  String?   @map("full_name")
   lastLogin DateTime? @map("last_login")
   isOwner   Boolean   @default(false) @map("is_owner")
 
-  tenant  Tenant  @relation(fields: [tenantId], references: [id])
-  account Account @relation(fields: [accountId], references: [id])
+  tenant Tenant @relation(fields: [tenantId], references: [id])
 
   archived  Boolean  @default(false)
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
 
-  @@unique([accountId, tenantId])
+  @@unique([accountEmail, tenantId])
   @@map("alumni")
 }
 

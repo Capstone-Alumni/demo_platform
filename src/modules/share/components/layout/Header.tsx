@@ -13,6 +13,7 @@ import Link from 'next/link';
 import Logo from '../Logo';
 import { Container } from '@mui/material';
 import { usePathname } from 'next/navigation';
+import { Session } from 'next-auth';
 
 interface Props {
   /**
@@ -41,9 +42,8 @@ function ElevationScroll(props: Props) {
   });
 }
 
-const Header = () => {
+const Header = ({ session }: { session: Session | null }) => {
   const theme = useTheme();
-  const { data: session } = useSession();
   const { user } = session || { user: undefined };
 
   const pathname = usePathname();

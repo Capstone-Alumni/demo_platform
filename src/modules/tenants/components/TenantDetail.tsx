@@ -29,7 +29,7 @@ const TenantDetail = ({ initialData }: { initialData: Tenant }) => {
 
       <Box sx={{ width: '100%' }}>
         <Typography fontWeight={600}>Email</Typography>
-        <Typography>{initialData.alumni[0].account.email}</Typography>
+        <Typography>{initialData.alumni[0]?.accountEmail}</Typography>
       </Box>
 
       <Divider sx={{ width: '100%' }} />
@@ -82,7 +82,7 @@ const TenantDetail = ({ initialData }: { initialData: Tenant }) => {
         <Box sx={{ width: '100%' }}>
           <Typography variant="h6">Văn bản</Typography>
         </Box>
-        <a href={initialData.evidenceUrl}>
+        <a href={initialData.evidenceUrl} target="_blank">
           <Typography>File</Typography>
         </a>
       </Box>
