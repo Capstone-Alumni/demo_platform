@@ -9,7 +9,6 @@ const handler = nc({
   onNoMatch: onNoMatchAPIHandler,
 })
   .use(extractTenantId)
-  .get(MemberController.getList)
   .post(MemberController.create);
 
 export default handler;

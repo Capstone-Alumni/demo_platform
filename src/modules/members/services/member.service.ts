@@ -189,9 +189,9 @@ export default class MemberService {
       'Mời gia nhập cộng đồng cựu học sinh',
       `
 <pre>
-Chào ${memberData.fullName},
-  
-<a href="${host}">${newAlumni.tenant.name}</a> mời bạn sử dụng hệ thống kết nối cựu học sinh <a href="${setupLink}">theo link sau</a>. 
+Xin chào ${memberData.fullName},
+  <p> Bạn nhận được một lời mời tham gia nền tảng kết nối cựu học sinh trường <a href="${host}">${newAlumni.tenant.name}</a>. </p> <br/>
+  Hãy click vào đường dẫn để  thiết lập mật khẩu và sử dụng dịch vụ <a href="${setupLink}">link truy cập</a>. 
 
 </pre>
             `,
