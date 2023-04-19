@@ -49,6 +49,9 @@ export default class SessionService {
 
     const { password } = alumni;
 
+    console.log(password, passwordInputted);
+    console.log(compareSync(passwordInputted, password || ''));
+
     if (password && compareSync(passwordInputted, password)) {
       await prisma.alumni.update({
         where: {
