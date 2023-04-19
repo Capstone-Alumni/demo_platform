@@ -177,8 +177,6 @@ export default class MemberService {
 
     console.log('alumni: ', newAlumni);
 
-    await dualWriteAlumniProfile({ tenantId, ...memberData }, newAlumni);
-
     const host = getTenantHost(newAlumni.tenant.subdomain || '');
     const setupLink = `${host}/setup_account?token=${token}&email=${memberData.email}`;
 
@@ -197,7 +195,10 @@ Xin chào ${memberData.fullName},
             `,
     );
 
-    return newAlumni;
+    return {
+      newAlumni: newAlumni,
+      inputtedData: memberData,
+    };
   };
 
   // Bỏ
