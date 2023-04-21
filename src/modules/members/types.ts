@@ -56,7 +56,7 @@ export type ExternalCreateMemberServiceProps = {
     grade: Array<{ id: string; value: string; label: string }>;
     alumClass: Array<{ id: string; value: string; label: string }>;
   }>;
-  email?: string;
+  email: string;
   phone?: string;
   dateOfBirth?: Date;
   facebook?: string;
@@ -65,8 +65,15 @@ export type ExternalCreateMemberServiceProps = {
 
 export type CreateManyMemberServiceProps = {
   memberListData: Array<{
+    fullName: string;
+    gradeClass: Array<{
+      grade: Array<{ id: string; value: string; label: string }>;
+      alumClass: Array<{ id: string; value: string; label: string }>;
+    }>;
     email: string;
-    password: string;
+    phone?: string;
+    dateOfBirth?: Date;
+    facebook?: string;
   }>;
   tenantId: string;
 };

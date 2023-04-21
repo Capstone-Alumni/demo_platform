@@ -9,7 +9,6 @@ const handler = nc({
   onNoMatch: onNoMatchAPIHandler,
 })
   .use(extractTenantId)
-  .put(MemberController.updateInfoById)
   .delete(MemberController.deleteById);
 
 export default handler;
