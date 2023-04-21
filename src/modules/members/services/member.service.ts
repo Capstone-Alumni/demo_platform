@@ -201,73 +201,116 @@ Xin chào ${memberData.fullName},
     };
   };
 
-  // Bỏ
   static createMany = async ({
     memberListData,
     tenantId,
   }: CreateManyMemberServiceProps) => {
     const tenant = await isTenantExisted(tenantId);
 
-    memberListData.forEach(({ email, password }) => {
-      if (!email || !password) {
-        throw new Error('invalid data');
-      }
-    });
-
-    const formattedData = await Promise.all(
-      memberListData.map(async ({ email, password }) => {
-        const encryptedPassword = hashSync(password, 10);
-
-        const user = await prisma.account.findUnique({
-          where: { email: email },
-        });
-
-        return {
-          accountId: user?.id,
-          email: email,
-          password: encryptedPassword,
-        };
-      }),
-    );
-
-    const res = await prisma.$transaction(
-      formattedData.map(({ accountId, email, password }) => {
-        return prisma.alumni.upsert({
-          where: {
-            accountEmail_tenantId: {
-              tenantId: tenant.id,
-              accountEmail: email || '',
-            },
+    const formattedDataList = memberListData.map(member => {
+      const tokenSecret = process.env.JWT_SECRET as string;
+      const token = jwt.sign(
+        {
+          exp: Math.floor(Date.now() / 1000) + 60 * 60 * 48,
+          data: {
+            alumniEmail: member.email,
+            tenantId: tenantId,
           },
-          update: {},
-          create: {
-            accountEmail: email,
-            tenant: {
-              connect: {
-                id: tenant.id,
-              },
-            },
-          },
-        });
-      }),
-    );
-
-    res.forEach(async ({ id, accountEmail }) => {
-      const insertAlumniQuery = `
-        INSERT INTO ${tenant.id}.alumni (id, tenant_id, account_email) values ($1, $2, $3, $4)
-      `;
-      await mainAppPrisma.$executeRawUnsafe(
-        insertAlumniQuery,
-        id,
-        tenant.id,
-        accountEmail,
+        },
+        tokenSecret,
       );
+
+      return {
+        accountEmail: member.email,
+        token: token,
+        tenantId: tenantId,
+      };
     });
 
-    return res;
+    const existingAlumni = await prisma.alumni.findMany({
+      where: {
+        tenantId: tenantId,
+        accountEmail: {
+          in: formattedDataList.map(d => d.accountEmail),
+        },
+      },
+      select: {
+        id: true,
+        accountEmail: true,
+      },
+    });
+
+    await prisma.alumni.createMany({
+      data: formattedDataList,
+      skipDuplicates: true,
+    });
+
+    const alumni = await prisma.alumni.findMany({
+      where: {
+        tenantId: tenantId,
+        accountEmail: {
+          in: formattedDataList.map(d => d.accountEmail),
+        },
+      },
+      select: {
+        id: true,
+        accountEmail: true,
+        token: true,
+      },
+    });
+
+    const newAlumni = alumni.filter(
+      al => !existingAlumni.find(ex => ex.id === al.id),
+    );
+
+    // map newAlumni to data
+    const newAlumniData = newAlumni.map(al => {
+      const data = memberListData.find(it => it.email === al.accountEmail);
+      return {
+        ...data,
+        tenantId: tenantId,
+        alumniId: al.id,
+        token: al.token,
+      };
+    });
+
+    // map existingAlumni to data
+    const existingAlumniData = existingAlumni.map(al => {
+      const data = memberListData.find(it => it.email === al.accountEmail);
+      return {
+        ...data,
+        tenantId: tenantId,
+        alumniId: al.id,
+      };
+    });
+
+    const host = getTenantHost(tenant.subdomain || '');
+
+    await Promise.all(
+      newAlumniData.map(al => {
+        const setupLink = `${host}/setup_account?token=${al.token}&email=${al.email}`;
+
+        return sendEmail(
+          al.email || '',
+          'Mời gia nhập cộng đồng cựu học sinh',
+          `
+  <pre>
+  Xin chào ${al.fullName},
+    <p> Bạn nhận được một lời mời tham gia nền tảng kết nối cựu học sinh trường <a href="${host}">${tenant.name}</a>. </p> <br/>
+    Hãy click vào đường dẫn để  thiết lập mật khẩu và sử dụng dịch vụ <a href="${setupLink}">link truy cập</a>. 
+  
+  </pre>
+              `,
+        );
+      }),
+    );
+
+    return {
+      newAlumni: newAlumniData.map(({ token, ...other }) => other),
+      existingAlumni: existingAlumniData,
+    };
   };
 
-  // On going
   static deleteById = async (tenantId: string, id: string) => {
     const member = await prisma.alumni.findUnique({
       where: { id: id },
