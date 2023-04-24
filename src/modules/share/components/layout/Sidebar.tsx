@@ -40,7 +40,7 @@ const tenantAdminItems = [
     text: 'Khách hàng',
   },
   {
-    link: '/dashboard/transaction',
+    link: '/dashboard/transactions',
     text: 'Giao dịch',
   },
 ];
