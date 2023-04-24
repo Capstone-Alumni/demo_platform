@@ -131,6 +131,13 @@ const RegisterTenantForm = ({
   };
 
   const onSubmitHandler = async (values: RegisterTenantFormValues) => {
+    if (!values.evidenceUrl) {
+      toast.error(
+        'Thiếu văn bản thể hiện sự đồng ý cho phép từ phía nhà trường',
+      );
+      return null;
+    }
+
     setSubmitting(true);
     const provinceData = provinceOptions.find(
       p => p.value === values.provinceCodename,
@@ -338,7 +345,7 @@ const RegisterTenantForm = ({
 
         <Box sx={{ width: '100%' }}>
           <Typography variant="body1" fontWeight="bold" sx={{ mb: 1 }}>
-            Văn bản có dấu mộc
+            Văn bản thể hiện sự đồng ý cho phép từ phía nhà trường
           </Typography>
           <Box sx={{ position: 'relative', width: '100%' }}>
             <Button variant="outlined" onClick={noop}>
@@ -362,10 +369,10 @@ const RegisterTenantForm = ({
             ) : null}
           </Box>
           <Typography variant="body2" color="GrayText" sx={{ mt: 1 }}>
-            Thêm văn bản quyết định sử dụng dịch vụ có đóng dấu từ phía nhà
-            trường.
-            <Typography variant="body2" color="red">
-              (chỉ chấp nhận file .pdf)
+            Sau khi tiếp nhận hồ sơ đăng ký. Nền tảng sẽ liên hệ với nhà trường
+            để xác nhận các nội dung có liên quan.
+            <Typography variant="body2" fontWeight={600}>
+              chỉ chấp nhận file .pdf
             </Typography>
           </Typography>
         </Box>

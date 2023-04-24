@@ -24,6 +24,7 @@ import { differenceInDays } from 'date-fns';
 import useResendPaymentTenantById from '../hooks/useResendPaymentTenant';
 import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 import { isEmpty } from 'lodash';
+import getSubscriptionDisplay from '@share/utils/getSubscriptionDisplay';
 
 const ActionButton = ({
   actions,
@@ -150,6 +151,9 @@ const AdminTenantListItem = ({
         </TableCell>
         <TableCell align="left">
           <Typography>{data.subdomain}</Typography>
+        </TableCell>
+        <TableCell align="left">
+          <Typography>{getSubscriptionDisplay(data.plan?.name)}</Typography>
         </TableCell>
         <TableCell align="left">
           <Typography>{data.alumni?.[0]?.accountEmail}</Typography>
