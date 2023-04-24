@@ -36,16 +36,12 @@ const SidebarWrapper = styled('div')(({ theme }) => ({
 
 const tenantAdminItems = [
   {
-    link: '/dashboard/tenants?plan=3-month',
-    text: 'Gói 3 tháng',
+    link: '/dashboard/tenants',
+    text: 'Khách hàng',
   },
   {
-    link: '/dashboard/tenants?plan=6-month',
-    text: 'Gói 6 tháng',
-  },
-  {
-    link: '/dashboard/tenants?plan=1-year',
-    text: 'Gói 1 năm',
+    link: '/dashboard/transaction',
+    text: 'Giao dịch',
   },
 ];
 

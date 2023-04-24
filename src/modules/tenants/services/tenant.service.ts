@@ -14,6 +14,7 @@ import {
 } from '../types';
 import { getVnpUrl } from '../helper';
 import getSubscriptionDisplay from '@share/utils/getSubscriptionDisplay';
+import { Prisma } from '@prisma/client';
 
 const cloneSchema = async (tenant: any) => {
   const alumni = tenant.alumni?.[0];
@@ -49,17 +50,27 @@ export default class TenantService {
   static getList = async ({ params }: GetTenantListServiceProps) => {
     const { name, page, limit, planName } = params;
 
-    const whereFilter = {
-      AND: [
-        { name: { contains: name } },
-        { archived: false },
-        {
-          plan: {
-            name: planName,
+    let whereFilter;
+
+    if (planName !== 'all') {
+      whereFilter = {
+        AND: [
+          { name: { contains: name } },
+          { archived: false },
+          {
+            plan: {
+              name: {
+                contains: planName,
+              },
+            },
           },
-        },
-      ],
-    };
+        ],
+      };
+    } else {
+      whereFilter = {
+        AND: [{ name: { contains: name } }, { archived: false }],
+      };
+    }
 
     const [totalTenantItem, TenantItems] = await prisma.$transaction([
       prisma.tenant.count({
@@ -107,6 +118,11 @@ export default class TenantService {
             },
             select: {
               paymentStatus: true,
+            },
+          },
+          plan: {
+            select: {
+              name: true,
             },
           },
         },
