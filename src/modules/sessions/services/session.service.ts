@@ -258,7 +258,7 @@ Chào bạn,
 
   static forgotPasswordRequest = async ({
     accountEmail,
-    tenantId
+    tenantId,
   }: {
     accountEmail: string;
     tenantId: string;
@@ -330,7 +330,11 @@ Chào bạn,
     return newAlumni;
   };
 
-  static precheckAlumniTokenForgotPassword = async ({ token }: { token: string }) => {
+  static precheckAlumniTokenForgotPassword = async ({
+    token,
+  }: {
+    token: string;
+  }) => {
     const decoded: any = await jwt.verify(
       token as string,
       process.env.JWT_SECRET as string,
