@@ -213,6 +213,13 @@ export default class SessionController {
         data: user,
       });
     } catch (error) {
+      if (error.message === 'email non exist') {
+        return res.status(400).json({
+          status: false,
+          message: 'Người dùng không tồn tại.',
+        });
+      }
+
       throw error;
     }
   };
