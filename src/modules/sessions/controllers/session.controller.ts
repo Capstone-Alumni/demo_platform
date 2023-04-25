@@ -208,6 +208,7 @@ export default class SessionController {
       const user = await SessionService.precheckAlumniTokenForgotPassword({
         token: req.query.token as string,
       });
+
       return res.status(200).json({
         status: true,
         data: user,
