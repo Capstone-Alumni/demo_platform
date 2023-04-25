@@ -49,9 +49,6 @@ export default class SessionService {
 
     const { password } = alumni;
 
-    console.log(password, passwordInputted);
-    console.log(compareSync(passwordInputted, password || ''));
-
     if (password && compareSync(passwordInputted, password)) {
       await prisma.alumni.update({
         where: {
@@ -259,7 +256,174 @@ Chào bạn,
     return 'verified';
   };
 
+  static forgotPasswordRequest = async ({
+    accountEmail,
+    tenantId
+  }: {
+    accountEmail: string;
+    tenantId: string;
+  }) => {
+    const tenant = await isTenantExisted(tenantId);
+
+    const existingAlumni = await prisma.alumni.findUnique({
+      where: {
+        accountEmail_tenantId: {
+          accountEmail: accountEmail,
+          tenantId: tenant.id,
+        },
+      },
+      select: {
+        id: true,
+        accountEmail: true,
+        isOwner: true,
+        token: true,
+        tenant: {
+          select: {
+            id: true,
+            subdomain: true,
+          },
+        },
+      },
+    });
+
+    if (!existingAlumni) {
+      throw new Error('email non exist');
+    }
+
+    const tokenSecret = process.env.JWT_SECRET as string;
+    const token = jwt.sign(
+      {
+        exp: Math.floor(Date.now() / 1000) + 60 * 60 * 48,
+        data: {
+          alumniEmail: existingAlumni.accountEmail,
+          tenantId: tenant.id,
+        },
+      },
+      tokenSecret,
+    );
+    const newAlumni = await prisma.alumni.update({
+      where: {
+        id: existingAlumni.id,
+      },
+      data: {
+        token: token,
+      },
+    });
+
+    const host = getTenantHost(tenant.subdomain || '');
+    const setupLink = `${host}/reset_password?token=${token}&email=${existingAlumni.accountEmail}`;
+
+    sendEmail(
+      existingAlumni.accountEmail as string,
+      'Đổi mật khẩu',
+      `
+        <pre>
+        Chào bạn,
+          
+        <a href="${host}">${tenant.name}</a> xin gửi bạn link để thay đổi mật khẩu <a href="${setupLink}">theo link sau</a>. 
+
+        Nếu bạn không yêu cầu đổi mật khẩu, xin vui lòng bỏ qua email này.
+        </pre>
+      `,
+    );
+
+    return newAlumni;
+  };
+
+  static precheckAlumniTokenForgotPassword = async ({ token }: { token: string }) => {
+    const decoded: any = await jwt.verify(
+      token as string,
+      process.env.JWT_SECRET as string,
+    );
+
+    const { alumniEmail, tenantId } = decoded.data;
+
+    const alumni = await prisma.alumni.findUnique({
+      where: {
+        accountEmail_tenantId: {
+          accountEmail: alumniEmail,
+          tenantId: tenantId,
+        },
+      },
+    });
+
+    if (!alumni) {
+      throw new Error('wrong subdomain');
+    }
+
+    if (alumni?.token !== token) {
+      throw new Error('404');
+    }
+
+    return 'verified';
+  };
+
   static updatePasswordByToken = async ({
+    token,
+    newPassword,
+  }: {
+    token: string;
+    newPassword: string;
+  }) => {
+    const decoded: any = await jwt.verify(
+      token as string,
+      process.env.JWT_SECRET as string,
+    );
+
+    const { alumniEmail, tenantId } = decoded.data;
+
+    const alumni = await prisma.alumni.findUnique({
+      where: {
+        accountEmail_tenantId: {
+          accountEmail: alumniEmail,
+          tenantId: tenantId,
+        },
+      },
+      select: {
+        id: true,
+        accountEmail: true,
+        isOwner: true,
+        token: true,
+        tenant: {
+          select: {
+            id: true,
+            subdomain: true,
+          },
+        },
+      },
+    });
+
+    if (!alumni) {
+      throw new Error('wrong subdomain');
+    }
+
+    if (alumni?.token !== token) {
+      throw new Error('404');
+    }
+
+    const hashedPassword = hashSync(newPassword, 10);
+    await prisma.alumni.update({
+      where: {
+        id: alumni.id,
+      },
+      data: {
+        password: hashedPassword,
+        token: null,
+      },
+    });
+
+    return {
+      id: alumni.id,
+      email: alumni.accountEmail,
+      tenant: {
+        tenantId: alumni.tenant.id,
+        subdomain: alumni.tenant.subdomain,
+      },
+      isOwner: alumni.isOwner,
+    };
+  };
+
+  static updatePasswordByTokenThroughForgotPassword = async ({
     token,
     newPassword,
   }: {
