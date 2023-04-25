@@ -32,6 +32,7 @@ const AdminTenantListTable = ({
             <TableRow>
               <TableCell align="left">Tên trường</TableCell>
               <TableCell align="left">Tên miền</TableCell>
+              <TableCell align="left">Gói đăng ký</TableCell>
               <TableCell align="left">Người quản lý</TableCell>
               <TableCell align="center">Trạng thái</TableCell>
               <TableCell align="center">Ngày hết hạn</TableCell>
@@ -51,7 +52,7 @@ const AdminTenantListTable = ({
           </TableBody>
 
           <DataTablePagination
-            colSpan={7}
+            colSpan={8}
             currentPage={page}
             totalPage={Math.ceil(data.totalItems / data.itemPerPage)}
             onChangePage={onChangePage}

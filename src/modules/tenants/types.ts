@@ -41,6 +41,21 @@ export type Tenant = {
   };
 };
 
+export type Transaction = {
+  id: string;
+  paymentStatus: number;
+  createdAt: string;
+  tenantId: string;
+  tenant: {
+    id: string;
+    name: string;
+  };
+  plan: {
+    id: string;
+    name: string;
+  };
+};
+
 export type GetTenantListData = {
   items: Tenant[];
   totalItems: number;
@@ -53,6 +68,12 @@ export type GetTenantListParams = {
   tenantId?: string;
   name?: string;
   planName?: string;
+};
+
+export type GetTransactionListParams = {
+  page?: number;
+  limit?: number;
+  tenantName?: string;
 };
 
 /** ========================== BE ================================= */
@@ -68,6 +89,14 @@ export type GetTenantListServiceParams = {
 
 export type GetTenantListServiceProps = {
   params: GetTenantListServiceParams;
+};
+
+export type GetTransactionListServiceProps = {
+  params: {
+    page: number;
+    limit: number;
+    tenantName: string;
+  };
 };
 
 export type CreateTenantServiceProps = {
