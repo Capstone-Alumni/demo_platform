@@ -197,4 +197,78 @@ export default class SessionController {
       throw error;
     }
   };
+
+  // Forgot password
+
+  static precheckAlumniTokenForgotPassword = async (
+    req: NextApiRequest,
+    res: NextApiResponse<ApiSuccessResponse | ApiErrorResponse>,
+  ) => {
+    try {
+      const user = await SessionService.precheckAlumniTokenForgotPassword({
+        token: req.query.token as string,
+      });
+      return res.status(200).json({
+        status: true,
+        data: user,
+      });
+    } catch (error) {
+      if (error.message === 'email non exist') {
+        return res.status(400).json({
+          status: false,
+          message: 'Người dùng không tồn tại.',
+        });
+      }
+
+      throw error;
+    }
+  };
+
+  static forgotPasswordRequest = async (
+    req: NextApiRequest,
+    res: NextApiResponse<ApiSuccessResponse | ApiErrorResponse>,
+  ) => {
+    try {
+      const user = await SessionService.forgotPasswordRequest({
+        ...req.body,
+      });
+      return res.status(200).json({
+        status: true,
+        data: user,
+      });
+    } catch (error) {
+      if (error.message === 'email non exist') {
+        return res.status(400).json({
+          status: false,
+          message: 'Người dùng không tồn tại.',
+        });
+      }
+      throw error;
+    }
+  };
+
+  static updatePasswordByTokenThroughForgotPassword = async (
+    req: NextApiRequest,
+    res: NextApiResponse<ApiSuccessResponse | ApiErrorResponse>,
+  ) => {
+    try {
+      const user =
+        await SessionService.updatePasswordByTokenThroughForgotPassword({
+          token: req.body.token,
+          newPassword: req.body.password,
+        });
+      return res.status(200).json({
+        status: true,
+        data: user,
+      });
+    } catch (error) {
+      if (error.message === 'email non exist') {
+        return res.status(400).json({
+          status: false,
+          message: 'Người dùng không tồn tại.',
+        });
+      }
+      throw error;
+    }
+  };
 }
