@@ -303,7 +303,7 @@ const RegisterTenantForm = ({
           name="provinceCodename"
           options={provinceOptions}
           inputProps={{
-            label: 'Tỉnh',
+            label: 'Tỉnh/Thành phố',
             sx: {
               width: '100%',
             },
@@ -315,7 +315,7 @@ const RegisterTenantForm = ({
           name="cityCodename"
           options={cityOptions}
           inputProps={{
-            label: 'Thành phố',
+            label: 'Huyện/Quận',
             sx: {
               width: '100%',
             },
