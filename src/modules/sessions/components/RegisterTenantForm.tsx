@@ -33,6 +33,10 @@ import Image from 'next/image';
 import { toast } from 'react-toastify';
 import { noop } from 'lodash';
 import { setStorage } from '@lib/firebase/methods/setStorage';
+import { Link } from '@mui/material';
+
+const TEMPLATE_FILE =
+  'https://firebasestorage.googleapis.com/v0/b/alumni-pf.appspot.com/o/QDDK.docx?alt=media&token=7ad981a8-352d-4946-ab0e-7d6bc07a3d7b';
 
 const StyledPlanBox = styled('div')(({ theme }) => ({
   display: 'flex',
@@ -347,32 +351,41 @@ const RegisterTenantForm = ({
           <Typography variant="body1" fontWeight="bold" sx={{ mb: 1 }}>
             Văn bản thể hiện sự đồng ý cho phép từ phía nhà trường
           </Typography>
-          <Box sx={{ position: 'relative', width: '100%' }}>
-            <Button variant="outlined" onClick={noop}>
-              Chọn file
-            </Button>
-            <input
-              type="file"
-              accept="application/pdf"
-              onChange={e => onUploadFile(e.target.files?.[0])}
-              style={{
-                width: '100px',
-                height: '30px',
-                position: 'absolute',
-                left: 0,
-                top: 0,
-                opacity: 0,
-              }}
-            />
-            {evidenceUrlWatcher ? (
-              <Typography color="primary">{evidenceUrlWatcher.name}</Typography>
-            ) : null}
-          </Box>
+
+          <Stack direction="row" gap={1} alignItems="center">
+            <Box sx={{ position: 'relative' }}>
+              <Button variant="outlined" onClick={noop}>
+                Chọn file
+              </Button>
+              <input
+                type="file"
+                accept="application/pdf, application/msword, application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                onChange={e => onUploadFile(e.target.files?.[0])}
+                style={{
+                  width: '100px',
+                  height: '30px',
+                  position: 'absolute',
+                  left: 0,
+                  top: 0,
+                  opacity: 0,
+                }}
+              />
+              {evidenceUrlWatcher ? (
+                <Typography color="primary">
+                  {evidenceUrlWatcher.name}
+                </Typography>
+              ) : null}
+            </Box>
+            <Link href={TEMPLATE_FILE} target="_blank">
+              Tải file mẫu
+            </Link>
+          </Stack>
+
           <Typography variant="body2" color="GrayText" sx={{ mt: 1 }}>
             Sau khi tiếp nhận hồ sơ đăng ký. Nền tảng sẽ liên hệ với nhà trường
             để xác nhận các nội dung có liên quan.
             <Typography variant="body2" fontWeight={600}>
-              chỉ chấp nhận file .pdf
+              chỉ chấp nhận file *.doc, *.docx hoặc *.pdf
             </Typography>
           </Typography>
         </Box>
