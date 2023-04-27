@@ -24,6 +24,7 @@ import {
   requiredEmailValidator,
   requiredFullNameValidator,
   requiredPasswordValidator,
+  requiredSubdomainValidator,
 } from '@share/utils/validators';
 import Logo from '@share/components/Logo';
 import UploadAvatarInput from '@share/components/form/UploadAvatarInput';
@@ -82,7 +83,7 @@ const validationSchema = yup.object({
   cityCodename: yup.string().required('Bắt buộc'),
   address: yup.string().required('Bắt buộc'),
   plan: yup.string().required('Bẳt buộc'),
-  subdomain: yup.string().required('Bẳt buộc'),
+  subdomain: requiredSubdomainValidator,
 });
 
 const MAINAPP_DOMAIN = '.vercel.app';
@@ -98,6 +99,7 @@ const RegisterTenantForm = ({
   const resolver = useYupValidateionResolver(validationSchema);
 
   const { control, handleSubmit, watch, setValue } = useForm({
+    mode: 'onChange',
     defaultValues: {
       email: '',
       fullName: '',
@@ -293,7 +295,7 @@ const RegisterTenantForm = ({
         <Controller
           control={control}
           name="subdomain"
-          render={({ field }) => (
+          render={({ field, fieldState: { error } }) => (
             <TextField
               fullWidth
               label="Subdomain"
@@ -305,6 +307,8 @@ const RegisterTenantForm = ({
                   </InputAdornment>
                 ),
               }}
+              error={Boolean(error?.message)}
+              helperText={error?.message}
             />
           )}
         />

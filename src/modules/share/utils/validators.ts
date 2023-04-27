@@ -1,5 +1,13 @@
 import * as yup from 'yup';
 
+export const requiredSubdomainValidator = yup
+  .string()
+  .matches(
+    /^[A-Za-z0-9](?:[A-Za-z0-9\\-]{0,61}[A-Za-z0-9])?$/,
+    'Subdomain không hợp lệ',
+  )
+  .required('Bắt buộc');
+
 export const requiredUsernameValidator = yup
   .string()
   .matches(
