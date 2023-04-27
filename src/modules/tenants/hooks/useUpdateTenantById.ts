@@ -2,11 +2,11 @@ import { useRouter } from 'next/navigation';
 import { AxiosError } from 'axios';
 import { toast } from 'react-toastify';
 import useApi from 'src/modules/share/hooks/useApi';
-import { EditTenantFormValues } from '../components/TenantDetail';
+import { TenantFormValues } from '../components/TenantForm';
 
 type UpdateTenantByIdDataParams = {
   id: string;
-} & EditTenantFormValues;
+} & TenantFormValues;
 
 type UpdateTenantByIdDataResponse = unknown;
 
