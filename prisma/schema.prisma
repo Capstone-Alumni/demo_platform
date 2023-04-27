@@ -126,7 +126,7 @@ model Transaction {
   plan   Plan   @relation(fields: [planId], references: [id])
 
   tenantId String @map("tenant_id")
-  tenant   Tenant @relation(fields: [tenantId], references: [id])
+  tenant   Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
 
   @@map("transactions")
 }

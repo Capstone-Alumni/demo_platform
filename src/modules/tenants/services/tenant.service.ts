@@ -325,10 +325,12 @@ Thông tin đăng ký của bạn chưa chính xác, bạn vui lòng kiểm tra 
 
     // // run async
     const host = process.env.NEXTAUTH_URL;
-    await axios.post(`${process.env.NEXT_PUBLIC_MAIL_HOST}/mail/send-email`, {
-      to: tenant.alumni[0].accountEmail,
-      subject: 'Đăng ký Alumni App',
-      text: `
+    const mailRes = await axios.post(
+      `${process.env.NEXT_PUBLIC_MAIL_HOST}/mail/send-email`,
+      {
+        to: tenant.alumni[0].accountEmail,
+        subject: 'Đăng ký Alumni App',
+        text: `
 <pre>
 Kính gửi,
 <br /><br />
@@ -342,7 +344,10 @@ Số ngày gia hạn: ${tenant.plan.duration}
 Ngày bắt đầu gia hạn: tính từ lúc thanh toán thành công
 </pre>
       `,
-    });
+      },
+    );
+
+    console.log(mailRes);
 
     return newTenant;
   };
@@ -525,6 +530,10 @@ Số ngày gia hạn thêm: ${tenant.plan.duration}
         id: id,
       },
     });
+
+    await mainAppPrisma.$executeRawUnsafe(
+      `DROP SCHEMA IF EXISTS ${id} CASCADE`,
+    );
 
     return deletedTenant;
   };
