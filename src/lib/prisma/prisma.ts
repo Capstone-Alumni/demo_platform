@@ -1,6 +1,12 @@
 // lib/prisma.ts
 import { PrismaClient } from '@prisma/client';
 
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore: Unreachable code error
+BigInt.prototype.toJSON = function () {
+  return this.toString();
+};
+
 const globalForPrisma = global as unknown as {
   prisma: PrismaClient;
   mainAppPrisma: PrismaClient;
