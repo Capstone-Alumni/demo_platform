@@ -19,7 +19,7 @@ model Plan {
 
   name         String        @unique
   duration     Int           @default(0)
-  price        Int           @default(0)
+  price        BigInt           @default(0)
   tenants      Tenant[]
   transactions Transaction[]
 
@@ -106,7 +106,7 @@ model Transaction {
   vnp_Version    String  @map("vpn_version")
   vnp_Command    String  @map("vnp_commnad")
   vnp_TmnCode    String  @map("vnp_tmn_code")
-  vnp_Amount     Int     @map("vnp_amount")
+  vnp_Amount     BigInt     @map("vnp_amount")
   vnp_BankCode   String? @map("vnp_bank_code")
   vnp_CreateDate String  @map("vnp_create_date")
   vnp_CurrCode   String  @map("vnp_CurrCode")
