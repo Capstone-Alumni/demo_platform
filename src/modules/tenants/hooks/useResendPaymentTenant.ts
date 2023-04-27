@@ -29,6 +29,7 @@ const useResendPaymentTenantById = () => {
         toast.error('Xảy ra lỗi, vui lòng thử lại');
       },
       onSuccess: () => {
+        toast.success('Đã gửi yêu cầu');
         router.refresh();
       },
     },

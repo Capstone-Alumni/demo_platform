@@ -1,3 +1,4 @@
+import { toast } from 'react-toastify';
 import useApi from 'src/modules/share/hooks/useApi';
 
 type ActivateTenantByIdDataParams = {
@@ -13,10 +14,21 @@ const useActivateTenantById = () => {
     ActivateTenantByIdDataParams,
     ActivateTenantByIdDataResponse,
     ActivateTenantByIdDataError
-  >('ActivateTenantById', ({ id }) => ({
-    method: 'PUT',
-    url: `/api/tenants/${id}/activate`,
-  }));
+  >(
+    'ActivateTenantById',
+    ({ id }) => ({
+      method: 'PUT',
+      url: `/api/tenants/${id}/activate`,
+    }),
+    {
+      onError: () => {
+        toast.error('Kích hoạt khách hành thất bại');
+      },
+      onSuccess: () => {
+        toast.success('Kích hoạt khách hàng thành công');
+      },
+    },
+  );
 
   return {
     isLoading,

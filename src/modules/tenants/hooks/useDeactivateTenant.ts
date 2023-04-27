@@ -25,6 +25,9 @@ const useDeactivateTenantById = () => {
       onError: () => {
         toast.error('Huỷ kích hoạt thất bại');
       },
+      onSuccess: () => {
+        toast.success('Huỷ kích hoạt thành công');
+      },
     },
   );
 

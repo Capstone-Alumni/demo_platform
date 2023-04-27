@@ -14,7 +14,7 @@ const useLogin = () => {
       redirect: false,
     }).then(res => {
       if (res?.error) {
-        toast.error('Đăng nhập thất bại');
+        toast.error('Đăng nhập thất bại, email hoặc mật khẩu không chính xác');
       } else {
         toast.success('Đăng nhập thành công');
         router.refresh();
