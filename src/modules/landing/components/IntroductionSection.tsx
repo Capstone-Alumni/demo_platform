@@ -24,7 +24,6 @@ const IntroductionSection = () => {
       >
         <Box
           sx={{
-            width: '50vw',
             display: 'flex',
             flexDirection: 'column',
             gap: theme.spacing(2),
