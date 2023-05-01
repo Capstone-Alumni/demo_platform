@@ -186,11 +186,14 @@ export default class MemberService {
       memberData.email,
       'Mời gia nhập cộng đồng cựu học sinh',
       `
+<pre>
 Xin chào ${memberData.fullName},
   
 Chào mừng bạn đến với cộng đồng cựu học sinh trường <a href="${host}">${newAlumni.tenant.name}</a>.
 
-Hãy sử dụng đường dẫn sau để thiết lập mật khẩu và tham gia các hoạt động của cộng đồng <a href="${setupLink}">link truy cập</a>. 
+Hãy sử dụng đường dẫn sau để thiết lập mật khẩu và tham gia các hoạt động của cộng đồng <a href="${setupLink}">link truy cập</a>.
+
+</pre>
             `,
     );
 
@@ -293,12 +296,14 @@ Hãy sử dụng đường dẫn sau để thiết lập mật khẩu và tham g
           al.email || '',
           'Mời gia nhập cộng đồng cựu học sinh',
           `
+<pre>
 Xin chào ${al.fullName},
   
 Chào mừng bạn đến với cộng đồng cựu học sinh trường <a href="${host}">${tenant.name}</a>.
 
 Hãy sử dụng đường dẫn sau để thiết lập mật khẩu và tham gia các hoạt động của cộng đồng <a href="${setupLink}">link truy cập</a>. 
 
+</pre>
               `,
         );
       }),
