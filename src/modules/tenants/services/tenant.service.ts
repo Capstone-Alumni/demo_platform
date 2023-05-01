@@ -214,6 +214,8 @@ export default class TenantService {
       },
     });
 
+    const { message } = req.body;
+
     // // run async
     await axios.post(`${process.env.NEXT_PUBLIC_MAIL_HOST}/mail/send-email`, {
       to: tenant.alumni[0].accountEmail,
@@ -222,7 +224,8 @@ export default class TenantService {
 <pre>
 Kính gửi,
 
-Thông tin đăng ký của bạn chưa chính xác, bạn vui lòng kiểm tra thông tin và đăng ký lại.
+Đơn đăng ký ALumni Platform của bạn đã bị từ chối với lý do:
+${message}
 </pre>
       `,
     });

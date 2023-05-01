@@ -5,6 +5,7 @@ import useApi from 'src/modules/share/hooks/useApi';
 
 type RejectTenantByIdDataParams = {
   id: string;
+  message?: string;
 };
 
 type RejectTenantByIdDataResponse = unknown;
@@ -19,9 +20,10 @@ const useRejectTenantById = () => {
     RejectTenantByIdDataError
   >(
     'RejectTenantById',
-    ({ id }) => ({
+    ({ id, message }) => ({
       method: 'PUT',
       url: `/api/tenants/${id}/reject`,
+      data: { message },
     }),
     {
       onError: ({ response }: AxiosError) => {
