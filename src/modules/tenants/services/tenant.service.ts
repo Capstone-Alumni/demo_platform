@@ -214,6 +214,8 @@ export default class TenantService {
       },
     });
 
+    const { message } = req.body;
+
     // // run async
     await axios.post(`${process.env.NEXT_PUBLIC_MAIL_HOST}/mail/send-email`, {
       to: tenant.alumni[0].accountEmail,
@@ -222,7 +224,8 @@ export default class TenantService {
 <pre>
 Kính gửi,
 
-Thông tin đăng ký của bạn chưa chính xác, bạn vui lòng kiểm tra thông tin và đăng ký lại.
+Đơn đăng ký ALumni Platform của bạn đã bị từ chối với lý do:
+${message}
 </pre>
       `,
     });
@@ -336,12 +339,12 @@ Kính gửi,
 <br /><br />
 Cảm ơn bạn đã lựa chọn The Alumn App. Mời bạn dùng link dưới đây để thanh toán và hoàn tất quá trình đăng ký.
 <a href="${host}/api/payment?token=${token}">Link thanh toán</a>
-* Link thanh toán sẽ hết hạn sau 72h.
+* Link thanh toán sẽ hết hạn sau 72h. Sau khi link thanh toán hết hạn bạn vui lòng liên hệ lại platform để được hỗ trợ.
 
 Gói ${getSubscriptionDisplay(tenant.plan.name)}
 Số tiền: ${tenant.plan.price} VNĐ
-Số ngày gia hạn: ${tenant.plan.duration}
-Ngày bắt đầu gia hạn: tính từ lúc thanh toán thành công
+Thời gian sử dụng: ${tenant.plan.duration} ngày
+Ngày bắt đầu: tính từ lúc thanh toán thành công
 </pre>
       `,
       },

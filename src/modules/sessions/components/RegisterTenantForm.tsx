@@ -78,7 +78,7 @@ const validationSchema = yup.object({
   email: requiredEmailValidator,
   password: requiredPasswordValidator,
   name: yup.string().required('Bắt buộc'),
-  logo: yup.string(),
+  logo: yup.string().required('Bắt buộc'),
   provinceCodename: yup.string().required('Bắt buộc'),
   cityCodename: yup.string().required('Bắt buộc'),
   address: yup.string().required('Bắt buộc'),

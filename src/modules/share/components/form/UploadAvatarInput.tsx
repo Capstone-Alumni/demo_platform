@@ -3,7 +3,7 @@ import { Control, Controller } from 'react-hook-form';
 import { toast } from 'react-toastify';
 import UploadAvatar, { UploadAvatarProps } from '../upload/UploadAvatar';
 import uniqid from 'uniqid';
-import { Box, FormLabel } from '@mui/material';
+import { Box, FormLabel, Typography } from '@mui/material';
 import { SxProps } from '@mui/material';
 
 type TextInputProps = {
@@ -46,20 +46,30 @@ const UploadAvatarInput = ({
 
   return (
     <Box sx={containerSx}>
-      <FormLabel sx={{ ml: 2 }}>{inputProps?.label}</FormLabel>
       <Controller
         control={control}
         name={name}
-        render={({ field }) => (
-          <UploadAvatar
-            // {...field}
-            {...inputProps}
-            file={field.value}
-            onDrop={async files => {
-              const url = await handleDrop(files);
-              field.onChange(url);
-            }}
-          />
+        render={({ field, fieldState: { error } }) => (
+          <>
+            <FormLabel sx={{ ml: 2 }} error={!!error}>
+              {inputProps?.label}
+            </FormLabel>
+            <UploadAvatar
+              // {...field}
+              {...inputProps}
+              file={field.value}
+              onDrop={async files => {
+                const url = await handleDrop(files);
+                field.onChange(url);
+              }}
+              error={!!error}
+            />
+            {error ? (
+              <Typography color="error" variant="body2">
+                {error.message}
+              </Typography>
+            ) : null}
+          </>
         )}
       />
     </Box>
