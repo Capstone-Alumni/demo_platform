@@ -151,6 +151,11 @@ export default function UploadAvatar({
                 bgcolor: 'grey.900',
                 '&:hover': { opacity: 0.72 },
               }),
+              ...(error && {
+                color: 'error.main',
+                borderColor: 'error.light',
+                bgcolor: 'error.lighter',
+              }),
             }}
           >
             <Box

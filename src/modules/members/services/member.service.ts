@@ -186,12 +186,11 @@ export default class MemberService {
       memberData.email,
       'Mời gia nhập cộng đồng cựu học sinh',
       `
-<pre>
 Xin chào ${memberData.fullName},
-  <p> Bạn nhận được một lời mời tham gia nền tảng kết nối cựu học sinh trường <a href="${host}">${newAlumni.tenant.name}</a>. </p> <br/>
-  Hãy click vào đường dẫn để  thiết lập mật khẩu và sử dụng dịch vụ <a href="${setupLink}">link truy cập</a>. 
+  
+Chào mừng bạn đến với cộng đồng cựu học sinh trường <a href="${host}">${newAlumni.tenant.name}</a>.
 
-</pre>
+Hãy sử dụng đường dẫn sau để thiết lập mật khẩu và tham gia các hoạt động của cộng đồng <a href="${setupLink}">link truy cập</a>. 
             `,
     );
 
@@ -294,12 +293,12 @@ Xin chào ${memberData.fullName},
           al.email || '',
           'Mời gia nhập cộng đồng cựu học sinh',
           `
-  <pre>
-  Xin chào ${al.fullName},
-    <p> Bạn nhận được một lời mời tham gia nền tảng kết nối cựu học sinh trường <a href="${host}">${tenant.name}</a>. </p> <br/>
-    Hãy click vào đường dẫn để  thiết lập mật khẩu và sử dụng dịch vụ <a href="${setupLink}">link truy cập</a>. 
+Xin chào ${al.fullName},
   
-  </pre>
+Chào mừng bạn đến với cộng đồng cựu học sinh trường <a href="${host}">${tenant.name}</a>.
+
+Hãy sử dụng đường dẫn sau để thiết lập mật khẩu và tham gia các hoạt động của cộng đồng <a href="${setupLink}">link truy cập</a>. 
+
               `,
         );
       }),
