@@ -339,7 +339,7 @@ Kính gửi,
 <br /><br />
 Cảm ơn bạn đã lựa chọn The Alumn App. Mời bạn dùng link dưới đây để thanh toán và hoàn tất quá trình đăng ký.
 <a href="${host}/api/payment?token=${token}">Link thanh toán</a>
-* Link thanh toán sẽ hết hạn sau 72h.
+* Link thanh toán sẽ hết hạn sau 72h. Sau khi link thanh toán hết hạn bạn vui lòng liên hệ lại platform để được hỗ trợ.
 
 Gói ${getSubscriptionDisplay(tenant.plan.name)}
 Số tiền: ${tenant.plan.price} VNĐ

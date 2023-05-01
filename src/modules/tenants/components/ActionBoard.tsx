@@ -19,7 +19,9 @@ const ActionBoard = ({ tenantData }: { tenantData: Tenant }) => {
   const theme = useTheme();
 
   const [openRejectModal, setOpenRejectModal] = useState(false);
-  const [rejectMsg, setRejectMsg] = useState<string | undefined>();
+  const [rejectMsg, setRejectMsg] = useState<string | undefined>(
+    'Thông tin chưa chính xác',
+  );
 
   const { rejectTenantById, isLoading: rejecting } = useRejectTenantById();
   const { approveTenantById, isLoading: approving } = useApproveTenantById();
