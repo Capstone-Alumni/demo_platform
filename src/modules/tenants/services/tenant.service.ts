@@ -343,8 +343,8 @@ Cảm ơn bạn đã lựa chọn The Alumn App. Mời bạn dùng link dưới 
 
 Gói ${getSubscriptionDisplay(tenant.plan.name)}
 Số tiền: ${tenant.plan.price} VNĐ
-Số ngày gia hạn: ${tenant.plan.duration}
-Ngày bắt đầu gia hạn: tính từ lúc thanh toán thành công
+Thời gian sử dụng: ${tenant.plan.duration} ngày
+Ngày bắt đầu: tính từ lúc thanh toán thành công
 </pre>
       `,
       },
