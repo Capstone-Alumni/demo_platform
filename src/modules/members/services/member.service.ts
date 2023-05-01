@@ -184,7 +184,7 @@ export default class MemberService {
 
     await sendEmail(
       memberData.email,
-      'Mời gia nhập cộng đồng cựu học sinh',
+      'Gia nhập cộng đồng cựu học sinh',
       `
 <pre>
 Xin chào ${memberData.fullName},
@@ -294,7 +294,7 @@ Hãy sử dụng đường dẫn sau để thiết lập mật khẩu và tham g
 
         return sendEmail(
           al.email || '',
-          'Mời gia nhập cộng đồng cựu học sinh',
+          'Gia nhập cộng đồng cựu học sinh',
           `
 <pre>
 Xin chào ${al.fullName},
