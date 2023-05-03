@@ -182,10 +182,11 @@ export default class MemberService {
 
     console.log(setupLink);
 
-    await sendEmail(
-      memberData.email,
-      'Gia nhập cộng đồng cựu học sinh',
-      `
+    try {
+      await sendEmail(
+        memberData.email,
+        'Gia nhập cộng đồng cựu học sinh',
+        `
 <pre>
 Xin chào ${memberData.fullName},
   
@@ -195,7 +196,10 @@ Hãy sử dụng đường dẫn sau để thiết lập mật khẩu và tham g
 
 </pre>
             `,
-    );
+      );
+    } catch (err) {
+      console.log(err);
+    }
 
     return {
       newAlumni: newAlumni,
@@ -288,14 +292,15 @@ Hãy sử dụng đường dẫn sau để thiết lập mật khẩu và tham g
 
     const host = getTenantHost(tenant.subdomain || '');
 
-    await Promise.all(
-      newAlumniData.map(al => {
-        const setupLink = `${host}/setup_account?token=${al.token}&email=${al.email}`;
+    try {
+      await Promise.all(
+        newAlumniData.map(al => {
+          const setupLink = `${host}/setup_account?token=${al.token}&email=${al.email}`;
 
-        return sendEmail(
-          al.email || '',
-          'Gia nhập cộng đồng cựu học sinh',
-          `
+          return sendEmail(
+            al.email || '',
+            'Gia nhập cộng đồng cựu học sinh',
+            `
 <pre>
 Xin chào ${al.fullName},
   
@@ -305,9 +310,12 @@ Hãy sử dụng đường dẫn sau để thiết lập mật khẩu và tham g
 
 </pre>
               `,
-        );
-      }),
-    );
+          );
+        }),
+      );
+    } catch (err) {
+      console.log(err);
+    }
 
     return {
       newAlumni: newAlumniData.map(({ token, ...other }) => other),
