@@ -70,7 +70,7 @@ const FeaturesSection = () => {
               width={200}
               height={200}
             />
-            <Typography variant="h4">Mạng xã hội</Typography>
+            <Typography variant="h4">Tìm kiếm bạn bè</Typography>
           </StyledBox>
         </Stack>
         <Typography
