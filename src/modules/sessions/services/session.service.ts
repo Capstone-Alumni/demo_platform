@@ -212,7 +212,7 @@ export default class SessionService {
     const host = getTenantHost(tenant.subdomain || '');
     const setupLink = `${host}/setup_account?token=${token}&email=${existingAlumni.accountEmail}`;
 
-    sendEmail(
+    await sendEmail(
       existingAlumni.accountEmail as string,
       'Mời gia nhập cộng đồng cựu học sinh',
       `
@@ -313,7 +313,7 @@ Chào bạn,
     const host = getTenantHost(tenant.subdomain || '');
     const setupLink = `${host}/reset_password?token=${token}&email=${existingAlumni.accountEmail}`;
 
-    sendEmail(
+    await sendEmail(
       existingAlumni.accountEmail as string,
       'Đổi mật khẩu',
       `
