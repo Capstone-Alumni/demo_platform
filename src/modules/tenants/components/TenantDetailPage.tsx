@@ -9,9 +9,18 @@ import SubscriptionForm from './SubscriptionForm';
 import TenantDetail from './TenantDetail';
 import ActionBoard from './ActionBoard';
 import { isEmpty } from 'lodash';
+import { differenceInDays } from 'date-fns';
 
 const TenantDetailPage = ({ initialData }: { initialData: Tenant }) => {
   const theme = useTheme();
+
+  const isNearEndTime =
+    initialData.requestStatus === 1 &&
+    initialData._count?.transactions &&
+    differenceInDays(
+      new Date(initialData.subscriptionEndTime ?? ''),
+      new Date(),
+    ) <= 10;
 
   return (
     <Box
@@ -46,7 +55,8 @@ const TenantDetailPage = ({ initialData }: { initialData: Tenant }) => {
         </Typography>
       </Box>
 
-      {initialData.requestStatus < 2 ? (
+      {initialData.requestStatus === 0 ||
+      (initialData.requestStatus === 1 && isNearEndTime) ? (
         <ActionBoard tenantData={initialData} />
       ) : null}
 

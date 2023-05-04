@@ -190,7 +190,7 @@ const AdminTenantListItem = ({
         <TableCell align="center">
           <ActionButton
             actions={[
-              hasTransaction
+              hasTransaction && isNearEndTime
                 ? {
                     id: 'reminder',
                     icon: <NotificationsNoneIcon color="inherit" />,
